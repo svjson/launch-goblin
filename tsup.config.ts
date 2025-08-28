@@ -10,6 +10,9 @@ export default defineConfig({
   clean: true,
   target: 'node20',
   shims: false,
+  define: {
+    __LG_VERSION__: JSON.stringify(pkg.version),
+  },
   outExtension: ({ format }) =>
     format === 'cjs' ? { js: '.cjs' } : { js: '.js' },
   external: [...Object.keys(pkg.dependencies ?? {}), ...builtinModules],

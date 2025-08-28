@@ -14,7 +14,7 @@ export class HeaderController extends Controller {
         width: '100%',
         height: 1,
         align: 'center',
-        content: 'Launch Goblin v0.0.1',
+        content: `Launch Goblin v${__LG_VERSION__}`,
         style: { bg: 'green', fg: 'black', bold: true },
       }),
       model
