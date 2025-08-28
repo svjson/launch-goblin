@@ -20,7 +20,5 @@ export class HeaderController extends Controller {
       model
     )
     this.inheritKeyMap(keyMap)
-
-    this.applyKeyMap()
   }
 }

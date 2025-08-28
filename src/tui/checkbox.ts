@@ -48,7 +48,5 @@ export class CheckboxController extends Controller<blessed.Widgets.CheckboxEleme
     this.item = item
 
     this.inheritKeyMap(keyMap)
-
-    this.applyKeyMap()
   }
 }

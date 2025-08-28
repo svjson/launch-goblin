@@ -56,8 +56,6 @@ export class RunnableSelectController extends Controller {
     })
 
     this.children[this.focusedIndex]?.focus()
-
-    this.applyKeyMap()
   }
 
   onChecked(event: CheckboxEvent) {

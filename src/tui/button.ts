@@ -50,8 +50,6 @@ export class ButtonController extends Controller<blessed.Widgets.ButtonElement> 
     this.item = item
 
     this.inheritKeyMap(keyMap)
-
-    this.applyKeyMap()
   }
 
   pressed() {

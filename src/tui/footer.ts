@@ -19,7 +19,5 @@ export class FooterController extends Controller {
       model
     )
     this.inheritKeyMap(keyMap)
-
-    this.applyKeyMap()
   }
 }

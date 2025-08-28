@@ -38,8 +38,6 @@ export class MainController extends Controller {
     this.addChild(RunnableSelectController)
     this.addChild(LaunchButtonController)
     this.addChild(FooterController)
-
-    this.applyKeyMap()
   }
 
   emit(event: Event | string) {

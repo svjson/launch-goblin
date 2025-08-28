@@ -44,7 +44,6 @@ export class TextField extends Controller {
     this.item = item
 
     this.inheritKeyMap(keyMap)
-    this.applyKeyMap(true)
   }
 }
 

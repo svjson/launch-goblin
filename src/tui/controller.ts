@@ -36,6 +36,11 @@ export interface CheckboxEvent {
   checked: boolean
 }
 
+export interface FocusEvent {
+  type: 'focus'
+  component: Controller
+}
+
 export interface DestroyEvent {
   type: 'destroy'
   component: Controller
@@ -45,7 +50,12 @@ export interface AnyEvent {
   type: string
 }
 
-export type Event = DirtyEvent | CheckboxEvent | DestroyEvent | AnyEvent
+export type Event =
+  | DirtyEvent
+  | CheckboxEvent
+  | DestroyEvent
+  | FocusEvent
+  | AnyEvent
 
 export abstract class Controller<
   T extends blessed.Widgets.BlessedElement = blessed.Widgets.BlessedElement,
@@ -116,17 +126,6 @@ export abstract class Controller<
     }
   }
 
-  protected applyKeyMap() {
-    Object.entries(this.keyMap).forEach(([key, entry]) => {
-      this.widget.key(
-        key,
-        (_ch: any, _key: blessed.Widgets.Events.IKeyEventArg) => {
-          entry.handler()
-        }
-      )
-    })
-  }
-
   receive(event: Event) {
     const handler = this.events[event.type]
 
@@ -138,7 +137,7 @@ export abstract class Controller<
       this.#destroyChild((event as DestroyEvent).component)
     }
 
-    if (['dirty', 'launch'].includes(event.type)) {
+    if (['dirty', 'launch', 'focus'].includes(event.type)) {
       this.emit(event)
     }
   }
@@ -200,9 +199,11 @@ export abstract class Controller<
 
   focus() {
     if (this.children && this.children[this.focusedIndex]) {
+      if (!this.children[this.focusedIndex].isFocusable()) this.nextChild()
       this.children[this.focusedIndex].focus()
     } else {
       this.widget.focus()
+      this.emit({ type: 'focus', component: this })
     }
   }
 }
