@@ -6,11 +6,14 @@ import { launch, readProject } from './project'
 import { initTui, MainController } from './tui'
 import { destroy } from './tui/destroy'
 import { FocusEvent, KeyMap } from './tui/controller'
+import { LogEvent } from './tui/controller'
 
 const main = async () => {
   const model = await readProject()
 
   const screen = initTui()
+
+  const log: string[] = []
 
   let activeKeyMap: KeyMap = {}
 
@@ -30,6 +33,10 @@ const main = async () => {
     activeKeyMap = event.component.keyMap
   })
 
+  mainCtrl.on('log', (event: LogEvent) => {
+    log.push(event.message)
+  })
+
   mainCtrl.focus()
 
   screen.on('keypress', (_ch, key) => {
@@ -38,7 +45,11 @@ const main = async () => {
     }
   })
 
-  screen.key(['q', 'C-c'], () => process.exit(0))
+  screen.key(['q', 'C-c'], () => {
+    destroy(screen)
+    log.forEach((m) => console.log(m))
+    process.exit(0)
+  })
 
   screen.render()
 }

@@ -46,6 +46,11 @@ export interface DestroyEvent {
   component: Controller
 }
 
+export interface LogEvent {
+  type: 'log'
+  message: string
+}
+
 export interface AnyEvent {
   type: string
 }
@@ -55,6 +60,7 @@ export type Event =
   | CheckboxEvent
   | DestroyEvent
   | FocusEvent
+  | LogEvent
   | AnyEvent
 
 export abstract class Controller<
@@ -137,7 +143,7 @@ export abstract class Controller<
       this.#destroyChild((event as DestroyEvent).component)
     }
 
-    if (['dirty', 'launch', 'focus'].includes(event.type)) {
+    if (['dirty', 'launch', 'focus', 'log'].includes(event.type)) {
       this.emit(event)
     }
   }
@@ -194,6 +200,13 @@ export abstract class Controller<
     event = typeof event === 'string' ? { type: event } : event
     this.listeners.forEach((l) => {
       l.receive(event)
+    })
+  }
+
+  log(message: string) {
+    this.emit({
+      type: 'log',
+      message,
     })
   }
 
