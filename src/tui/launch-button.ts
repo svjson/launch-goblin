@@ -1,8 +1,9 @@
 import blessed from 'neo-blessed'
 
 import { Controller, CtrlCtorParams } from './controller'
+import { ButtonController } from './button'
 
-export class LaunchButtonController extends Controller {
+export class LaunchButtonController extends ButtonController {
   focusable = true
 
   keyMap = {
@@ -11,26 +12,8 @@ export class LaunchButtonController extends Controller {
     },
   }
 
-  constructor({ parent, model, keyMap }: CtrlCtorParams) {
-    super(
-      blessed.button({
-        parent,
-        content: 'Launch',
-        height: 1,
-        left: 'center',
-        top: '60%',
-        style: {
-          bg: 'gray',
-          focus: {
-            fg: 'black',
-            bg: 'green',
-          },
-        },
-        width: 10,
-        align: 'center',
-      }),
-      model
-    )
+  constructor({ parent, model, keyMap, options }: CtrlCtorParams) {
+    super({ parent, model, keyMap, options }, { text: 'Launch' })
     this.inheritKeyMap(keyMap)
 
     this.applyKeyMap()

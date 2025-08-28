@@ -42,16 +42,20 @@ export class RunnableSelectController extends Controller {
     this.inheritKeyMap(keyMap)
 
     model.components.forEach((c, i) => {
-      this.addChild(CheckboxController, {
-        offsetY: 1,
-        id: c.id,
-        label: c.name,
-        index: i,
-        selected: c.selected,
-      })
+      this.addChild(
+        CheckboxController,
+        {},
+        {
+          offsetY: 1,
+          id: c.id,
+          label: c.name,
+          index: i,
+          selected: c.selected,
+        }
+      )
     })
 
-    this.children[this.focusedIndex].focus()
+    this.children[this.focusedIndex]?.focus()
 
     this.applyKeyMap()
   }
@@ -72,7 +76,7 @@ export class RunnableSelectController extends Controller {
   }
 
   applySelection() {
-    this.children[this.focusedIndex].focus()
+    this.children[this.focusedIndex]?.focus()
     this.emit('dirty')
   }
 }

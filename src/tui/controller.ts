@@ -6,6 +6,7 @@ export type CtrlCtorParams = {
   parent: blessed.Widgets.BlessedElement
   model: Model
   keyMap?: KeyMapArg
+  options?: blessed.Widgets.ElementOptions
 }
 
 export interface KeyMapArg {
@@ -35,11 +36,16 @@ export interface CheckboxEvent {
   checked: boolean
 }
 
+export interface DestroyEvent {
+  type: 'destroy'
+  component: Controller
+}
+
 export interface AnyEvent {
   type: string
 }
 
-export type Event = DirtyEvent | CheckboxEvent | AnyEvent
+export type Event = DirtyEvent | CheckboxEvent | DestroyEvent | AnyEvent
 
 export abstract class Controller<
   T extends blessed.Widgets.BlessedElement = blessed.Widgets.BlessedElement,
@@ -60,6 +66,7 @@ export abstract class Controller<
 
   addChild<T extends Controller>(
     ctrlClass: new (ctorParams: CtrlCtorParams, ...args: any[]) => T,
+    options: blessed.Widgets.ElementOptions,
     ...args: any[]
   ): void {
     const inheritKeys: KeyMap = Object.entries(this.keyMap).reduce(
@@ -77,6 +84,7 @@ export abstract class Controller<
         parent: this.widget,
         model: this.model,
         keyMap: { replace: false, keys: inheritKeys },
+        options: options,
       },
       ...args
     )
@@ -126,6 +134,10 @@ export abstract class Controller<
       handler(event)
     }
 
+    if (event.type === 'destroy') {
+      this.#destroyChild((event as DestroyEvent).component)
+    }
+
     if (['dirty', 'launch'].includes(event.type)) {
       this.emit(event)
     }
@@ -156,6 +168,27 @@ export abstract class Controller<
 
     this.children[this.focusedIndex].focus()
     this.emit('dirty')
+  }
+
+  requestDestroy() {
+    this.emit({
+      type: 'destroy',
+      component: this,
+    })
+  }
+
+  destroy() {
+    console.log('Destroying widget')
+    this.widget.detach()
+    this.widget.destroy()
+  }
+
+  #destroyChild(component: Controller) {
+    const index = this.children.findIndex((c) => c === component)
+    if (index === -1) return
+
+    component.destroy()
+    this.children.splice(index, 1)
   }
 
   emit(event: Event | string) {
