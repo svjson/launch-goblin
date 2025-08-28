@@ -155,24 +155,30 @@ export abstract class Controller<
     }
   }
 
-  isFocusable() {
-    return this.focusable
+  isFocusable(): boolean {
+    if (this.focusable) return true
+
+    for (const child of this.children) {
+      if (child.isFocusable()) return true
+    }
+
+    return false
   }
 
-  nextChild() {
-    this.focusedIndex =
-      (this.focusedIndex - 1 + this.children.length) % this.children.length
+  nextChild(): Controller | undefined {
+    this.focusedIndex = (this.focusedIndex + 1) % this.children.length
 
     const child = this.children[this.focusedIndex]
     if (!child.isFocusable()) {
       if (this.children.some((c) => c.isFocusable())) {
-        this.nextChild()
+        return this.nextChild()
       }
       return
     }
 
-    this.children[this.focusedIndex].focus()
+    child.focus()
     this.emit('dirty')
+    return child
   }
 
   requestDestroy() {
@@ -211,9 +217,15 @@ export abstract class Controller<
   }
 
   focus() {
-    if (this.children && this.children[this.focusedIndex]) {
-      if (!this.children[this.focusedIndex].isFocusable()) this.nextChild()
-      this.children[this.focusedIndex].focus()
+    let focusedChild: Controller | undefined = this.children[this.focusedIndex]
+    if (focusedChild) {
+      if (!focusedChild.isFocusable()) {
+        focusedChild = this.nextChild()
+      }
+
+      if (focusedChild) {
+        focusedChild.focus()
+      }
     } else {
       this.widget.focus()
       this.emit({ type: 'focus', component: this })
