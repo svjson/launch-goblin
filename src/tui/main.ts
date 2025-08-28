@@ -5,11 +5,16 @@ import { LaunchButtonController } from './launch-button'
 import { FooterController } from './footer'
 import { Model } from 'src/project'
 import { HeaderController } from './header'
+import { SaveConfigDialog } from './save-config-dialog'
 
 export class MainController extends Controller {
   screen: blessed.Widgets.Screen
 
   keyMap = {
+    'C-s': {
+      propagate: true,
+      handler: this.bind(this.saveConfig),
+    },
     tab: {
       propagate: true,
       handler: this.bind(this.nextChild),
@@ -38,6 +43,22 @@ export class MainController extends Controller {
     this.addChild(RunnableSelectController)
     this.addChild(LaunchButtonController)
     this.addChild(FooterController)
+  }
+
+  saveConfig() {
+    const dialog = new SaveConfigDialog({
+      screen: this.screen,
+      model: this.model,
+    })
+
+    dialog.on('*', (event: Event) => {
+      if (event.type === 'destroyed') {
+        this.focus()
+      }
+      this.emit(event)
+    })
+
+    dialog.focus()
   }
 
   emit(event: Event | string) {

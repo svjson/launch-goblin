@@ -41,8 +41,8 @@ export interface FocusEvent {
   component: Controller
 }
 
-export interface DestroyEvent {
-  type: 'destroy'
+export interface DestroyedEvent {
+  type: 'destroyed'
   component: Controller
 }
 
@@ -58,7 +58,7 @@ export interface AnyEvent {
 export type Event =
   | DirtyEvent
   | CheckboxEvent
-  | DestroyEvent
+  | DestroyedEvent
   | FocusEvent
   | LogEvent
   | AnyEvent
@@ -115,7 +115,7 @@ export abstract class Controller<
   on(eventId: string, handler: Function) {
     this.listeners.push({
       receive: (received) => {
-        if (eventId === received.type) {
+        if (eventId === received.type || eventId === '*') {
           handler(received)
         }
       },
@@ -137,6 +137,10 @@ export abstract class Controller<
 
     if (handler) {
       handler(event)
+    }
+
+    for (const l of this.listeners) {
+      l.receive(event)
     }
 
     if (event.type === 'destroy') {
@@ -181,17 +185,10 @@ export abstract class Controller<
     return child
   }
 
-  requestDestroy() {
-    this.emit({
-      type: 'destroy',
-      component: this,
-    })
-  }
-
   destroy() {
-    console.log('Destroying widget')
     this.widget.detach()
     this.widget.destroy()
+    this.emit({ type: 'destroyed', component: this })
   }
 
   #destroyChild(component: Controller) {

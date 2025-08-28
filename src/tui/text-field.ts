@@ -33,6 +33,8 @@ export class TextField extends Controller {
       model
     )
 
+    this.inheritKeyMap(keyMap)
+
     this.addChild(
       LabelController,
       { top: 1 },
@@ -42,8 +44,6 @@ export class TextField extends Controller {
 
     this.focusedIndex = 1
     this.item = item
-
-    this.inheritKeyMap(keyMap)
   }
 }
 
@@ -55,7 +55,7 @@ export class TextInputController extends Controller<blessed.Widgets.TextboxEleme
     super(
       blessed.textbox({
         parent,
-        width: '70%',
+        width: '100%',
         height: 1,
         keys: true,
         style: {
@@ -67,9 +67,9 @@ export class TextInputController extends Controller<blessed.Widgets.TextboxEleme
       model
     )
 
-    this.inheritKeyMap(keyMap)
-    this.applyKeyMap(true)
+    this.widget.on('submit', () => {})
+    this.widget.on('cancel', () => {})
 
-    this.widget.on('keypress', (ch, key) => {})
+    this.inheritKeyMap(keyMap)
   }
 }

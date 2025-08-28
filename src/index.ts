@@ -1,7 +1,5 @@
 #!/usr/bin/env node
 
-import { spawn } from 'child_process'
-
 import { launch, readProject } from './project'
 import { initTui, MainController } from './tui'
 import { destroy } from './tui/destroy'
@@ -39,9 +37,9 @@ const main = async () => {
 
   mainCtrl.focus()
 
-  screen.on('keypress', (_ch, key) => {
-    if (activeKeyMap[key.name]) {
-      activeKeyMap[key.name].handler()
+  screen.on('keypress', (ch, key) => {
+    if (activeKeyMap[key.full]) {
+      activeKeyMap[key.full].handler(ch, key)
     }
   })
 
