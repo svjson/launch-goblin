@@ -7,9 +7,9 @@ import { initTui, MainController } from './tui'
 import { destroy } from './tui/destroy'
 
 const main = async () => {
-  const screen = initTui()
-
   const model = await readProject()
+
+  const screen = initTui()
 
   const mainCtrl = new MainController({ screen, model })
 

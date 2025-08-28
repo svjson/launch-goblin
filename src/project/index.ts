@@ -1,14 +1,10 @@
-import path from 'node:path'
-
 import { spawn } from 'node:child_process'
 import {
   makeWhimbrelContext,
-  makeAnalyzeScaffold,
-  makeRunner,
-  materializePlan,
   ActorFacet,
   SourceFacet,
   ProjectFacet,
+  analyzePath,
 } from '@whimbrel/core'
 import NpmFacet from '@whimbrel/npm'
 import PackageJsonFacet from '@whimbrel/package-json'
@@ -43,26 +39,21 @@ export const readProject = async (): Promise<Model> => {
     ]),
   })
 
-  const blueprint = makeAnalyzeScaffold(process.cwd())
-  const plan = await materializePlan(ctx, blueprint)
+  await analyzePath(ctx, process.cwd())
 
-  const runner = makeRunner(ctx, plan)
-  await runner.run()
+  const root = ctx.getActor({ root: process.cwd() })
 
-  const root = Object.values(ctx.sources).find((s) => s.root === process.cwd())
-
-  const components: ProjectComponent[] = []
-  for (const sm of root?.facets.project.config.subModules) {
-    const actor = Object.values(ctx.sources).find((s) => s.root === sm.root)
-    if (!actor) continue
-    const pkgJson = await ctx.disk.readJson(path.join(sm.root, 'package.json'))
-    components.push({
-      id: actor.id,
-      name: pkgJson.name,
-      package: pkgJson.name,
-      selected: true,
-    } satisfies ProjectComponent)
-  }
+  const components = Object.values(ctx.sources)
+    .filter((a) => a !== root)
+    .map(
+      (a) =>
+        ({
+          id: a.id,
+          name: a.name,
+          package: a.name,
+          selected: true,
+        }) satisfies ProjectComponent
+    )
 
   return { components }
 }
