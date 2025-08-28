@@ -66,7 +66,7 @@ export abstract class Controller<
 
   addChild<T extends Controller>(
     ctrlClass: new (ctorParams: CtrlCtorParams, ...args: any[]) => T,
-    options: blessed.Widgets.ElementOptions,
+    options: blessed.Widgets.ElementOptions = {},
     ...args: any[]
   ): void {
     const inheritKeys: KeyMap = Object.entries(this.keyMap).reduce(
