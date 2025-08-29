@@ -1,7 +1,4 @@
-import blessed from 'neo-blessed'
-
-import { Controller, CtrlCtorParams } from './controller'
-import { ButtonController } from './button'
+import { ButtonController, CtrlCtorParams } from './framework'
 
 export class LaunchButtonController extends ButtonController {
   focusable = true

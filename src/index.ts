@@ -2,15 +2,15 @@
 
 import { launch } from './launch'
 import { readProject } from './project'
-import { initTui, MainController } from './tui'
-import { destroy } from './tui/destroy'
+import { initTui, destroy } from './tui/framework'
+import { MainController } from './tui'
 import {
   Action,
   ActionEvent,
   LogEvent,
   FocusEvent,
   KeyMap,
-} from './tui/controller'
+} from './tui/framework'
 import { Model } from './project'
 import {
   saveLatestLaunch,

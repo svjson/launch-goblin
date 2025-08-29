@@ -9,7 +9,7 @@ export interface LabelItem {
 export class LabelController extends Controller<blessed.Widgets.TextElement> {
   focusable = false
 
-  constructor({ parent, model, keyMap }: CtrlCtorParams, label: LabelItem) {
+  constructor({ parent, model }: CtrlCtorParams, label: LabelItem) {
     super(
       blessed.text({
         parent: parent,

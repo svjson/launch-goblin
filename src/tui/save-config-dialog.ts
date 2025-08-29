@@ -1,10 +1,12 @@
 import blessed from 'neo-blessed'
 
 import { Model } from 'src/project'
-import { ModalDialog } from './modal'
-import { TextField } from './text-field'
-import { ButtonController } from './button'
-import { TextChangedEvent } from './controller'
+import {
+  ModalDialog,
+  TextChangedEvent,
+  TextField,
+  ButtonController,
+} from './framework'
 
 export class SaveConfigDialog extends ModalDialog {
   constructor({

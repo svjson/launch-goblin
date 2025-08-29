@@ -15,7 +15,7 @@ export interface TextInputModel {
 export class TextField extends Controller {
   item: TextFieldModel
 
-  textInput: TextInputController
+  textInput: TextInput
 
   constructor(
     { parent, model, keyMap, options }: CtrlCtorParams,
@@ -42,11 +42,7 @@ export class TextField extends Controller {
       { top: 1 },
       typeof item.label === 'string' ? { text: item.label } : item.label
     )
-    this.textInput = this.addChild(
-      TextInputController,
-      { top: 1 },
-      { value: item.value }
-    )
+    this.textInput = this.addChild(TextInput, { top: 1 }, { value: item.value })
 
     this.focusedIndex = 1
     this.item = item
@@ -57,7 +53,9 @@ export class TextField extends Controller {
   }
 }
 
-export class TextInputController extends Controller<blessed.Widgets.TextboxElement> {
+export class TextInput extends Controller<blessed.Widgets.TextboxElement> {
+  item: TextInputModel
+
   constructor(
     { parent, model, keyMap, options }: CtrlCtorParams,
     item: TextInputModel
@@ -76,6 +74,8 @@ export class TextInputController extends Controller<blessed.Widgets.TextboxEleme
       }),
       model
     )
+
+    this.item = item
 
     this.widget.on('submit', () => {
       this.emit({ type: 'text-changed', value: this.widget.content })

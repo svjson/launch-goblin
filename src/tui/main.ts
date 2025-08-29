@@ -1,5 +1,5 @@
 import blessed from 'neo-blessed'
-import { Controller } from './controller'
+import { Controller } from './framework/controller'
 import { RunnableSelectController } from './runnable-select'
 import { LaunchButtonController } from './launch-button'
 import { FooterController } from './footer'

@@ -1,5 +1,5 @@
-import { CheckboxController } from './checkbox'
-import { CheckboxEvent, Controller, CtrlCtorParams } from './controller'
+import { CheckboxController } from './framework/checkbox'
+import { CheckboxEvent, Controller, CtrlCtorParams } from './framework'
 
 import blessed from 'neo-blessed'
 

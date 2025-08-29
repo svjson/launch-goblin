@@ -1,6 +1,6 @@
 import blessed from 'neo-blessed'
 
-import { Controller, CtrlCtorParams } from './controller'
+import { Controller, CtrlCtorParams } from './framework'
 
 export class FooterController extends Controller {
   focusable = false
