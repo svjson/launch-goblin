@@ -74,10 +74,7 @@ export class MainController extends Controller<
       if (event.type === 'destroyed') {
         this.focus()
       }
-      if (event.type === 'focus') {
-        this.componentFocused(event)
-      }
-      this.emit(event)
+      this.receive(event)
     })
 
     dialog.focus()
