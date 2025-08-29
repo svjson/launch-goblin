@@ -2,8 +2,12 @@ import { CheckboxController } from './framework/checkbox'
 import { CheckboxEvent, Controller, CtrlCtorParams } from './framework'
 
 import blessed from 'neo-blessed'
+import { ProjectComponent } from '@src/project'
 
-export class RunnableSelectController extends Controller {
+export class RunnableSelectController extends Controller<
+  blessed.Widgets.BoxElement,
+  ProjectComponent[]
+> {
   keyMap = {
     up: {
       propagate: true,
@@ -21,14 +25,14 @@ export class RunnableSelectController extends Controller {
 
   focusedIndex = 0
 
-  constructor({ parent, model, keyMap }: CtrlCtorParams) {
+  constructor({ parent, model, keyMap }: CtrlCtorParams<ProjectComponent[]>) {
     super(
       blessed.box({
         parent: parent,
         label: ' Select Components to Launch ',
         focusable: true,
         width: '50%',
-        height: Math.max(10, model.project.components.length + 4),
+        height: Math.max(10, model.length + 4),
         top: '25%',
         left: 'center',
         border: 'line',
@@ -41,7 +45,7 @@ export class RunnableSelectController extends Controller {
     )
     this.inheritKeyMap(keyMap)
 
-    model.project.components.forEach((c, i) => {
+    model.forEach((c, i) => {
       this.addChild(
         CheckboxController,
         {},
@@ -59,7 +63,7 @@ export class RunnableSelectController extends Controller {
   }
 
   onChecked(event: CheckboxEvent) {
-    this.model.project.components[event.item.index].selected = event.checked
+    this.model[event.item.index].selected = event.checked
   }
 
   moveUp() {

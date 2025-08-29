@@ -1,10 +1,12 @@
 import blessed from 'neo-blessed'
 
 import { Controller } from './controller'
-import { Model } from 'src/project'
 import { mergeLeft } from '@whimbrel/walk'
 
-export class ModalDialog extends Controller {
+export class ModalDialog<Model> extends Controller<
+  blessed.Widgets.BoxElement,
+  Model
+> {
   keyMap = {
     escape: {
       propagate: true,

@@ -1,9 +1,8 @@
 import blessed from 'neo-blessed'
-import { Model } from 'src/project'
 import { DestroyedEvent, Event } from './event'
 import { KeyMap, KeyMapArg } from './keymap'
 
-export type CtrlCtorParams = {
+export type CtrlCtorParams<Model = any> = {
   parent: blessed.Widgets.BlessedElement
   model: Model
   keyMap?: KeyMapArg
@@ -16,6 +15,7 @@ export interface Listener {
 
 export abstract class Controller<
   T extends blessed.Widgets.BlessedElement = blessed.Widgets.BlessedElement,
+  Model = any,
 > {
   keyMap: KeyMap = {}
   events: Record<string, Function> = {}

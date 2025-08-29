@@ -10,12 +10,12 @@ export type {
   ProjectComponent,
 } from './types'
 
-export interface Model {
+export interface ApplicationState {
   project: Project
   config: ContextConfig
 }
 
-export const readProject = async (): Promise<Model> => {
+export const readProject = async (): Promise<ApplicationState> => {
   const project = await analyze(process.cwd())
   const config: ContextConfig = await readConfig(project)
   applyConfig(config.global.lastConfig, project)

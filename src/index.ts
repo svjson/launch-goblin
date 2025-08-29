@@ -11,14 +11,14 @@ import {
   FocusEvent,
   KeyMap,
 } from './tui/framework'
-import { Model } from './project'
+import { ApplicationState } from './project'
 import {
   saveLatestLaunch,
   saveLocalConfig,
   toLaunchConfigComponents,
 } from './config'
 
-const performAction = async (action: Action, model: Model) => {
+const performAction = async (action: Action, model: ApplicationState) => {
   if (action.type === 'create-config') {
     model.config.local.launchConfigs[action.details.name] = {
       components: toLaunchConfigComponents(model.project.components),
@@ -28,7 +28,7 @@ const performAction = async (action: Action, model: Model) => {
 }
 
 const main = async () => {
-  const model = await readProject()
+  const model: ApplicationState = await readProject()
 
   const screen = initTui()
 

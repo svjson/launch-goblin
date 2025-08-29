@@ -4,7 +4,7 @@ import { mkdir, readFile, writeFile } from 'node:fs/promises'
 import path from 'node:path'
 
 import { ContextConfig, GlobalConfig, LGConfig } from './types'
-import { Model, Project, ProjectComponent } from '@src/project'
+import { ApplicationState, Project } from '@src/project'
 import { toLaunchConfigComponents } from './apply'
 
 export const localConfigPath = (project: Project) =>
@@ -44,7 +44,7 @@ export const readConfig = async (project: Project): Promise<ContextConfig> => {
   }
 }
 
-export const saveLatestLaunch = async (model: Model) => {
+export const saveLatestLaunch = async (model: ApplicationState) => {
   model.config.global.lastConfig = {
     components: toLaunchConfigComponents(model.project.components),
   }

@@ -1,6 +1,6 @@
 import blessed from 'neo-blessed'
 
-import { Model } from 'src/project'
+import { ApplicationState } from 'src/project'
 import {
   ModalDialog,
   TextChangedEvent,
@@ -8,13 +8,13 @@ import {
   ButtonController,
 } from './framework'
 
-export class SaveConfigDialog extends ModalDialog {
+export class SaveConfigDialog extends ModalDialog<ApplicationState> {
   constructor({
     screen,
     model,
   }: {
     screen: blessed.Widgets.Screen
-    model: Model
+    model: ApplicationState
   }) {
     super({ screen, model, options: { height: 8, width: 45 } })
 

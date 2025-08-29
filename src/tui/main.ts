@@ -1,13 +1,17 @@
 import blessed from 'neo-blessed'
-import { Controller } from './framework/controller'
-import { RunnableSelectController } from './runnable-select'
+
+import { ApplicationState } from '@src/project'
+import { Controller } from './framework'
 import { LaunchButtonController } from './launch-button'
+import { RunnableSelectController } from './runnable-select'
 import { FooterController } from './footer'
-import { Model } from 'src/project'
 import { HeaderController } from './header'
 import { SaveConfigDialog } from './save-config-dialog'
 
-export class MainController extends Controller {
+export class MainController extends Controller<
+  blessed.Widgets.BoxElement,
+  ApplicationState
+> {
   screen: blessed.Widgets.Screen
 
   keyMap = {
@@ -26,7 +30,7 @@ export class MainController extends Controller {
     model,
   }: {
     screen: blessed.Widgets.Screen
-    model: Model
+    model: ApplicationState
   }) {
     super(
       blessed.box({
