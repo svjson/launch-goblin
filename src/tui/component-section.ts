@@ -2,14 +2,13 @@ import {
   CheckboxController,
   CheckboxEvent,
   Controller,
-  createStore,
   CtrlCtorParams,
 } from './framework'
 import { juxt } from '@whimbrel/array'
 import blessed from 'neo-blessed'
 import { ProjectComponent } from '@src/project'
 
-export class RunnableSelectController extends Controller<
+export class ComponentSection extends Controller<
   blessed.Widgets.BoxElement,
   ProjectComponent[]
 > {

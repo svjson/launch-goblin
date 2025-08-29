@@ -3,7 +3,7 @@ import blessed from 'neo-blessed'
 import { ApplicationState, Project } from '@src/project'
 import { Controller, Event, FocusEvent, Store } from './framework'
 import { LaunchButtonController } from './launch-button'
-import { RunnableSelectController } from './runnable-select'
+import { ComponentSection } from './component-section'
 import { FooterController } from './footer'
 import { HeaderController } from './header'
 import { SaveConfigDialog } from './save-config-dialog'
@@ -32,7 +32,7 @@ export class MainController extends Controller<
     focus: this.bind(this.componentFocused),
   }
 
-  componentSection: RunnableSelectController
+  componentSection: ComponentSection
   footer: FooterController
 
   constructor({
@@ -55,7 +55,7 @@ export class MainController extends Controller<
 
     this.addChild(HeaderController)
     this.componentSection = this.addChild({
-      component: RunnableSelectController,
+      component: ComponentSection,
       model: store.get<Project>('project').components,
       store,
     })
