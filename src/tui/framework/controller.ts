@@ -169,8 +169,9 @@ export abstract class Controller<
     return false
   }
 
-  nextChild(): Controller | undefined {
-    this.focusedIndex = (this.focusedIndex + 1) % this.children.length
+  nextChild(dir: number = 1): Controller | undefined {
+    dir = typeof dir !== 'number' ? 1 : dir
+    this.focusedIndex = (this.focusedIndex + dir) % this.children.length
 
     const child = this.children[this.focusedIndex]
     if (!child.isFocusable()) {

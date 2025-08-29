@@ -26,6 +26,11 @@ export class MainController extends Controller<
       legend: 'Next Section',
       handler: this.bind(this.nextChild),
     },
+    'S-tab': {
+      propagate: true,
+      legend: 'Prev Section',
+      handler: this.bind(() => this.nextChild(-1)),
+    },
   }
 
   events = {
