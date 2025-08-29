@@ -7,6 +7,7 @@ import { RunnableSelectController } from './runnable-select'
 import { FooterController } from './footer'
 import { HeaderController } from './header'
 import { SaveConfigDialog } from './save-config-dialog'
+import { ConfigSection } from './config-section'
 
 export class MainController extends Controller<
   blessed.Widgets.BoxElement,
@@ -31,6 +32,7 @@ export class MainController extends Controller<
     focus: this.bind(this.componentFocused),
   }
 
+  componentSection: RunnableSelectController
   footer: FooterController
 
   constructor({
@@ -52,11 +54,18 @@ export class MainController extends Controller<
     this.screen = screen
 
     this.addChild(HeaderController)
-    this.addChild({
+    this.componentSection = this.addChild({
       component: RunnableSelectController,
       model: model.project.components,
     })
     this.addChild(LaunchButtonController)
+    this.addChild(ConfigSection, {
+      top: this.componentSection.top(),
+      left:
+        Number(this.componentSection.left()) +
+        Number(this.componentSection.width()) +
+        4,
+    })
     this.footer = this.addChild(FooterController)
   }
 

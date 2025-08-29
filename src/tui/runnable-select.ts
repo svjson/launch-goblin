@@ -35,7 +35,10 @@ export class RunnableSelectController extends Controller<
         parent: parent,
         label: ' Select Components to Launch ',
         focusable: true,
-        width: '50%',
+        width: Math.max(
+          20,
+          10 + Math.max(...model.map((cmp) => cmp.name.length))
+        ),
         height: Math.max(10, model.length + 4),
         top: '25%',
         left: 'center',

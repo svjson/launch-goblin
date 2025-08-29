@@ -198,6 +198,48 @@ export abstract class Controller<
     })
   }
 
+  top(value?: string | number): string | number {
+    if (value !== undefined) {
+      this.widget.top = value
+    }
+    return this.widget.top
+  }
+
+  right(value?: string | number): string | number {
+    if (value !== undefined) {
+      this.widget.right = value
+    }
+    return this.widget.right
+  }
+
+  bottom(value?: string | number): string | number {
+    if (value !== undefined) {
+      this.widget.bottom = value
+    }
+    return this.widget.bottom
+  }
+
+  left(value?: string | number): string | number {
+    if (value !== undefined) {
+      this.widget.left = value
+    }
+    return this.widget.left
+  }
+
+  width(value?: string | number): string | number {
+    if (value !== undefined) {
+      this.widget.width = value
+    }
+    return this.widget.width
+  }
+
+  height(value?: string | number): string | number {
+    if (value !== undefined) {
+      this.widget.height = value
+    }
+    return this.widget.height
+  }
+
   focus() {
     let focusedChild: Controller | undefined = this.children[this.focusedIndex]
     if (focusedChild) {
