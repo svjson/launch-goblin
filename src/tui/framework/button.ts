@@ -17,6 +17,7 @@ export class ButtonController extends Controller<blessed.Widgets.ButtonElement> 
 
   keyMap = {
     enter: {
+      legend: 'Press Button',
       handler: this.bind(this.pressed),
     },
   }

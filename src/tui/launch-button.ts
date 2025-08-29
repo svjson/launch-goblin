@@ -5,6 +5,7 @@ export class LaunchButtonController extends ButtonController {
 
   keyMap = {
     enter: {
+      legend: 'Launch',
       handler: this.bind(this.launch),
     },
   }

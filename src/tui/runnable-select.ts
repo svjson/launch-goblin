@@ -11,10 +11,14 @@ export class RunnableSelectController extends Controller<
   keyMap = {
     up: {
       propagate: true,
+      legend: 'Navigate',
+      group: 'nav',
       handler: this.bind(this.moveUp),
     },
     down: {
       propagate: true,
+      legend: 'Navigate',
+      group: 'nav',
       handler: this.bind(this.moveDown),
     },
   }

@@ -2,8 +2,10 @@ import { Action } from './action'
 import { SelectableItem } from './checkbox'
 import { Controller } from './controller'
 
-export interface DirtyEvent {
-  type: 'dirty'
+export type StringEvent = 'dirty' | 'pressed' | 'launch'
+
+export interface NoArgEvent {
+  type: StringEvent
 }
 
 export interface CheckboxEvent {
@@ -22,6 +24,11 @@ export interface FocusEvent {
   component: Controller
 }
 
+export interface DestroyEvent {
+  type: 'destroy'
+  component: Controller
+}
+
 export interface DestroyedEvent {
   type: 'destroyed'
   component: Controller
@@ -37,16 +44,12 @@ export interface ActionEvent {
   action: Action
 }
 
-export interface AnyEvent {
-  type: string
-}
-
 export type Event =
   | ActionEvent
-  | DirtyEvent
+  | NoArgEvent
   | CheckboxEvent
+  | DestroyEvent
   | DestroyedEvent
   | FocusEvent
   | LogEvent
   | TextChangedEvent
-  | AnyEvent

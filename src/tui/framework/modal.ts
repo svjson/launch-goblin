@@ -10,10 +10,12 @@ export class ModalDialog<Model> extends Controller<
   keyMap = {
     escape: {
       propagate: true,
+      legend: 'Cancel',
       handler: this.bind(this.destroy),
     },
     tab: {
       propagate: true,
+      legend: 'Next',
       handler: this.bind(this.nextChild),
     },
   }

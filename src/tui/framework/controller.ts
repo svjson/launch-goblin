@@ -1,5 +1,5 @@
 import blessed from 'neo-blessed'
-import { DestroyedEvent, Event } from './event'
+import { DestroyEvent, Event, StringEvent } from './event'
 import { KeyMap, KeyMapArg } from './keymap'
 
 export type CtrlCtorParams<Model = any> = {
@@ -12,6 +12,20 @@ export type CtrlCtorParams<Model = any> = {
 export interface Listener {
   receive: (event: Event) => void
 }
+
+export type CtrlConstructor<T extends Controller, M> = new (
+  ctorParams: CtrlCtorParams<M>,
+  ...args: any[]
+) => T
+
+export interface ChildDescription<T extends Controller, M> {
+  component: CtrlConstructor<T, M>
+  model: M
+}
+
+export type ChildParam<T extends Controller, M> =
+  | CtrlConstructor<T, M>
+  | ChildDescription<T, M>
 
 export abstract class Controller<
   T extends blessed.Widgets.BlessedElement = blessed.Widgets.BlessedElement,
@@ -33,8 +47,8 @@ export abstract class Controller<
     protected model: Model
   ) {}
 
-  addChild<T extends Controller>(
-    ctrlClass: new (ctorParams: CtrlCtorParams, ...args: any[]) => T,
+  addChild<T extends Controller, M = Model>(
+    childDesc: ChildParam<T, M>,
     options: blessed.Widgets.ElementOptions = {},
     ...args: any[]
   ): T {
@@ -48,10 +62,18 @@ export abstract class Controller<
       {} as KeyMap
     )
 
+    const ctrlClass =
+      typeof childDesc === 'function' ? childDesc : childDesc.component
+
+    const model: M =
+      typeof childDesc === 'function'
+        ? (this.model as unknown as M)
+        : childDesc.model
+
     const child = new ctrlClass(
       {
         parent: this.widget,
-        model: this.model,
+        model: model,
         keyMap: { replace: false, keys: inheritKeys },
         options: options,
       },
@@ -99,7 +121,7 @@ export abstract class Controller<
     }
 
     if (event.type === 'destroy') {
-      this.#destroyChild((event as DestroyedEvent).component)
+      this.#destroyChild((event as DestroyEvent).component)
     }
 
     if (['dirty', 'launch', 'focus', 'log', 'action'].includes(event.type)) {
@@ -162,7 +184,7 @@ export abstract class Controller<
     this.children.splice(index, 1)
   }
 
-  emit(event: Event | string) {
+  emit(event: Event | StringEvent) {
     event = typeof event === 'string' ? { type: event } : event
     this.listeners.forEach((l) => {
       l.receive(event)

@@ -1,7 +1,7 @@
 import blessed from 'neo-blessed'
 
 import { ApplicationState } from '@src/project'
-import { Controller } from './framework'
+import { Controller, Event, FocusEvent } from './framework'
 import { LaunchButtonController } from './launch-button'
 import { RunnableSelectController } from './runnable-select'
 import { FooterController } from './footer'
@@ -17,13 +17,21 @@ export class MainController extends Controller<
   keyMap = {
     'C-s': {
       propagate: true,
+      legend: 'Save Configuration',
       handler: this.bind(this.saveConfig),
     },
     tab: {
       propagate: true,
+      legend: 'Next Section',
       handler: this.bind(this.nextChild),
     },
   }
+
+  events = {
+    focus: this.bind(this.componentFocused),
+  }
+
+  footer: FooterController
 
   constructor({
     screen,
@@ -44,9 +52,16 @@ export class MainController extends Controller<
     this.screen = screen
 
     this.addChild(HeaderController)
-    this.addChild(RunnableSelectController)
+    this.addChild({
+      component: RunnableSelectController,
+      model: model.project.components,
+    })
     this.addChild(LaunchButtonController)
-    this.addChild(FooterController)
+    this.footer = this.addChild(FooterController)
+  }
+
+  componentFocused(event: FocusEvent) {
+    this.footer.applyContext(event.component)
   }
 
   saveConfig() {
@@ -59,13 +74,12 @@ export class MainController extends Controller<
       if (event.type === 'destroyed') {
         this.focus()
       }
+      if (event.type === 'focus') {
+        this.componentFocused(event)
+      }
       this.emit(event)
     })
 
     dialog.focus()
-  }
-
-  emit(event: Event | string) {
-    super.emit(event)
   }
 }

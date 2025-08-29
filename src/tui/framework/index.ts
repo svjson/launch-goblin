@@ -9,13 +9,18 @@ export type { Action } from './action'
 export type { CtrlCtorParams } from './controller'
 export type {
   ActionEvent,
-  AnyEvent,
   CheckboxEvent,
   Event,
   FocusEvent,
   DestroyedEvent,
-  DirtyEvent,
   LogEvent,
+  NoArgEvent,
   TextChangedEvent,
 } from './event'
-export type { KeyMap, KeyMapArg, KeyHandler, KeyIdentifier } from './keymap'
+export type {
+  KeyMap,
+  KeyMapArg,
+  KeyHandler,
+  KeyIdentifier,
+  LegendEntry,
+} from './keymap'
