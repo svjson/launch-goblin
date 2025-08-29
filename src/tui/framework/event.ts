@@ -14,6 +14,11 @@ export interface CheckboxEvent {
   checked: boolean
 }
 
+export interface ItemSelectedEvent<T> {
+  type: 'selected'
+  item: T
+}
+
 export interface TextChangedEvent {
   type: 'text-changed'
   value: string
@@ -51,5 +56,6 @@ export type Event =
   | DestroyEvent
   | DestroyedEvent
   | FocusEvent
+  | ItemSelectedEvent<any>
   | LogEvent
   | TextChangedEvent
