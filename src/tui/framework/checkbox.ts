@@ -10,7 +10,7 @@ export interface SelectableItem {
   selected: boolean
 }
 
-export class CheckboxController extends Controller<blessed.Widgets.CheckboxElement> {
+export class Checkbox extends Controller<blessed.Widgets.CheckboxElement> {
   item: SelectableItem
 
   keyMap = {}

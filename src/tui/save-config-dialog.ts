@@ -5,7 +5,7 @@ import {
   ModalDialog,
   TextChangedEvent,
   TextField,
-  ButtonController,
+  Button,
   Store,
 } from './framework'
 
@@ -26,14 +26,14 @@ export class SaveConfigDialog extends ModalDialog<ApplicationState> {
     )
 
     const saveButton = this.addChild(
-      ButtonController,
+      Button,
       { top: 4, left: '50%-14' },
       { text: 'Save' }
     )
     saveButton.disable()
 
     const cancelButton = this.addChild(
-      ButtonController,
+      Button,
       { top: 4, left: '50%+2' },
       { text: 'Cancel' }
     )

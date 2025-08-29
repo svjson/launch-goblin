@@ -1,5 +1,5 @@
 import {
-  CheckboxController,
+  Checkbox,
   CheckboxEvent,
   Controller,
   CtrlCtorParams,
@@ -67,7 +67,7 @@ export class ComponentSection extends Controller<
 
     model.forEach((c, i) => {
       this.addChild(
-        CheckboxController,
+        Checkbox,
         {},
         {
           offsetY: 1,
@@ -81,7 +81,7 @@ export class ComponentSection extends Controller<
 
     this.store.subscribe('config.activeConfigName', () => {
       juxt(this.children, this.components).forEach(([checkbox, cmp]) => {
-        ;(checkbox as CheckboxController).setSelected(cmp.selected ?? false)
+        ;(checkbox as Checkbox).setSelected(cmp.selected ?? false)
       })
       return true
     })

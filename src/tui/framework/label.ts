@@ -6,7 +6,10 @@ export interface LabelItem {
   text: string
 }
 
-export class LabelController extends Controller<blessed.Widgets.TextElement> {
+export class Label<Model extends LabelItem> extends Controller<
+  blessed.Widgets.TextElement,
+  Model
+> {
   focusable = false
 
   constructor({ parent, model }: CtrlCtorParams, label: LabelItem) {

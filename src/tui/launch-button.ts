@@ -1,6 +1,6 @@
-import { ButtonController, CtrlCtorParams } from './framework'
+import { Button, CtrlCtorParams } from './framework'
 
-export class LaunchButtonController extends ButtonController {
+export class LaunchButtonController extends Button {
   focusable = true
 
   keyMap = {

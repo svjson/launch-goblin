@@ -1,6 +1,6 @@
 import blessed from 'neo-blessed'
 import { Controller, CtrlCtorParams } from './controller'
-import { LabelController, LabelItem } from './label'
+import { Label, LabelItem } from './label'
 import { mergeLeft } from '@whimbrel/walk'
 
 export interface TextFieldModel {
@@ -38,7 +38,7 @@ export class TextField extends Controller {
     this.inheritKeyMap(keyMap)
 
     this.addChild(
-      LabelController,
+      Label,
       { top: 1 },
       typeof item.label === 'string' ? { text: item.label } : item.label
     )
