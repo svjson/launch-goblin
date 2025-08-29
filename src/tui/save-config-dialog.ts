@@ -8,8 +8,12 @@ import {
   Button,
   Store,
 } from './framework'
+import { ModalDialogModel } from './framework/modal'
 
-export class SaveConfigDialog extends ModalDialog<ApplicationState> {
+export class SaveConfigDialog extends ModalDialog<
+  ModalDialogModel,
+  ApplicationState
+> {
   constructor({
     screen,
     store,
@@ -17,7 +21,12 @@ export class SaveConfigDialog extends ModalDialog<ApplicationState> {
     screen: blessed.Widgets.Screen
     store: Store<ApplicationState>
   }) {
-    super({ screen, store, options: { height: 8, width: 45 } })
+    super({
+      screen,
+      store,
+      model: { title: ' Save Configuration ' },
+      options: { height: 8, width: 45 },
+    })
 
     const nameField = this.addChild(
       TextField,

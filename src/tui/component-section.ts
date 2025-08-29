@@ -6,11 +6,12 @@ import {
 } from './framework'
 import { juxt } from '@whimbrel/array'
 import blessed from 'neo-blessed'
-import { ProjectComponent } from '@src/project'
+import { ApplicationState, ProjectComponent } from '@src/project'
 
 export class ComponentSection extends Controller<
   blessed.Widgets.BoxElement,
-  ProjectComponent[]
+  ProjectComponent[],
+  ApplicationState
 > {
   keyMap = {
     up: {
@@ -40,7 +41,7 @@ export class ComponentSection extends Controller<
     model = [],
     store,
     keyMap,
-  }: CtrlCtorParams<ProjectComponent[]>) {
+  }: CtrlCtorParams<ProjectComponent[], ApplicationState>) {
     super(
       blessed.box({
         parent: parent,
@@ -59,7 +60,8 @@ export class ComponentSection extends Controller<
         scrollable: true,
         alwaysScroll: true,
       }),
-      store!
+      model,
+      store
     )
     this.inheritKeyMap(keyMap)
 
@@ -79,7 +81,7 @@ export class ComponentSection extends Controller<
       )
     })
 
-    this.store.subscribe('config.activeConfigName', () => {
+    this.store!.subscribe('config.activeConfigName', () => {
       juxt(this.children, this.components).forEach(([checkbox, cmp]) => {
         ;(checkbox as Checkbox).setSelected(cmp.selected ?? false)
       })

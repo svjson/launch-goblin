@@ -12,11 +12,10 @@ export interface ListItem {
 
 export class ListBox extends Controller<
   blessed.Widgets.ListElement,
-  ListItem[]
+  ListItem[],
+  undefined
 > {
   focusable = true
-
-  items: ListItem[]
 
   constructor({
     parent,
@@ -44,18 +43,17 @@ export class ListBox extends Controller<
           options
         )
       ),
-      createStore(model)
+      model
     )
-    this.items = model
 
-    if (this.items.length === 0) {
+    if (this.model.length === 0) {
       this.disable()
     }
 
     this.widget.on('select item', (_item, index) => {
       this.emit({
         type: 'selected',
-        item: this.items[index],
+        item: this.model[index],
       })
     })
 

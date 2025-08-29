@@ -38,9 +38,12 @@ export class TextField extends Controller {
     this.inheritKeyMap(keyMap)
 
     this.addChild(
-      Label,
-      { top: 1 },
-      typeof item.label === 'string' ? { text: item.label } : item.label
+      {
+        component: Label,
+        model:
+          typeof item.label === 'string' ? { text: item.label } : item.label,
+      },
+      { top: 1 }
     )
     this.textInput = this.addChild(TextInput, { top: 1 }, { value: item.value })
 

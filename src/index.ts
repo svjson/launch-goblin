@@ -38,7 +38,7 @@ const main = async () => {
 
   const store = createStore(model)
 
-  const mainCtrl = new MainController({ screen, store })
+  const mainCtrl = new MainController({ screen, store, model })
 
   mainCtrl.on('dirty', () => {
     screen.render()

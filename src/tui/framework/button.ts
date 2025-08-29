@@ -10,7 +10,10 @@ export interface ButtonModel {
   disabled?: any
 }
 
-export class Button extends Controller<blessed.Widgets.ButtonElement> {
+export class Button extends Controller<
+  blessed.Widgets.ButtonElement,
+  ButtonModel
+> {
   item: ButtonModel
 
   focusable = true

@@ -1,11 +1,12 @@
 import blessed from 'neo-blessed'
-import { Controller, CtrlCtorParams } from './framework'
+import { CtrlCtorParams } from './framework'
 import { ApplicationState } from '@src/project'
 import { launchConfigByName, launchConfigCount } from '@src/config/query'
 import { mergeLeft } from '@whimbrel/walk'
 import { ListBox, ListItem } from './framework/list-box'
 import { applyConfig, ContextConfig, LaunchConfig } from '@src/config'
 import { ItemSelectedEvent } from './framework/event'
+import { Controller } from './framework/controller'
 
 const transformEntries = (
   launchConfigs: Record<string, LaunchConfig>,
@@ -17,8 +18,17 @@ const transformEntries = (
 
 export class ConfigSection extends Controller<
   blessed.Widgets.BoxElement,
+  ContextConfig,
   ApplicationState
 > {
+  keyMap = {
+    delete: {
+      legend: 'Delete Config',
+      propagate: true,
+      handler: this.bind(this.confirmDelete),
+    },
+  }
+
   events = {
     selected: this.bind(this.configSelected),
   }
@@ -26,9 +36,10 @@ export class ConfigSection extends Controller<
   constructor({
     parent,
     store,
+    model,
     keyMap,
     options,
-  }: CtrlCtorParams<ApplicationState>) {
+  }: CtrlCtorParams<ContextConfig, ApplicationState>) {
     super(
       blessed.box(
         mergeLeft(
@@ -36,7 +47,7 @@ export class ConfigSection extends Controller<
             parent: parent,
             label: ' Configurations ',
             width: 40,
-            height: Math.min(14, launchConfigCount(store!.get('config')) + 4),
+            height: Math.min(14, launchConfigCount(store.get('config')) + 4),
             border: 'line',
             keys: true,
             scrollable: true,
@@ -45,7 +56,8 @@ export class ConfigSection extends Controller<
           options
         )
       ),
-      store!
+      model!,
+      store
     )
 
     this.inheritKeyMap(keyMap)
@@ -73,8 +85,10 @@ export class ConfigSection extends Controller<
   configSelected(event: ItemSelectedEvent<ListItem>) {
     const config = launchConfigByName(event.item.id, this.store.get('config'))
     if (config) {
-      applyConfig(config, this.store.get('project'))
+      applyConfig(config, this.store!.get('project'))
       this.store.set('config.activeConfigName', event.item.id)
     }
   }
+
+  confirmDelete() {}
 }

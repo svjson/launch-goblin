@@ -1,12 +1,12 @@
 import blessed from 'neo-blessed'
 import { DestroyEvent, Event, StringEvent } from './event'
 import { KeyMap, KeyMapArg } from './keymap'
-import { Store } from './store'
+import { createStore, Store } from './store'
 
-export type CtrlCtorParams<Model = any> = {
+export interface CtrlCtorParams<Model = any, StoreModel = Model> {
   parent: blessed.Widgets.BlessedElement
-  model?: Model
-  store?: Store<Model>
+  model: Model
+  store: Store<StoreModel>
   keyMap?: KeyMapArg
   options?: blessed.Widgets.ElementOptions
 }
@@ -15,24 +15,25 @@ export interface Listener {
   receive: (event: Event) => void
 }
 
-export type CtrlConstructor<T extends Controller, M> = new (
-  ctorParams: CtrlCtorParams<M>,
+export type CtrlConstructor<T extends Controller, M, SM> = new (
+  ctorParams: CtrlCtorParams<M, SM>,
   ...args: any[]
 ) => T
 
-export interface ChildDescription<T extends Controller, M> {
-  component: CtrlConstructor<T, M>
+export interface ChildDescription<T extends Controller, M, SM> {
+  component: CtrlConstructor<T, M, SM>
   model?: M
-  store?: Store<M>
+  store?: Store<SM>
 }
 
-export type ChildParam<T extends Controller, M> =
-  | CtrlConstructor<T, M>
-  | ChildDescription<T, M>
+export type ChildParam<T extends Controller, M, SM> =
+  | CtrlConstructor<T, M, SM>
+  | ChildDescription<T, M, SM>
 
 export abstract class Controller<
   T extends blessed.Widgets.BlessedElement = blessed.Widgets.BlessedElement,
   Model = any,
+  StoreModel = Model,
 > {
   keyMap: KeyMap = {}
   events: Record<string, Function> = {}
@@ -47,11 +48,12 @@ export abstract class Controller<
 
   constructor(
     protected widget: T,
-    protected store: Store<Model>
+    protected model: Model,
+    protected store: Store<StoreModel> = createStore({}) as Store<StoreModel>
   ) {}
 
-  addChild<T extends Controller, M = Model>(
-    childDesc: ChildParam<T, M>,
+  addChild<T extends Controller, M = Model, SM = StoreModel>(
+    childDesc: ChildParam<T, M, SM>,
     options: blessed.Widgets.ElementOptions = {},
     ...args: any[]
   ): T {
@@ -73,8 +75,8 @@ export abstract class Controller<
     const child = new ctrlClass(
       {
         parent: this.widget,
-        store,
-        model,
+        store: store!,
+        model: model!,
         keyMap: { replace: false, keys: inheritKeys },
         options,
       },
@@ -86,8 +88,8 @@ export abstract class Controller<
     return child
   }
 
-  #resolveChildParams<T extends Controller, M = Model>(
-    childDesc: ChildParam<T, M>,
+  #resolveChildParams<T extends Controller, M, SM>(
+    childDesc: ChildParam<T, M, SM>,
     _options: blessed.Widgets.ElementOptions = {}
   ) {
     return {

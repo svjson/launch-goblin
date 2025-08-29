@@ -12,11 +12,11 @@ export class Label<Model extends LabelItem> extends Controller<
 > {
   focusable = false
 
-  constructor({ parent, model }: CtrlCtorParams, label: LabelItem) {
+  constructor({ parent, model = { text: '' } }: CtrlCtorParams) {
     super(
       blessed.text({
         parent: parent,
-        content: label.text,
+        content: model.text,
       }),
       model
     )

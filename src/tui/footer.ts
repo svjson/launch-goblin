@@ -10,7 +10,7 @@ const KEY_SYMBOLS: Record<string, string> = {
 export class FooterController extends Controller {
   focusable = false
 
-  constructor({ parent, model, keyMap }: CtrlCtorParams) {
+  constructor({ parent, model, store, keyMap }: CtrlCtorParams) {
     super(
       blessed.box({
         parent: parent,
@@ -21,7 +21,8 @@ export class FooterController extends Controller {
         content: ' q = quit • ↑↓ = nav • space = toggle',
         style: { fg: 'white', bg: 'gray' },
       }),
-      model
+      model,
+      store
     )
     this.inheritKeyMap(keyMap)
   }

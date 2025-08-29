@@ -37,9 +37,11 @@ export class MainController extends Controller<
 
   constructor({
     screen,
+    model,
     store,
   }: {
     screen: blessed.Widgets.Screen
+    model: ApplicationState
     store: Store<ApplicationState>
   }) {
     super(
@@ -49,8 +51,10 @@ export class MainController extends Controller<
         height: '100%',
         style: { fg: 'default' },
       }),
+      model,
       store
     )
+    this.store = store
     this.screen = screen
 
     this.addChild(HeaderController)
@@ -60,13 +64,20 @@ export class MainController extends Controller<
       store,
     })
     this.addChild(LaunchButtonController)
-    this.addChild(ConfigSection, {
-      top: this.componentSection.top(),
-      left:
-        Number(this.componentSection.left()) +
-        Number(this.componentSection.width()) +
-        4,
-    })
+    this.addChild(
+      {
+        component: ConfigSection,
+        model: store.get('config'),
+        store,
+      },
+      {
+        top: this.componentSection.top(),
+        left:
+          Number(this.componentSection.left()) +
+          Number(this.componentSection.width()) +
+          4,
+      }
+    )
     this.footer = this.addChild(FooterController)
   }
 
