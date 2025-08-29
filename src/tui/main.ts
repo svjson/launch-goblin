@@ -1,7 +1,7 @@
 import blessed from 'neo-blessed'
 
-import { ApplicationState } from '@src/project'
-import { Controller, Event, FocusEvent } from './framework'
+import { ApplicationState, Project } from '@src/project'
+import { Controller, Event, FocusEvent, Store } from './framework'
 import { LaunchButtonController } from './launch-button'
 import { RunnableSelectController } from './runnable-select'
 import { FooterController } from './footer'
@@ -37,10 +37,10 @@ export class MainController extends Controller<
 
   constructor({
     screen,
-    model,
+    store,
   }: {
     screen: blessed.Widgets.Screen
-    model: ApplicationState
+    store: Store<ApplicationState>
   }) {
     super(
       blessed.box({
@@ -49,14 +49,15 @@ export class MainController extends Controller<
         height: '100%',
         style: { fg: 'default' },
       }),
-      model
+      store
     )
     this.screen = screen
 
     this.addChild(HeaderController)
     this.componentSection = this.addChild({
       component: RunnableSelectController,
-      model: model.project.components,
+      model: store.get<Project>('project').components,
+      store,
     })
     this.addChild(LaunchButtonController)
     this.addChild(ConfigSection, {
@@ -76,7 +77,7 @@ export class MainController extends Controller<
   saveConfig() {
     const dialog = new SaveConfigDialog({
       screen: this.screen,
-      model: this.model,
+      store: this.store,
     })
 
     dialog.on('*', (event: Event) => {

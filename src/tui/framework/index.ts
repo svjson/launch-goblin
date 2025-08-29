@@ -1,9 +1,11 @@
 export { ButtonController } from './button'
+export { CheckboxController } from './checkbox'
 export { TextField, TextInput } from './text-field'
 export { Controller } from './controller'
 export { destroy } from './destroy'
 export { initTui } from './init'
 export { ModalDialog } from './modal'
+export { createStore, Store } from './store'
 
 export type { Action } from './action'
 export type { CtrlCtorParams } from './controller'

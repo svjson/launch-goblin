@@ -43,6 +43,7 @@ export interface Store<Model> {
     propertyPath: PropertyPath,
     subscriber: SubscriberFunction<T>
   ): void
+  touch(propertyPath: PropertyPath): void
 }
 
 export const createStore = <Model>(state: Model): Store<Model> => {
@@ -61,6 +62,9 @@ export const createStore = <Model>(state: Model): Store<Model> => {
         propertyPath,
         handler,
       })
+    },
+    touch(propertyPath: PropertyPath) {
+      publish(subscribers, propertyPath, store.get(propertyPath))
     },
   }
 

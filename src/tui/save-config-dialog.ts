@@ -6,17 +6,18 @@ import {
   TextChangedEvent,
   TextField,
   ButtonController,
+  Store,
 } from './framework'
 
 export class SaveConfigDialog extends ModalDialog<ApplicationState> {
   constructor({
     screen,
-    model,
+    store,
   }: {
     screen: blessed.Widgets.Screen
-    model: ApplicationState
+    store: Store<ApplicationState>
   }) {
-    super({ screen, model, options: { height: 8, width: 45 } })
+    super({ screen, store, options: { height: 8, width: 45 } })
 
     const nameField = this.addChild(
       TextField,

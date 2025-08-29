@@ -2,7 +2,7 @@
 
 import { launch } from './launch'
 import { readProject } from './project'
-import { initTui, destroy } from './tui/framework'
+import { initTui, destroy, createStore } from './tui/framework'
 import { MainController } from './tui'
 import {
   Action,
@@ -36,7 +36,9 @@ const main = async () => {
 
   let activeKeyMap: KeyMap = {}
 
-  const mainCtrl = new MainController({ screen, model })
+  const store = createStore(model)
+
+  const mainCtrl = new MainController({ screen, store })
 
   mainCtrl.on('dirty', () => {
     screen.render()

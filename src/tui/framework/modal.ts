@@ -1,7 +1,8 @@
 import blessed from 'neo-blessed'
+import { mergeLeft } from '@whimbrel/walk'
 
 import { Controller } from './controller'
-import { mergeLeft } from '@whimbrel/walk'
+import { Store } from './store'
 
 export class ModalDialog<Model> extends Controller<
   blessed.Widgets.BoxElement,
@@ -24,11 +25,11 @@ export class ModalDialog<Model> extends Controller<
 
   constructor({
     screen,
-    model,
+    store,
     options = {},
   }: {
     screen: blessed.Widgets.Screen
-    model: Model
+    store: Store<Model>
     options?: blessed.Widgets.ElementOptions
   }) {
     super(
@@ -51,7 +52,7 @@ export class ModalDialog<Model> extends Controller<
           options
         )
       ),
-      model
+      store
     )
 
     this.screen = screen

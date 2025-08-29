@@ -3,6 +3,7 @@ import blessed from 'neo-blessed'
 import { mergeLeft } from '@whimbrel/walk'
 
 import { Controller, CtrlCtorParams } from './controller'
+import { createStore } from './store'
 
 export interface ListItem {
   id: string
@@ -15,9 +16,11 @@ export class ListBox extends Controller<
 > {
   focusable = true
 
+  items: ListItem[]
+
   constructor({
     parent,
-    model,
+    model = [],
     keyMap,
     options = {},
   }: CtrlCtorParams<ListItem[]>) {
@@ -28,7 +31,7 @@ export class ListBox extends Controller<
             parent,
             width: 4 + Math.max(...model.map((item) => item.label.length)),
             align: 'left',
-            items: model.map((item) => item.label),
+            items: model!.map((item) => item.label),
             keys: true,
             style: {
               selected: {
@@ -41,17 +44,18 @@ export class ListBox extends Controller<
           options
         )
       ),
-      model
+      createStore(model)
     )
+    this.items = model
 
-    if (this.model.length === 0) {
+    if (this.items.length === 0) {
       this.disable()
     }
 
     this.widget.on('select item', (_item, index) => {
       this.emit({
         type: 'selected',
-        item: this.model[index],
+        item: this.items[index],
       })
     })
 

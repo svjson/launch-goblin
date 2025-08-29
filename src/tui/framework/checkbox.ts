@@ -29,7 +29,7 @@ export class CheckboxController extends Controller<blessed.Widgets.CheckboxEleme
         padding: { left: 1 },
         content: item.label,
         style: {
-          focus: { bg: 'blue' },
+          focus: { bg: 'blue', fg: 'black' },
         },
       }),
       model
@@ -48,5 +48,9 @@ export class CheckboxController extends Controller<blessed.Widgets.CheckboxEleme
     this.item = item
 
     this.inheritKeyMap(keyMap)
+  }
+
+  setSelected(selected: boolean) {
+    this.widget.checked = selected
   }
 }

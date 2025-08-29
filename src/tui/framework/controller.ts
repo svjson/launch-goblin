@@ -1,10 +1,12 @@
 import blessed from 'neo-blessed'
 import { DestroyEvent, Event, StringEvent } from './event'
 import { KeyMap, KeyMapArg } from './keymap'
+import { Store } from './store'
 
 export type CtrlCtorParams<Model = any> = {
   parent: blessed.Widgets.BlessedElement
-  model: Model
+  model?: Model
+  store?: Store<Model>
   keyMap?: KeyMapArg
   options?: blessed.Widgets.ElementOptions
 }
@@ -20,7 +22,8 @@ export type CtrlConstructor<T extends Controller, M> = new (
 
 export interface ChildDescription<T extends Controller, M> {
   component: CtrlConstructor<T, M>
-  model: M
+  model?: M
+  store?: Store<M>
 }
 
 export type ChildParam<T extends Controller, M> =
@@ -44,7 +47,7 @@ export abstract class Controller<
 
   constructor(
     protected widget: T,
-    protected model: Model
+    protected store: Store<Model>
   ) {}
 
   addChild<T extends Controller, M = Model>(
@@ -62,20 +65,18 @@ export abstract class Controller<
       {} as KeyMap
     )
 
-    const ctrlClass =
-      typeof childDesc === 'function' ? childDesc : childDesc.component
-
-    const model: M =
-      typeof childDesc === 'function'
-        ? (this.model as unknown as M)
-        : childDesc.model
+    const { ctrlClass, model, store } = this.#resolveChildParams(
+      childDesc,
+      options
+    )
 
     const child = new ctrlClass(
       {
         parent: this.widget,
-        model: model,
+        store,
+        model,
         keyMap: { replace: false, keys: inheritKeys },
-        options: options,
+        options,
       },
       ...args
     )
@@ -83,6 +84,18 @@ export abstract class Controller<
     this.children.push(child)
 
     return child
+  }
+
+  #resolveChildParams<T extends Controller, M = Model>(
+    childDesc: ChildParam<T, M>,
+    _options: blessed.Widgets.ElementOptions = {}
+  ) {
+    return {
+      ctrlClass:
+        typeof childDesc === 'function' ? childDesc : childDesc.component,
+      model: typeof childDesc === 'function' ? undefined : childDesc.model,
+      store: typeof childDesc === 'function' ? this.store : childDesc.store,
+    }
   }
 
   addListener(listener: Listener) {

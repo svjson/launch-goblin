@@ -1,6 +1,11 @@
-import { CheckboxController } from './framework/checkbox'
-import { CheckboxEvent, Controller, CtrlCtorParams } from './framework'
-
+import {
+  CheckboxController,
+  CheckboxEvent,
+  Controller,
+  createStore,
+  CtrlCtorParams,
+} from './framework'
+import { juxt } from '@whimbrel/array'
 import blessed from 'neo-blessed'
 import { ProjectComponent } from '@src/project'
 
@@ -29,14 +34,21 @@ export class RunnableSelectController extends Controller<
 
   focusedIndex = 0
 
-  constructor({ parent, model, keyMap }: CtrlCtorParams<ProjectComponent[]>) {
+  components: ProjectComponent[]
+
+  constructor({
+    parent,
+    model = [],
+    store,
+    keyMap,
+  }: CtrlCtorParams<ProjectComponent[]>) {
     super(
       blessed.box({
         parent: parent,
         label: ' Select Components to Launch ',
         focusable: true,
         width: Math.max(
-          20,
+          4 + ' Select Components to Launch '.length,
           10 + Math.max(...model.map((cmp) => cmp.name.length))
         ),
         height: Math.max(10, model.length + 4),
@@ -48,9 +60,11 @@ export class RunnableSelectController extends Controller<
         scrollable: true,
         alwaysScroll: true,
       }),
-      model
+      store!
     )
     this.inheritKeyMap(keyMap)
+
+    this.components = model
 
     model.forEach((c, i) => {
       this.addChild(
@@ -66,11 +80,18 @@ export class RunnableSelectController extends Controller<
       )
     })
 
+    this.store.subscribe('config.activeConfigName', () => {
+      juxt(this.children, this.components).forEach(([checkbox, cmp]) => {
+        ;(checkbox as CheckboxController).setSelected(cmp.selected ?? false)
+      })
+      return true
+    })
+
     this.children[this.focusedIndex]?.focus()
   }
 
   onChecked(event: CheckboxEvent) {
-    this.model[event.item.index].selected = event.checked
+    this.components[event.item.index].selected = event.checked
   }
 
   moveUp() {

@@ -4,7 +4,7 @@ import { ApplicationState } from '@src/project'
 import { launchConfigByName, launchConfigCount } from '@src/config/query'
 import { mergeLeft } from '@whimbrel/walk'
 import { ListBox, ListItem } from './framework/list-box'
-import { applyConfig, LaunchConfig } from '@src/config'
+import { applyConfig, ContextConfig, LaunchConfig } from '@src/config'
 import { ItemSelectedEvent } from './framework/event'
 
 const transformEntries = (
@@ -25,7 +25,7 @@ export class ConfigSection extends Controller<
 
   constructor({
     parent,
-    model,
+    store,
     keyMap,
     options,
   }: CtrlCtorParams<ApplicationState>) {
@@ -36,7 +36,7 @@ export class ConfigSection extends Controller<
             parent: parent,
             label: ' Configurations ',
             width: 40,
-            height: Math.min(14, launchConfigCount(model.config) + 4),
+            height: Math.min(14, launchConfigCount(store!.get('config')) + 4),
             border: 'line',
             keys: true,
             scrollable: true,
@@ -45,17 +45,19 @@ export class ConfigSection extends Controller<
           options
         )
       ),
-      model
+      store!
     )
 
     this.inheritKeyMap(keyMap)
+
+    const config: ContextConfig = store!.get('config')
 
     this.addChild(
       {
         component: ListBox,
         model: [
-          ...transformEntries(model.config.global.launchConfigs, 'private'),
-          ...transformEntries(model.config.local.launchConfigs, 'shared'),
+          ...transformEntries(config.global.launchConfigs, 'private'),
+          ...transformEntries(config.local.launchConfigs, 'shared'),
         ].map(
           ([name, _cfg]) =>
             ({
@@ -69,7 +71,10 @@ export class ConfigSection extends Controller<
   }
 
   configSelected(event: ItemSelectedEvent<ListItem>) {
-    const config = launchConfigByName(event.item.id, this.model.config)
-    if (config) applyConfig(config, this.model.project)
+    const config = launchConfigByName(event.item.id, this.store.get('config'))
+    if (config) {
+      applyConfig(config, this.store.get('project'))
+      this.store.set('config.activeConfigName', event.item.id)
+    }
   }
 }

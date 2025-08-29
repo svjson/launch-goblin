@@ -17,4 +17,5 @@ export interface GlobalConfig extends LGConfig {
 export interface ContextConfig {
   local: LGConfig
   global: GlobalConfig
+  activeConfigName?: string
 }
