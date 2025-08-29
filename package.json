@@ -18,13 +18,14 @@
   "scripts": {
     "build": "tsup",
     "dev": "tsx src/index.ts",
+    "test": "vitest run",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@whimbrel/core": "0.0.3",
+    "@whimbrel/node": "0.0.3",
     "@whimbrel/npm": "0.0.3",
     "@whimbrel/package-json": "0.0.3",
-    "@whimbrel/node": "0.0.3",
     "@whimbrel/turborepo": "0.0.3",
     "neo-blessed": "^0.2.0"
   },
@@ -35,6 +36,8 @@
     "prettier": "^3.6.2",
     "tsup": "^8.5.0",
     "tsx": "^4.20.4",
-    "typescript": "^5.9.2"
+    "typescript": "^5.9.2",
+    "vite-tsconfig-paths": "^5.1.4",
+    "vitest": "^3.2.4"
   }
 }

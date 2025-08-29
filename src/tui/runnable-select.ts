@@ -28,7 +28,7 @@ export class RunnableSelectController extends Controller {
         label: ' Select Components to Launch ',
         focusable: true,
         width: '50%',
-        height: Math.max(10, model.components.length + 4),
+        height: Math.max(10, model.project.components.length + 4),
         top: '25%',
         left: 'center',
         border: 'line',
@@ -41,7 +41,7 @@ export class RunnableSelectController extends Controller {
     )
     this.inheritKeyMap(keyMap)
 
-    model.components.forEach((c, i) => {
+    model.project.components.forEach((c, i) => {
       this.addChild(
         CheckboxController,
         {},
@@ -59,7 +59,7 @@ export class RunnableSelectController extends Controller {
   }
 
   onChecked(event: CheckboxEvent) {
-    this.model.components[event.item.index].selected = event.checked
+    this.model.project.components[event.item.index].selected = event.checked
   }
 
   moveUp() {

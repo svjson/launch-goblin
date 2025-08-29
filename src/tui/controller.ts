@@ -9,6 +9,11 @@ export type CtrlCtorParams = {
   options?: blessed.Widgets.ElementOptions
 }
 
+export interface Action {
+  type: string
+  details?: any
+}
+
 export interface KeyMapArg {
   replace: boolean
   keys: KeyMap
@@ -36,6 +41,11 @@ export interface CheckboxEvent {
   checked: boolean
 }
 
+export interface TextChangedEvent {
+  type: 'text-changed'
+  value: string
+}
+
 export interface FocusEvent {
   type: 'focus'
   component: Controller
@@ -51,16 +61,23 @@ export interface LogEvent {
   message: string
 }
 
+export interface ActionEvent {
+  type: 'action'
+  action: Action
+}
+
 export interface AnyEvent {
   type: string
 }
 
 export type Event =
+  | ActionEvent
   | DirtyEvent
   | CheckboxEvent
   | DestroyedEvent
   | FocusEvent
   | LogEvent
+  | TextChangedEvent
   | AnyEvent
 
 export abstract class Controller<
@@ -75,6 +92,8 @@ export abstract class Controller<
   focusedIndex = 0
   focusable = true
 
+  enabled = true
+
   constructor(
     protected widget: T,
     protected model: Model
@@ -84,7 +103,7 @@ export abstract class Controller<
     ctrlClass: new (ctorParams: CtrlCtorParams, ...args: any[]) => T,
     options: blessed.Widgets.ElementOptions = {},
     ...args: any[]
-  ): void {
+  ): T {
     const inheritKeys: KeyMap = Object.entries(this.keyMap).reduce(
       (km, [key, entry]) => {
         if (entry.propagate) {
@@ -106,6 +125,8 @@ export abstract class Controller<
     )
     child.addListener(this)
     this.children.push(child)
+
+    return child
   }
 
   addListener(listener: Listener) {
@@ -144,10 +165,10 @@ export abstract class Controller<
     }
 
     if (event.type === 'destroy') {
-      this.#destroyChild((event as DestroyEvent).component)
+      this.#destroyChild((event as DestroyedEvent).component)
     }
 
-    if (['dirty', 'launch', 'focus', 'log'].includes(event.type)) {
+    if (['dirty', 'launch', 'focus', 'log', 'action'].includes(event.type)) {
       this.emit(event)
     }
   }
@@ -159,8 +180,16 @@ export abstract class Controller<
     }
   }
 
+  enable() {
+    this.enabled = true
+  }
+
+  disable() {
+    this.enabled = false
+  }
+
   isFocusable(): boolean {
-    if (this.focusable) return true
+    if (this.focusable && this.enabled) return true
 
     for (const child of this.children) {
       if (child.isFocusable()) return true

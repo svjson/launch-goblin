@@ -10,9 +10,12 @@
     "forceConsistentCasingInFileNames": true,
     "resolveJsonModule": true,
     "typeRoots": ["./types", "./node_modules/@types"],
-    "baseUrl": "."
+    "baseUrl": ".",
+    "paths": {
+      "@src/*": ["src/*"]
+    }
   },
-  "include": ["src", "types"],
+  "include": ["src", "test", "types"],
   "exclude": [
     "node_modules",
     "dist"

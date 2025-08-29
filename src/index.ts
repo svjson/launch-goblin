@@ -1,10 +1,31 @@
 #!/usr/bin/env node
 
-import { launch, readProject } from './project'
+import { launch } from './launch'
+import { readProject } from './project'
 import { initTui, MainController } from './tui'
 import { destroy } from './tui/destroy'
-import { FocusEvent, KeyMap } from './tui/controller'
-import { LogEvent } from './tui/controller'
+import {
+  Action,
+  ActionEvent,
+  LogEvent,
+  FocusEvent,
+  KeyMap,
+} from './tui/controller'
+import { Model } from './project'
+import {
+  saveLatestLaunch,
+  saveLocalConfig,
+  toLaunchConfigComponents,
+} from './config'
+
+const performAction = async (action: Action, model: Model) => {
+  if (action.type === 'create-config') {
+    model.config.local.launchConfigs[action.details.name] = {
+      components: toLaunchConfigComponents(model.project.components),
+    }
+    await saveLocalConfig(model.project, model.config.local)
+  }
+}
 
 const main = async () => {
   const model = await readProject()
@@ -23,7 +44,8 @@ const main = async () => {
 
   mainCtrl.on('launch', async () => {
     destroy(screen)
-    const selected = model.components.filter((c) => c.selected)
+    const selected = model.project.components.filter((c) => c.selected)
+    await saveLatestLaunch(model)
     await launch(selected)
   })
 
@@ -33,6 +55,10 @@ const main = async () => {
 
   mainCtrl.on('log', (event: LogEvent) => {
     log.push(event.message)
+  })
+
+  mainCtrl.on('action', async (event: ActionEvent) => {
+    await performAction(event.action, model)
   })
 
   mainCtrl.focus()

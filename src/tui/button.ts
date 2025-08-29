@@ -6,6 +6,8 @@ import { Controller, CtrlCtorParams } from './controller'
 
 export interface ButtonModel {
   text: string
+  enabled?: any
+  disabled?: any
 }
 
 export class ButtonController extends Controller<blessed.Widgets.ButtonElement> {
@@ -33,7 +35,8 @@ export class ButtonController extends Controller<blessed.Widgets.ButtonElement> 
             left: 'center',
             top: '60%',
             style: {
-              bg: 'gray',
+              fg: 'black',
+              bg: '#888888',
               focus: {
                 fg: 'black',
                 bg: 'green',
@@ -47,12 +50,31 @@ export class ButtonController extends Controller<blessed.Widgets.ButtonElement> 
       ),
       model
     )
+    item.disabled = mergeLeft({ bg: 'gray', fg: 'black' }, item.disabled ?? {})
+    item.enabled = mergeLeft({ bg: 'white', fg: 'black' }, item.enabled ?? {})
+
     this.item = item
+
+    this.enable()
 
     this.inheritKeyMap(keyMap)
   }
 
+  enable() {
+    super.enable()
+    mergeLeft(this.widget.style, this.item.enabled)
+    this.emit('dirty')
+  }
+
+  disable() {
+    super.disable()
+    mergeLeft(this.widget.style, this.item.disabled)
+    this.emit('dirty')
+  }
+
   pressed() {
-    this.emit('pressed')
+    if (this.enabled) {
+      this.emit('pressed')
+    }
   }
 }
