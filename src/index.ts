@@ -48,6 +48,7 @@ const performAction = async (
       'launchConfigs',
       configId,
     ])
+    await saveLocalConfig(model.project, model.config.local)
   }
 }
 
