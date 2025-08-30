@@ -2,6 +2,7 @@ import blessed from 'neo-blessed'
 import { mergeLeft } from '@whimbrel/walk'
 
 import { Controller } from './controller'
+import { Event } from './event'
 import { Store } from './store'
 import { Label } from './label'
 import { Button } from './button'
@@ -97,9 +98,9 @@ export interface ConfirmDialogModel {
   message?: string
   options?: ConfirmOption[]
   buttonSpacing?: number
-  onConfirm?: () => void
-  onCancel?: () => void
-  onDecline?: () => void
+  onConfirm?: Event | (() => void)
+  onCancel?: Event | (() => void)
+  onDecline?: Event | (() => void)
 }
 
 const DEFAULT_BUTTON_TEXT = {
@@ -219,19 +220,28 @@ export class ConfirmDialog<
     )
   }
 
+  #fireHandler(handler: Event | (() => void) | undefined) {
+    if (handler === undefined) return
+    if (typeof handler === 'function') {
+      handler()
+    } else {
+      this.emit(handler)
+    }
+  }
+
   onConfirm() {
-    this.model.onConfirm?.()
+    this.#fireHandler(this.model.onConfirm)
     this.destroy()
   }
 
   onDecline() {
-    this.model.onDecline?.()
+    this.#fireHandler(this.model.onDecline)
     this.destroy()
   }
 
   onCancel() {
     if (this.hasOption('cancel')) {
-      this.model.onCancel?.()
+      this.#fireHandler(this.model.onCancel)
       this.destroy()
     }
   }

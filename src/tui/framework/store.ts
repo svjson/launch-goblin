@@ -1,4 +1,4 @@
-import { PropertyPath, readPath, writePath } from '@whimbrel/walk'
+import { deletePath, PropertyPath, readPath, writePath } from '@whimbrel/walk'
 import equal from 'fast-deep-equal'
 
 export interface Subscriber<T> {
@@ -39,6 +39,7 @@ const publish = (
 export interface Store<Model> {
   get<T>(propertyPath: PropertyPath): T
   set<T>(propertyPath: PropertyPath, value: T): void
+  delete(propertyPath: PropertyPath): void
   subscribe<T>(
     propertyPath: PropertyPath,
     subscriber: SubscriberFunction<T>
@@ -56,6 +57,10 @@ export const createStore = <Model>(state: Model): Store<Model> => {
     set<T>(propertyPath: PropertyPath, value: T) {
       writePath(state, propertyPath, value)
       publish(subscribers, propertyPath, value)
+    },
+    delete(propertyPath: PropertyPath) {
+      deletePath(state, propertyPath)
+      publish(subscribers, propertyPath, null)
     },
     subscribe<T>(propertyPath: PropertyPath, handler: SubscriberFunction<T>) {
       subscribers.push({

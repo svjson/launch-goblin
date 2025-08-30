@@ -26,9 +26,9 @@ const performAction = async (
   store: Store<ApplicationState>
 ) => {
   if (action.type === 'create-config') {
-    model.config.local.launchConfigs[action.details.name] = {
+    store.set(['config', 'local', 'launchConfigs', action.details.name], {
       components: toLaunchConfigComponents(model.project.components),
-    }
+    })
     await saveLocalConfig(model.project, model.config.local)
   } else if (action.type === 'open-modal') {
     const dialog = action.details.create({ model, store, screen })
@@ -40,6 +40,14 @@ const performAction = async (
     })
 
     dialog.focus()
+  } else if (action.type === 'delete-config') {
+    const { configId, configType } = action.details
+    store.delete([
+      'config',
+      configType === 'shared' ? 'local' : 'global',
+      'launchConfigs',
+      configId,
+    ])
   }
 }
 

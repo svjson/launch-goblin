@@ -2,8 +2,9 @@ export { applyConfig, toLaunchConfigComponents } from './apply'
 export { readConfig, saveLatestLaunch, saveLocalConfig } from './io'
 
 export type {
-  LGConfig,
+  ComponentLaunchConfig,
+  ConfigType,
   ContextConfig,
   LaunchConfig,
-  ComponentLaunchConfig,
+  LGConfig,
 } from './types'

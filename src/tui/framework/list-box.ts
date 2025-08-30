@@ -3,16 +3,15 @@ import blessed from 'neo-blessed'
 import { mergeLeft } from '@whimbrel/walk'
 
 import { Controller, CtrlCtorParams } from './controller'
-import { createStore } from './store'
 
 export interface ListItem {
   id: string
   label: string
 }
 
-export class ListBox extends Controller<
+export class ListBox<ItemModel extends ListItem = ListItem> extends Controller<
   blessed.Widgets.ListElement,
-  ListItem[],
+  ItemModel[],
   undefined
 > {
   focusable = true
@@ -22,7 +21,7 @@ export class ListBox extends Controller<
     model = [],
     keyMap,
     options = {},
-  }: CtrlCtorParams<ListItem[]>) {
+  }: CtrlCtorParams<ItemModel[]>) {
     super(
       blessed.list(
         mergeLeft(
@@ -30,7 +29,7 @@ export class ListBox extends Controller<
             parent,
             width: 4 + Math.max(...model.map((item) => item.label.length)),
             align: 'left',
-            items: model!.map((item) => item.label),
+            items: model.map((item) => item.label),
             keys: true,
             style: {
               selected: {
@@ -57,6 +56,7 @@ export class ListBox extends Controller<
     }
 
     this.widget.on('select item', (_item, index) => {
+      this.focusedIndex = index
       this.emit({
         type: 'selected',
         item: this.model[index],
@@ -64,5 +64,21 @@ export class ListBox extends Controller<
     })
 
     this.inheritKeyMap(keyMap)
+  }
+
+  getSelectedItem() {
+    return this.model[this.focusedIndex]
+  }
+
+  setItems(items: ItemModel[]) {
+    this.model = items
+    this.widget.setItems(this.model.map((item) => item.label))
+    if (this.model.length > 0) {
+      if (this.focusedIndex >= this.model.length)
+        this.focusedIndex = this.model.length - 1
+
+      this.widget.select(this.focusedIndex)
+    }
+    this.widget.render()
   }
 }

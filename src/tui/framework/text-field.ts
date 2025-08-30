@@ -1,5 +1,6 @@
 import blessed from 'neo-blessed'
 import { Controller, CtrlCtorParams } from './controller'
+import { Event } from './event'
 import { Label, LabelItem } from './label'
 import { mergeLeft } from '@whimbrel/walk'
 
@@ -48,6 +49,10 @@ export class TextField extends Controller<
       { top: 1 },
       { value: model.value }
     )
+
+    this.textInput.on('text-changed', (event: Event) => {
+      this.emit(event)
+    })
 
     this.focusedIndex = 1
   }

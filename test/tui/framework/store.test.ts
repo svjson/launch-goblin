@@ -181,4 +181,32 @@ describe('Store', () => {
       ])
     })
   })
+
+  describe('delete', () => {
+    it('should delete object at path', () => {
+      // Given
+      const state = makeTestState()
+      const store = createStore(state)
+
+      // When
+      store.delete('config.ui.web')
+
+      // Then
+      expect(state).toEqual({
+        inventory: {
+          stock: [],
+          backOrder: [],
+          ordered: [],
+        },
+        config: {
+          ui: {
+            backOffice: {
+              fgColor: 'white',
+              bgColor: 'blue',
+            },
+          },
+        },
+      })
+    })
+  })
 })

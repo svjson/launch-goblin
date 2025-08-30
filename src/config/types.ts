@@ -1,3 +1,5 @@
+export type ConfigType = 'private' | 'shared'
+
 export interface ComponentLaunchConfig {
   selected?: boolean
 }

@@ -4,18 +4,27 @@ import { ApplicationState } from '@src/project'
 import { launchConfigByName, launchConfigCount } from '@src/config/query'
 import { mergeLeft } from '@whimbrel/walk'
 import { ListBox, ListItem } from './framework/list-box'
-import { applyConfig, ContextConfig, LaunchConfig } from '@src/config'
+import {
+  applyConfig,
+  ConfigType,
+  ContextConfig,
+  LaunchConfig,
+} from '@src/config'
 import { ItemSelectedEvent } from './framework/event'
 import { Controller } from './framework/controller'
 import { ConfirmDialog } from './framework/modal'
 
 const transformEntries = (
   launchConfigs: Record<string, LaunchConfig>,
-  type: string
-) =>
-  Object.entries(launchConfigs).map(([name, cfg]) => {
-    return [name, { ...cfg, type }]
+  type: ConfigType
+): ConfigListItem[] =>
+  Object.entries(launchConfigs).map(([name, _cfg]) => {
+    return { id: name, label: name, type }
   })
+
+export interface ConfigListItem extends ListItem {
+  type: 'private' | 'shared'
+}
 
 export class ConfigSection extends Controller<
   blessed.Widgets.BoxElement,
@@ -34,6 +43,8 @@ export class ConfigSection extends Controller<
     selected: this.bind(this.configSelected),
   }
 
+  configList: ListBox<ConfigListItem>
+
   constructor({
     parent,
     store,
@@ -48,7 +59,7 @@ export class ConfigSection extends Controller<
             parent: parent,
             label: ' Configurations ',
             width: 40,
-            height: Math.min(14, launchConfigCount(store.get('config')) + 4),
+            height: 14,
             border: 'line',
             keys: true,
             scrollable: true,
@@ -61,25 +72,45 @@ export class ConfigSection extends Controller<
       store
     )
 
+    this.store.subscribe('config.global', () => {
+      this.populateList()
+      return true
+    })
+    this.store.subscribe('config.local', () => {
+      this.populateList()
+      return true
+    })
+
     this.inheritKeyMap(keyMap)
 
-    const config: ContextConfig = store!.get('config')
-
-    this.addChild(
+    this.configList = this.addChild(
       {
         component: ListBox,
-        model: [
-          ...transformEntries(config.global.launchConfigs, 'private'),
-          ...transformEntries(config.local.launchConfigs, 'shared'),
-        ].map(
-          ([name, _cfg]) =>
-            ({
-              id: name,
-              label: name,
-            }) as ListItem
-        ),
+        model: this.modelToListItems(),
       },
       { left: 1, top: 1, width: '100%-4' }
+    )
+
+    this.adjustHeight()
+  }
+
+  modelToListItems() {
+    const config: ContextConfig = this.store.get('config')
+    return [
+      ...transformEntries(config.local.launchConfigs, 'shared'),
+      ...transformEntries(config.global.launchConfigs, 'private'),
+    ]
+  }
+
+  populateList() {
+    this.configList.setItems(this.modelToListItems())
+    this.adjustHeight()
+  }
+
+  adjustHeight() {
+    this.widget.height = Math.min(
+      14,
+      launchConfigCount(this.store.get('config')) + 4
     )
   }
 
@@ -112,6 +143,16 @@ export class ConfigSection extends Controller<
                 title: ' Delete Configuration ',
                 message: `Are you sure you want to delete the configuration?`,
                 options: [{ option: 'yes', buttonText: 'Delete' }, 'cancel'],
+                onConfirm: {
+                  type: 'action',
+                  action: {
+                    type: 'delete-config',
+                    details: {
+                      configId: this.model.activeConfigName,
+                      configType: this.configList.getSelectedItem()?.type,
+                    },
+                  },
+                },
               },
             }),
           source: this,
