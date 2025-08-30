@@ -1,4 +1,5 @@
 import blessed from 'neo-blessed'
+import { mergeLeft } from '@whimbrel/walk'
 
 import { Controller, CtrlCtorParams } from './controller'
 
@@ -12,12 +13,17 @@ export class Label<Model extends LabelItem> extends Controller<
 > {
   focusable = false
 
-  constructor({ parent, model = { text: '' } }: CtrlCtorParams) {
+  constructor({ parent, model = { text: '' }, options }: CtrlCtorParams) {
     super(
-      blessed.text({
-        parent: parent,
-        content: model.text,
-      }),
+      blessed.text(
+        mergeLeft(
+          {
+            parent: parent,
+            content: model.text,
+          },
+          options
+        )
+      ),
       model
     )
   }

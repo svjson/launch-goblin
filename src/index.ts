@@ -1,8 +1,9 @@
 #!/usr/bin/env node
+import blessed from 'neo-blessed'
 
 import { launch } from './launch'
 import { readProject } from './project'
-import { initTui, destroy, createStore } from './tui/framework'
+import { initTui, destroy, createStore, Store } from './tui/framework'
 import { MainController } from './tui'
 import {
   Action,
@@ -18,12 +19,27 @@ import {
   toLaunchConfigComponents,
 } from './config'
 
-const performAction = async (action: Action, model: ApplicationState) => {
+const performAction = async (
+  screen: blessed.Widgets.Screen,
+  action: Action,
+  model: ApplicationState,
+  store: Store<ApplicationState>
+) => {
   if (action.type === 'create-config') {
     model.config.local.launchConfigs[action.details.name] = {
       components: toLaunchConfigComponents(model.project.components),
     }
     await saveLocalConfig(model.project, model.config.local)
+  } else if (action.type === 'open-modal') {
+    const dialog = action.details.create({ model, store, screen })
+    dialog.on('*', (event: Event) => {
+      if (event.type === 'destroyed') {
+        action.details.source.focus()
+      }
+      action.details.source.receive(event)
+    })
+
+    dialog.focus()
   }
 }
 
@@ -60,7 +76,7 @@ const main = async () => {
   })
 
   mainCtrl.on('action', async (event: ActionEvent) => {
-    await performAction(event.action, model)
+    await performAction(screen, event.action, model, store)
   })
 
   mainCtrl.focus()

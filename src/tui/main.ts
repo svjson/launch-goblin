@@ -68,7 +68,9 @@ export class MainController extends Controller<
       model: store.get<Project>('project').components,
       store,
     })
-    this.addChild(LaunchButtonController)
+    this.addChild(LaunchButtonController, {
+      top: Number(this.componentSection.bottom()) + 3,
+    })
     this.addChild(
       {
         component: ConfigSection,
@@ -88,6 +90,10 @@ export class MainController extends Controller<
 
   componentFocused(event: FocusEvent) {
     this.footer.applyContext(event.component)
+  }
+
+  emit(event: Event) {
+    super.emit(event)
   }
 
   saveConfig() {

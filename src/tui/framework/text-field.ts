@@ -12,15 +12,13 @@ export interface TextInputModel {
   value: string
 }
 
-export class TextField extends Controller {
-  item: TextFieldModel
-
+export class TextField extends Controller<
+  blessed.Widgets.BoxElement,
+  TextFieldModel
+> {
   textInput: TextInput
 
-  constructor(
-    { parent, model, keyMap, options }: CtrlCtorParams,
-    item: TextFieldModel
-  ) {
+  constructor({ parent, model, keyMap, options }: CtrlCtorParams) {
     super(
       blessed.box(
         mergeLeft(
@@ -41,14 +39,17 @@ export class TextField extends Controller {
       {
         component: Label,
         model:
-          typeof item.label === 'string' ? { text: item.label } : item.label,
+          typeof model.label === 'string' ? { text: model.label } : model.label,
       },
       { top: 1 }
     )
-    this.textInput = this.addChild(TextInput, { top: 1 }, { value: item.value })
+    this.textInput = this.addChild(
+      TextInput,
+      { top: 1 },
+      { value: model.value }
+    )
 
     this.focusedIndex = 1
-    this.item = item
   }
 
   getText() {
@@ -56,13 +57,11 @@ export class TextField extends Controller {
   }
 }
 
-export class TextInput extends Controller<blessed.Widgets.TextboxElement> {
-  item: TextInputModel
-
-  constructor(
-    { parent, model, keyMap, options }: CtrlCtorParams,
-    item: TextInputModel
-  ) {
+export class TextInput extends Controller<
+  blessed.Widgets.TextboxElement,
+  TextInputModel
+> {
+  constructor({ parent, model, keyMap, options }: CtrlCtorParams) {
     super(
       blessed.textbox({
         parent,
@@ -77,8 +76,6 @@ export class TextInput extends Controller<blessed.Widgets.TextboxElement> {
       }),
       model
     )
-
-    this.item = item
 
     this.widget.on('submit', () => {
       this.emit({ type: 'text-changed', value: this.widget.content })

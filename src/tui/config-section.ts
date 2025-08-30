@@ -1,5 +1,5 @@
 import blessed from 'neo-blessed'
-import { CtrlCtorParams } from './framework'
+import { CtrlCtorParams, Store } from './framework'
 import { ApplicationState } from '@src/project'
 import { launchConfigByName, launchConfigCount } from '@src/config/query'
 import { mergeLeft } from '@whimbrel/walk'
@@ -7,6 +7,7 @@ import { ListBox, ListItem } from './framework/list-box'
 import { applyConfig, ContextConfig, LaunchConfig } from '@src/config'
 import { ItemSelectedEvent } from './framework/event'
 import { Controller } from './framework/controller'
+import { ConfirmDialog } from './framework/modal'
 
 const transformEntries = (
   launchConfigs: Record<string, LaunchConfig>,
@@ -90,5 +91,32 @@ export class ConfigSection extends Controller<
     }
   }
 
-  confirmDelete() {}
+  confirmDelete() {
+    this.emit({
+      type: 'action',
+      action: {
+        type: 'open-modal',
+        details: {
+          create: <M, SM>({
+            screen,
+            store,
+          }: {
+            screen: blessed.Widgets.Screen
+            model: M
+            store: Store<SM>
+          }) =>
+            new ConfirmDialog({
+              screen,
+              store,
+              model: {
+                title: ' Delete Configuration ',
+                message: `Are you sure you want to delete the configuration?`,
+                options: [{ option: 'yes', buttonText: 'Delete' }, 'cancel'],
+              },
+            }),
+          source: this,
+        },
+      },
+    })
+  }
 }

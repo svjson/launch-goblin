@@ -29,22 +29,25 @@ export class SaveConfigDialog extends ModalDialog<
     })
 
     const nameField = this.addChild(
-      TextField,
-      { top: 1, left: 2, width: '100%-6' },
-      { label: 'Configuration Name:', value: '' }
+      {
+        component: TextField,
+        model: { label: 'Configuration Name:', value: '' },
+      },
+      { top: 1, left: 2, width: '100%-6' }
     )
 
     const saveButton = this.addChild(
-      Button,
-      { top: 4, left: '50%-14' },
-      { text: 'Save' }
+      {
+        component: Button,
+        model: { text: 'Save' },
+      },
+      { top: 4, left: '50%-14' }
     )
     saveButton.disable()
 
     const cancelButton = this.addChild(
-      Button,
-      { top: 4, left: '50%+2' },
-      { text: 'Cancel' }
+      { component: Button, model: { text: 'Cancel' } },
+      { top: 4, left: '50%+2' }
     )
 
     nameField.on('text-changed', (event: TextChangedEvent) => {

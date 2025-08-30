@@ -14,8 +14,6 @@ export class Button extends Controller<
   blessed.Widgets.ButtonElement,
   ButtonModel
 > {
-  item: ButtonModel
-
   focusable = true
 
   keyMap = {
@@ -25,19 +23,15 @@ export class Button extends Controller<
     },
   }
 
-  constructor(
-    { parent, model, keyMap, options = {} }: CtrlCtorParams,
-    item: ButtonModel
-  ) {
+  constructor({ parent, model, keyMap, options = {} }: CtrlCtorParams) {
     super(
       blessed.button(
         mergeLeft(
           {
             parent,
-            content: item.text,
+            content: model.text,
             height: 1,
             left: 'center',
-            top: '60%',
             style: {
               fg: 'black',
               bg: '#888888',
@@ -46,7 +40,7 @@ export class Button extends Controller<
                 bg: 'green',
               },
             },
-            width: 10,
+            width: model.text.length + 4,
             align: 'center',
           },
           options
@@ -54,10 +48,11 @@ export class Button extends Controller<
       ),
       model
     )
-    item.disabled = mergeLeft({ bg: 'gray', fg: 'black' }, item.disabled ?? {})
-    item.enabled = mergeLeft({ bg: 'white', fg: 'black' }, item.enabled ?? {})
-
-    this.item = item
+    model.disabled = mergeLeft(
+      { bg: 'gray', fg: 'black' },
+      model.disabled ?? {}
+    )
+    model.enabled = mergeLeft({ bg: 'white', fg: 'black' }, model.enabled ?? {})
 
     this.enable()
 
@@ -66,13 +61,13 @@ export class Button extends Controller<
 
   enable() {
     super.enable()
-    mergeLeft(this.widget.style, this.item.enabled)
+    mergeLeft(this.widget.style, this.model.enabled)
     this.emit('dirty')
   }
 
   disable() {
     super.disable()
-    mergeLeft(this.widget.style, this.item.disabled)
+    mergeLeft(this.widget.style, this.model.disabled)
     this.emit('dirty')
   }
 

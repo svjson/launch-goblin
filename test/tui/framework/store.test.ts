@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 
 import { PropertyPath } from '@whimbrel/walk'
 import { createStore, matchesPath } from '@src/tui/framework/store'
+import { generateSingleResultTests } from 'test/fixtures'
 
 interface TestProduct {
   id: number
@@ -64,16 +65,6 @@ const makeTestSubscriber = <T>() => {
   }
 }
 
-const generateTests = <Inputs, Expected>(
-  generator: (inputs: Inputs, expected: Expected) => void,
-  expected: Expected,
-  testCases: Inputs[]
-) => {
-  for (const testCase of testCases) {
-    generator(testCase, expected)
-  }
-}
-
 describe('matchesPath', () => {
   const matchesTest = (
     [testPath, againstPath]: [PropertyPath, PropertyPath],
@@ -84,7 +75,7 @@ describe('matchesPath', () => {
     })
   }
 
-  generateTests(matchesTest, true, [
+  generateSingleResultTests(matchesTest, true, [
     ['somewhere.over.the.rainbow', 'somewhere'],
     ['somewhere.over.the', 'somewhere'],
     ['somewhere.over', 'somewhere'],
@@ -95,7 +86,7 @@ describe('matchesPath', () => {
     [['somewhere'], ['somewhere']],
   ])
 
-  generateTests(matchesTest, false, [
+  generateSingleResultTests(matchesTest, false, [
     ['somewhere', 'somewhere.over.the.rainbow'],
     ['somewhere', 'somewhere.over.the'],
     ['somewhere', 'somewhere.over'],

@@ -34,9 +34,15 @@ export class ListBox extends Controller<
             keys: true,
             style: {
               selected: {
-                bg: 'green',
+                bg: 'white',
                 fg: 'black',
                 bold: true,
+              },
+              focus: {
+                selected: {
+                  bg: 'blue',
+                  fg: 'white',
+                },
               },
             },
           } as blessed.Widgets.ListOptions<blessed.Widgets.ListElementStyle>,

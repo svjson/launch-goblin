@@ -131,10 +131,6 @@ export abstract class Controller<
       handler(event)
     }
 
-    for (const l of this.listeners) {
-      l.receive(event)
-    }
-
     if (event.type === 'destroy') {
       this.#destroyChild((event as DestroyEvent).component)
     }
