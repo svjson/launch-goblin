@@ -53,7 +53,15 @@ const performAction = async (
 }
 
 const main = async () => {
-  const model: ApplicationState = await readProject()
+  const targetAction = 'dev'
+  const model: ApplicationState = await readProject(targetAction)
+
+  if (model.project.launchers.length === 0) {
+    console.error(
+      `No launch strategy available for target action '${targetAction}'`
+    )
+    process.exit(1)
+  }
 
   const screen = initTui()
 
@@ -73,7 +81,8 @@ const main = async () => {
     destroy(screen)
     const selected = model.project.components.filter((c) => c.selected)
     await saveLatestLaunch(model)
-    await launch(selected)
+    const cmd = model.project.launchers[0].launchCommand(selected)
+    await launch(cmd)
   })
 
   mainCtrl.on('focus', (event: FocusEvent) => {

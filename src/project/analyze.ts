@@ -5,8 +5,10 @@ import {
   ProjectFacet,
   analyzePath,
 } from '@whimbrel/core'
+import PnpmFacet from '@whimbrel/pnpm'
 import NpmFacet from '@whimbrel/npm'
-import PackageJsonFacet from '@whimbrel/package-json'
+import TurborepoFacet from '@whimbrel/turborepo'
+import PackageJsonFacet, { PackageJSON } from '@whimbrel/package-json'
 import { DefaultFacetRegistry } from '@whimbrel/facet'
 import { Project, ProjectComponent } from './types'
 
@@ -15,9 +17,11 @@ export const analyze = async (dir: string): Promise<Project> => {
     facets: new DefaultFacetRegistry([
       ActorFacet,
       SourceFacet,
+      PnpmFacet,
       NpmFacet,
       ProjectFacet,
       PackageJsonFacet,
+      TurborepoFacet,
     ]),
   })
 
@@ -25,19 +29,26 @@ export const analyze = async (dir: string): Promise<Project> => {
 
   const root = ctx.getActor({ root: dir })!
 
+  const cmpActors = Object.values(ctx.sources).filter((a) => a !== root)
+
+  const components: ProjectComponent[] = []
+
+  for (const a of cmpActors) {
+    components.push({
+      id: a.id,
+      name: a.name,
+      root: a.root,
+      package: a.name,
+      pkgJson: await PackageJSON.read(ctx.disk, a.root),
+      selected: true,
+    })
+  }
+
   return {
     id: root.id,
     root: root.root,
-    components: Object.values(ctx.sources)
-      .filter((a) => a !== root)
-      .map(
-        (a) =>
-          ({
-            id: a.id,
-            name: a.name,
-            package: a.name,
-            selected: true,
-          }) satisfies ProjectComponent
-      ),
+    launchers: [],
+    ctx,
+    components,
   }
 }

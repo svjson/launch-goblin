@@ -2,34 +2,56 @@ import { describe, expect, it } from 'vitest'
 
 import { applyConfig, LaunchConfig } from '@src/config'
 import { Project, ProjectComponent } from '@src/project'
+import { PackageJSON } from '@whimbrel/package-json'
+import { WhimbrelContext } from '@whimbrel/core'
+import { LaunchCommand } from '@src/launch'
 
 describe('applyConfig', () => {
   const components: Record<string, (sel: boolean) => ProjectComponent> = {
     'great-cmp': (selected: boolean) => ({
       id: 'great-cmp',
+      root: '',
       name: 'Great Component',
       package: '@project/great-cmp',
+      pkgJson: null as unknown as PackageJSON,
       selected,
     }),
     'terrible-cmp': (selected: boolean) => ({
       id: 'terrible-cmp',
+      root: '',
       name: 'Terrible Component',
       package: '@project/just-terrible',
+      pkgJson: null as unknown as PackageJSON,
       selected,
     }),
     'awesome-cmp': (selected: boolean) => ({
       id: 'awesome-cmp',
+      root: '',
       name: 'Cowabunga!',
       package: '@project/awesome-cmp',
+      pkgJson: null as unknown as PackageJSON,
       selected,
     }),
   }
 
   const makeProject = (...cmps: [string, boolean][]): Project => {
+    const selectedComponents = cmps.map(([id, selected]) =>
+      components[id](selected)
+    )
     return {
       id: 'my-project',
+      ctx: null as unknown as WhimbrelContext,
+      launchers: [
+        {
+          id: 'turbo',
+          launchCommand: () => {
+            return null as unknown as LaunchCommand
+          },
+          components: selectedComponents.map((c) => c.id),
+        },
+      ],
       root: '/tmp/somewhere',
-      components: cmps.map(([id, selected]) => components[id](selected)),
+      components: selectedComponents,
     }
   }
 

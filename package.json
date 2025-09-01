@@ -1,8 +1,13 @@
 {
   "name": "launch-goblin",
   "version": "0.1.0",
-  "main": "./dist/index.cjs",
   "type": "commonjs",
+  "license": "MIT",
+  "author": "Sven Johansson",
+  "main": "./dist/index.cjs",
+  "files": [
+    "dist"
+  ],
   "bin": {
     "launch-goblin": "dist/index.cjs"
   },
@@ -12,9 +17,6 @@
       "import": "./dist/index.js"
     }
   },
-  "files": [
-    "dist"
-  ],
   "scripts": {
     "build": "tsup",
     "dev": "tsx src/index.ts",
@@ -22,11 +24,12 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@whimbrel/core": "0.0.3",
-    "@whimbrel/node": "0.0.3",
-    "@whimbrel/npm": "0.0.3",
-    "@whimbrel/package-json": "0.0.3",
-    "@whimbrel/turborepo": "0.0.3",
+    "@whimbrel/core": "0.0.4",
+    "@whimbrel/node": "0.0.4",
+    "@whimbrel/npm": "0.0.4",
+    "@whimbrel/pnpm": "0.0.4",
+    "@whimbrel/package-json": "0.0.4",
+    "@whimbrel/turborepo": "0.0.4",
     "neo-blessed": "^0.2.0"
   },
   "devDependencies": {
