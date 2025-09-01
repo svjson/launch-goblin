@@ -65,7 +65,11 @@ export class MainController extends Controller<
     this.addChild(HeaderController)
     this.componentSection = this.addChild({
       component: ComponentSection,
-      model: store.get<Project>('project').components,
+      model: store
+        .get<Project>('project')
+        .components.filter((cmp) =>
+          model.project.launchers[0].components.includes(cmp.id)
+        ),
       store,
     })
     this.addChild(LaunchButtonController, {
