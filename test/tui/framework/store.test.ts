@@ -2,7 +2,6 @@ import { describe, expect, it } from 'vitest'
 
 import { PropertyPath } from '@whimbrel/walk'
 import { createStore, matchesPath } from '@src/tui/framework/store'
-import { generateSingleResultTests } from 'test/fixtures'
 
 interface TestProduct {
   id: number
@@ -75,7 +74,7 @@ describe('matchesPath', () => {
     })
   }
 
-  generateSingleResultTests(matchesTest, true, [
+  it.each([
     ['somewhere.over.the.rainbow', 'somewhere'],
     ['somewhere.over.the', 'somewhere'],
     ['somewhere.over', 'somewhere'],
@@ -84,16 +83,20 @@ describe('matchesPath', () => {
     [['somewhere', 'over', 'the'], ['somewhere']],
     [['somewhere', 'over'], ['somewhere']],
     [['somewhere'], ['somewhere']],
-  ])
+  ])('should test true for %o against %o', (testPath, againstPath) => {
+    expect(matchesPath(testPath, againstPath)).toBe(true)
+  })
 
-  generateSingleResultTests(matchesTest, false, [
+  it.each([
     ['somewhere', 'somewhere.over.the.rainbow'],
     ['somewhere', 'somewhere.over.the'],
     ['somewhere', 'somewhere.over'],
     [['somewhere'], ['somewhere', 'over', 'the', 'rainbow']],
     [['somewhere'], ['somewhere', 'over', 'the']],
     [['somewhere'], ['somewhere', 'over']],
-  ])
+  ])('should test false for %o against %o', (testPath, againstPath) => {
+    expect(matchesPath(testPath, againstPath)).toBe(false)
+  })
 })
 
 describe('Store', () => {
