@@ -38,6 +38,8 @@ export class MainController extends Controller<
   }
 
   componentSection: ComponentSection
+  configSection: ConfigSection
+  launchButton: LaunchButtonController
   footer: FooterController
 
   constructor({
@@ -72,22 +74,25 @@ export class MainController extends Controller<
         ),
       store,
     })
-    this.addChild(LaunchButtonController, {
-      top: Number(this.componentSection.bottom()) + 3,
+
+    this.launchButton = this.addChild(LaunchButtonController)
+    this.launchButton.layout.bind(
+      'top',
+      () => Number(this.componentSection.bottom()) + 1
+    )
+
+    this.configSection = this.addChild({
+      component: ConfigSection,
+      model: store.get('config'),
+      store,
     })
-    this.addChild(
-      {
-        component: ConfigSection,
-        model: store.get('config'),
-        store,
-      },
-      {
-        top: this.componentSection.top(),
-        left:
-          Number(this.componentSection.left()) +
-          Number(this.componentSection.width()) +
-          4,
-      }
+    this.configSection.layout.bind('top', () => this.componentSection.top())
+    this.configSection.layout.bind(
+      'left',
+      () =>
+        Number(this.componentSection.left()) +
+        Number(this.componentSection.width()) +
+        4
     )
     this.footer = this.addChild(FooterController)
   }
