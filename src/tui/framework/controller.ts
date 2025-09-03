@@ -226,11 +226,12 @@ export abstract class Controller<
     }
   }
 
-  bind(fn: Function) {
-    const _self = this
-    return (...args: any[]) => {
-      fn.apply(_self, args)
-    }
+  bind<T extends (...args: any[]) => any>(
+    this: any,
+    fn: T
+  ): (...args: Parameters<T>) => ReturnType<T> {
+    const self = this
+    return (...args: Parameters<T>): ReturnType<T> => fn.apply(self, args)
   }
 
   enable() {

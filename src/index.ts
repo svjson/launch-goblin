@@ -1,51 +1,13 @@
 #!/usr/bin/env node
-import blessed from 'neo-blessed'
 
 import { launch } from './launch'
 import { readProject } from './project'
-import { initTui, destroy, Store, readTTYTitleString } from './tui/framework'
+import { initTui, destroy, readTTYTitleString } from './tui/framework'
 import { LaunchGoblinApp } from './tui'
-import { Action, ActionEvent, LogEvent } from './tui/framework'
+import { LogEvent } from './tui/framework'
 import { ApplicationState } from './project'
-import {
-  saveLatestLaunch,
-  saveLocalConfig,
-  toLaunchConfigComponents,
-} from './config'
+import { saveLatestLaunch } from './config'
 import { setTTYTitleString } from './tui/framework/tty'
-
-const performAction = async (
-  screen: blessed.Widgets.Screen,
-  action: Action,
-  model: ApplicationState,
-  store: Store<ApplicationState>
-) => {
-  if (action.type === 'create-config') {
-    store.set(['config', 'local', 'launchConfigs', action.details.name], {
-      components: toLaunchConfigComponents(model.project.components),
-    })
-    await saveLocalConfig(model.project, model.config.local)
-  } else if (action.type === 'open-modal') {
-    const dialog = action.details.create({ model, store, screen })
-    dialog.on('*', (event: Event) => {
-      if (event.type === 'destroyed') {
-        action.details.source.focus()
-      }
-      action.details.source.receive(event)
-    })
-
-    dialog.focus()
-  } else if (action.type === 'delete-config') {
-    const { configId, configType } = action.details
-    store.delete([
-      'config',
-      configType === 'shared' ? 'local' : 'global',
-      'launchConfigs',
-      configId,
-    ])
-    await saveLocalConfig(model.project, model.config.local)
-  }
-}
 
 const main = async () => {
   const targetAction = 'dev'
@@ -75,10 +37,6 @@ const main = async () => {
 
   app.mainCtrl.on('log', (event: LogEvent) => {
     log.push(event.message)
-  })
-
-  app.mainCtrl.on('action', async (event: ActionEvent) => {
-    await performAction(screen, event.action, model, app.store)
   })
 
   app.mainCtrl.focus()
