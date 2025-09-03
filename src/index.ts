@@ -5,13 +5,7 @@ import { launch } from './launch'
 import { readProject } from './project'
 import { initTui, destroy, Store, readTTYTitleString } from './tui/framework'
 import { LaunchGoblinApp } from './tui'
-import {
-  Action,
-  ActionEvent,
-  LogEvent,
-  FocusEvent,
-  KeyMap,
-} from './tui/framework'
+import { Action, ActionEvent, LogEvent } from './tui/framework'
 import { ApplicationState } from './project'
 import {
   saveLatestLaunch,
@@ -69,13 +63,7 @@ const main = async () => {
 
   const log: string[] = []
 
-  let activeKeyMap: KeyMap = {}
-
   const app = new LaunchGoblinApp(screen, model)
-
-  app.mainCtrl.on('dirty', () => {
-    screen.render()
-  })
 
   app.mainCtrl.on('launch', async () => {
     destroy(screen)
@@ -83,10 +71,6 @@ const main = async () => {
     await saveLatestLaunch(model)
     const cmd = model.project.launchers[0].launchCommand(selected)
     await launch(cmd)
-  })
-
-  app.mainCtrl.on('focus', (event: FocusEvent) => {
-    activeKeyMap = event.component.keyMap
   })
 
   app.mainCtrl.on('log', (event: LogEvent) => {
@@ -98,12 +82,6 @@ const main = async () => {
   })
 
   app.mainCtrl.focus()
-
-  screen.on('keypress', (ch, key) => {
-    if (activeKeyMap[key.full]) {
-      activeKeyMap[key.full].handler(ch, key)
-    }
-  })
 
   screen.key(['q', 'C-c'], () => {
     destroy(screen)
