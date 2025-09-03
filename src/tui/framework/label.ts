@@ -7,7 +7,7 @@ export interface LabelItem {
   text: string
 }
 
-export class Label<Model extends LabelItem> extends Controller<
+export class Label<Model extends LabelItem = LabelItem> extends Controller<
   blessed.Widgets.TextElement,
   Model
 > {
@@ -19,12 +19,20 @@ export class Label<Model extends LabelItem> extends Controller<
         mergeLeft(
           {
             parent: parent,
-            content: model.text,
+            content: model.text ?? '',
+            transparent: true,
+            tags: true,
+            style: {},
           },
           options
         )
       ),
       model
     )
+  }
+
+  setText(text: string) {
+    this.model.text = text ?? ''
+    this.widget.content = this.model.text
   }
 }

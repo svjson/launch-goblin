@@ -18,7 +18,7 @@ export class FooterController extends Controller {
         left: 0,
         width: '100%',
         height: 1,
-        content: ' q = quit • ↑↓ = nav • space = toggle',
+        content: ' q = quit ',
         style: { fg: 'white', bg: 'gray' },
       }),
       model,

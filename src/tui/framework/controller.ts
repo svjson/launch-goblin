@@ -133,7 +133,7 @@ export abstract class Controller<
     protected store: Store<StoreModel> = createStore({}) as Store<StoreModel>
   ) {
     this.layout = new ControllerLayout(this)
-    this.widget.onScreenEvent('render', () => {
+    this.widget.onScreenEvent('prerender', () => {
       this.layout.apply()
     })
   }
@@ -298,7 +298,15 @@ export abstract class Controller<
   }
 
   set(prop: LayoutProperty, value: string | number) {
-    this[prop].call(this, value)
+    const accessors: Record<LayoutProperty, (value: string | number) => void> =
+      {
+        top: this.bind(this.top),
+        left: this.bind(this.left),
+        bg: (value: string | number) => (this.widget.style.bg = value),
+        fg: (value: string | number) => (this.widget.style.fg = value),
+      }
+
+    accessors[prop](value)
   }
 
   top(value?: string | number): string | number {
@@ -312,21 +320,21 @@ export abstract class Controller<
     if (value !== undefined) {
       this.widget.right = value
     }
-    return this.widget.lpos.xl
+    return this.widget.lpos?.xl
   }
 
   bottom(value?: string | number): string | number {
     if (value !== undefined) {
       this.widget.bottom = value
     }
-    return this.widget.lpos.yl
+    return this.widget.lpos?.yl
   }
 
   left(value?: string | number): string | number {
     if (value !== undefined) {
       this.widget.left = value
     }
-    return this.widget.lpos.xi
+    return this.widget.lpos?.xi
   }
 
   width(value?: string | number): string | number {
@@ -352,8 +360,11 @@ export abstract class Controller<
 
       if (focusedChild) {
         focusedChild.focus()
+        return
       }
-    } else {
+    }
+
+    if (this.isFocusable()) {
       this.widget.focus()
       this.emit({ type: 'focus', component: this })
     }

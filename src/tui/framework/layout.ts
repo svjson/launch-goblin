@@ -6,7 +6,7 @@ export const add = (...nums: number[]) => {
 
 export const withSign = (num: number): string => `${num >= 0 ? '+' : ''}${num}`
 
-export type LayoutProperty = 'top' | 'left'
+export type LayoutProperty = 'top' | 'left' | 'bg' | 'fg'
 export type ValueProvider = () => string | number
 
 export class ControllerLayout {

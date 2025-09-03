@@ -7,6 +7,7 @@ import {
 import { juxt } from '@whimbrel/array'
 import blessed from 'neo-blessed'
 import { ApplicationState, ProjectComponent } from '@src/project'
+import { CheckboxItem } from './framework/checkbox'
 
 export class ComponentSection extends Controller<
   blessed.Widgets.BoxElement,
@@ -69,14 +70,17 @@ export class ComponentSection extends Controller<
 
     model.forEach((c, i) => {
       this.addChild(
-        Checkbox,
-        {},
         {
-          offsetY: 1,
-          id: c.id,
-          label: c.name,
-          index: i,
-          selected: c.selected,
+          component: Checkbox,
+          model: {
+            id: c.id,
+            label: c.name,
+            index: i,
+            checked: c.selected,
+          } as CheckboxItem,
+        },
+        {
+          top: i + 1,
         }
       )
     })
