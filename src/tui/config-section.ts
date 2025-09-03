@@ -83,14 +83,17 @@ export class ConfigSection extends Controller<
 
     this.inheritKeyMap(keyMap)
 
+    const listItems = this.modelToListItems()
+
     this.configList = this.addChild(
       {
         component: ListBox,
-        model: this.modelToListItems(),
+        model: listItems,
       },
       { left: 1, top: 1, width: '100%-4' }
     )
 
+    this.focusable = listItems.length > 0
     this.adjustHeight()
   }
 
@@ -103,8 +106,10 @@ export class ConfigSection extends Controller<
   }
 
   populateList() {
-    this.configList.setItems(this.modelToListItems())
+    const listItems = this.modelToListItems()
+    this.configList.setItems(listItems)
     this.adjustHeight()
+    this.focusable = listItems.length > 0
   }
 
   adjustHeight() {
