@@ -3,14 +3,8 @@ import blessed from 'neo-blessed'
 
 import { launch } from './launch'
 import { readProject } from './project'
-import {
-  initTui,
-  destroy,
-  createStore,
-  Store,
-  readTTYTitleString,
-} from './tui/framework'
-import { MainController } from './tui'
+import { initTui, destroy, Store, readTTYTitleString } from './tui/framework'
+import { LaunchGoblinApp } from './tui'
 import {
   Action,
   ActionEvent,
@@ -77,15 +71,13 @@ const main = async () => {
 
   let activeKeyMap: KeyMap = {}
 
-  const store = createStore(model)
+  const app = new LaunchGoblinApp(screen, model)
 
-  const mainCtrl = new MainController({ screen, store, model })
-
-  mainCtrl.on('dirty', () => {
+  app.mainCtrl.on('dirty', () => {
     screen.render()
   })
 
-  mainCtrl.on('launch', async () => {
+  app.mainCtrl.on('launch', async () => {
     destroy(screen)
     const selected = model.project.components.filter((c) => c.selected)
     await saveLatestLaunch(model)
@@ -93,19 +85,19 @@ const main = async () => {
     await launch(cmd)
   })
 
-  mainCtrl.on('focus', (event: FocusEvent) => {
+  app.mainCtrl.on('focus', (event: FocusEvent) => {
     activeKeyMap = event.component.keyMap
   })
 
-  mainCtrl.on('log', (event: LogEvent) => {
+  app.mainCtrl.on('log', (event: LogEvent) => {
     log.push(event.message)
   })
 
-  mainCtrl.on('action', async (event: ActionEvent) => {
-    await performAction(screen, event.action, model, store)
+  app.mainCtrl.on('action', async (event: ActionEvent) => {
+    await performAction(screen, event.action, model, app.store)
   })
 
-  mainCtrl.focus()
+  app.mainCtrl.focus()
 
   screen.on('keypress', (ch, key) => {
     if (activeKeyMap[key.full]) {

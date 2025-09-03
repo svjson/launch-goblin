@@ -12,6 +12,15 @@ export interface Listener {
 }
 
 /**
+ * Parameters for constructor an ApplicationController
+ */
+export interface ApplicationCtrlCtorParams<M> {
+  screen: blessed.Widgets.Screen
+  model: M
+  store: Store<M>
+}
+
+/**
  * Parameters for constructing a Controller.
  */
 export interface CtrlCtorParams<Model = any, StoreModel = Model> {
@@ -29,6 +38,14 @@ export type CtrlConstructor<T extends Controller, M, SM> = new (
   ctorParams: CtrlCtorParams<M, SM>,
   ...args: any[]
 ) => T
+
+/**
+ * Type for an ApplicationController class/constructor.
+ */
+export type ApplicationCtrlConstructor<
+  T extends ApplicationController<M>,
+  M,
+> = new (ctorParams: ApplicationCtrlCtorParams<M>) => T
 
 /**
  * Description of a child controller to be added.
@@ -339,5 +356,27 @@ export abstract class Controller<
       this.widget.focus()
       this.emit({ type: 'focus', component: this })
     }
+  }
+}
+
+export class ApplicationController<M> extends Controller<
+  blessed.Widgets.BoxElement,
+  M,
+  Store<M>
+> {
+  screen: blessed.Widgets.Screen
+
+  constructor({ screen, model, store }: ApplicationCtrlCtorParams<M>) {
+    super(
+      blessed.box({
+        parent: screen,
+        width: '100%',
+        height: '100%',
+        style: { fg: 'default' },
+      }),
+      model,
+      store
+    )
+    this.screen = screen
   }
 }

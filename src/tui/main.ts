@@ -1,7 +1,14 @@
 import blessed from 'neo-blessed'
 
 import { ApplicationState, Project } from '@src/project'
-import { Controller, Event, FocusEvent, Store } from './framework'
+import {
+  ApplicationController,
+  ApplicationCtrlCtorParams,
+  Controller,
+  Event,
+  FocusEvent,
+  Store,
+} from './framework'
 import { LaunchButtonController } from './launch-button'
 import { ComponentSection } from './component-section'
 import { FooterController } from './footer'
@@ -9,12 +16,7 @@ import { HeaderController } from './header'
 import { SaveConfigDialog } from './save-config-dialog'
 import { ConfigSection } from './config-section'
 
-export class MainController extends Controller<
-  blessed.Widgets.BoxElement,
-  ApplicationState
-> {
-  screen: blessed.Widgets.Screen
-
+export class MainController extends ApplicationController<ApplicationState> {
   keyMap = {
     'C-s': {
       propagate: true,
@@ -42,37 +44,18 @@ export class MainController extends Controller<
   launchButton: LaunchButtonController
   footer: FooterController
 
-  constructor({
-    screen,
-    model,
-    store,
-  }: {
-    screen: blessed.Widgets.Screen
-    model: ApplicationState
-    store: Store<ApplicationState>
-  }) {
-    super(
-      blessed.box({
-        parent: screen,
-        width: '100%',
-        height: '100%',
-        style: { fg: 'default' },
-      }),
-      model,
-      store
-    )
-    this.store = store
-    this.screen = screen
+  constructor(params: ApplicationCtrlCtorParams<ApplicationState>) {
+    super(params)
 
     this.addChild(HeaderController)
     this.componentSection = this.addChild({
       component: ComponentSection,
-      model: store
+      model: this.store
         .get<Project>('project')
         .components.filter((cmp) =>
-          model.project.launchers[0].components.includes(cmp.id)
+          this.model.project.launchers[0].components.includes(cmp.id)
         ),
-      store,
+      store: this.store,
     })
 
     this.launchButton = this.addChild(LaunchButtonController)
@@ -83,8 +66,8 @@ export class MainController extends Controller<
 
     this.configSection = this.addChild({
       component: ConfigSection,
-      model: store.get('config'),
-      store,
+      model: this.store.get('config'),
+      store: this.store,
     })
     this.configSection.layout.bind('top', () => this.componentSection.top())
     this.configSection.layout.bind(
