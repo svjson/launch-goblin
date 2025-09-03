@@ -1,4 +1,5 @@
 import blessed from 'neo-blessed'
+import { hideCursor } from './tty'
 
 export const initTui = () => {
   const screen = blessed.screen({
@@ -6,9 +7,7 @@ export const initTui = () => {
     title: 'launch-goblin',
   })
 
-  setTimeout(() => {
-    screen.program.write('\x1b[?25l') // ANSI escape for "hide cursor"
-  }, 10)
+  hideCursor(10)
 
   screen.program.hideCursor()
   screen.program.setMode('256')

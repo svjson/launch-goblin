@@ -3,7 +3,13 @@ import blessed from 'neo-blessed'
 
 import { launch } from './launch'
 import { readProject } from './project'
-import { initTui, destroy, createStore, Store } from './tui/framework'
+import {
+  initTui,
+  destroy,
+  createStore,
+  Store,
+  readTTYTitleString,
+} from './tui/framework'
 import { MainController } from './tui'
 import {
   Action,
@@ -18,6 +24,7 @@ import {
   saveLocalConfig,
   toLaunchConfigComponents,
 } from './config'
+import { setTTYTitleString } from './tui/framework/tty'
 
 const performAction = async (
   screen: blessed.Widgets.Screen,
@@ -55,6 +62,7 @@ const performAction = async (
 const main = async () => {
   const targetAction = 'dev'
   const model: ApplicationState = await readProject(targetAction)
+  model.originalWindowTitleString = await readTTYTitleString()
 
   if (model.project.launchers.length === 0) {
     console.error(
@@ -109,6 +117,10 @@ const main = async () => {
     destroy(screen)
     log.forEach((m) => console.log(m))
     process.exit(0)
+  })
+
+  process.on('exit', () => {
+    setTTYTitleString(model.originalWindowTitleString ?? '')
   })
 
   screen.render()

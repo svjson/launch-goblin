@@ -7,6 +7,7 @@ export { initTui } from './init'
 export { ModalDialog } from './modal'
 export { createStore, Store } from './store'
 export { Label } from './label'
+export { readTTYTitleString } from './tty'
 
 export type { Action } from './action'
 export type { CtrlCtorParams } from './controller'
