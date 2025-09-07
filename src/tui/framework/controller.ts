@@ -252,14 +252,18 @@ export abstract class Controller<
     return false
   }
 
+  getWidget() {
+    return this.widget
+  }
+
   nextChild(dir: number = 1): Controller | undefined {
     dir = typeof dir !== 'number' ? 1 : dir
-    this.focusedIndex = (this.focusedIndex + dir) % this.children.length
-
+    this.focusedIndex =
+      (this.focusedIndex + dir + this.children.length) % this.children.length
     const child = this.children[this.focusedIndex]
     if (!child.isFocusable()) {
       if (this.children.some((c) => c.isFocusable())) {
-        return this.nextChild()
+        return this.nextChild(dir)
       }
       return
     }
@@ -295,6 +299,24 @@ export abstract class Controller<
       type: 'log',
       message,
     })
+  }
+
+  removeAllChildren() {
+    while (this.children.length) {
+      const child = this.children.shift()
+      if (child) {
+        child.destroy()
+      }
+    }
+  }
+
+  extendKeyMap(keyMap: KeyMap): KeyMap {
+    this.inheritKeyMap({ replace: false, keys: keyMap })
+    return this.keyMap
+  }
+
+  extendEvents(events: Record<string, Function>): Record<string, Function> {
+    return Object.assign({}, this.events, events)
   }
 
   set(prop: LayoutProperty, value: string | number) {

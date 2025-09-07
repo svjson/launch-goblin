@@ -2,7 +2,7 @@ import blessed from 'neo-blessed'
 
 import { mergeLeft } from '@whimbrel/walk'
 
-import { Controller, CtrlCtorParams } from './controller'
+import { Controller, CtrlConstructor, CtrlCtorParams } from './controller'
 
 export interface ListItem {
   id: string
@@ -29,7 +29,7 @@ export class ListBox<ItemModel extends ListItem = ListItem> extends Controller<
             parent,
             width: 4 + Math.max(...model.map((item) => item.label.length)),
             align: 'left',
-            items: model.map((item) => item.label),
+            items: [],
             keys: true,
             style: {
               selected: {
@@ -70,9 +70,33 @@ export class ListBox<ItemModel extends ListItem = ListItem> extends Controller<
     return this.model[this.focusedIndex]
   }
 
-  setItems(items: ItemModel[]) {
+  clearItems() {
+    this.widget.clearItems()
+    this.children = []
+  }
+
+  setItems(
+    items: ItemModel[],
+    component?: CtrlConstructor<any, ItemModel, any>
+  ) {
     this.model = items
-    this.widget.setItems(this.model.map((item) => item.label))
+    if (component) {
+      this.children = []
+      items.forEach((item) => {
+        this.addChild({
+          component: component,
+          model: item,
+        })
+      })
+    }
+
+    const listItems = this.children.length
+      ? this.children.map((child) => child.getWidget())
+      : this.model.map((item) => item.label)
+
+    console.log(listItems)
+
+    this.widget.setItems(listItems)
     if (this.model.length > 0) {
       if (this.focusedIndex >= this.model.length)
         this.focusedIndex = this.model.length - 1
