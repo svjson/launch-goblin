@@ -42,7 +42,7 @@ export class TextField extends Controller<
         model:
           typeof model.label === 'string' ? { text: model.label } : model.label,
       },
-      { top: 1 }
+      { top: 0 }
     )
     this.textInput = this.addChild(
       TextInput,
