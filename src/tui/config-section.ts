@@ -160,7 +160,7 @@ export class ConfigSection extends CustomListBox<
                     type: 'delete-config',
                     details: {
                       configId: this.store.get('config.activeConfigName'),
-                      //                      configType: this.configList.getSelectedItem()?.type,
+                      configType: this.model[this.focusedIndex]?.type,
                     },
                   },
                 },
