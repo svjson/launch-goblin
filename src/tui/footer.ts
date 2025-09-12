@@ -5,6 +5,8 @@ import { Controller, CtrlCtorParams, LegendEntry } from './framework'
 const KEY_SYMBOLS: Record<string, string> = {
   down: '↓',
   up: '↑',
+  left: '←',
+  right: '→',
 }
 
 export class FooterController extends Controller {

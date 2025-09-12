@@ -9,17 +9,17 @@ export class OptionBar<
   ItemModel extends ListItem = ListItem,
 > extends Controller<blessed.Widgets.BoxElement, ItemModel[], undefined> {
   keyMap = this.extendKeyMap({
-    left: {
-      propagate: true,
-      legend: 'Select Previous',
-      group: 'nav',
-      handler: this.bind(() => this.nextChild(-1)),
-    },
     right: {
       propagate: true,
       legend: 'Select Next',
       group: 'nav',
       handler: this.bind(this.nextChild),
+    },
+    left: {
+      propagate: true,
+      legend: 'Select Previous',
+      group: 'nav',
+      handler: this.bind(() => this.nextChild(-1)),
     },
   })
 
