@@ -3,6 +3,7 @@ import { ApplicationState } from '@src/project'
 import { MainController } from './main'
 import { Action, Application } from './framework'
 import { saveLocalConfig, toLaunchConfigComponents } from '@src/config'
+import { saveGlobalConfig } from '@src/config/io'
 
 export class LaunchGoblinApp extends Application<
   ApplicationState,
@@ -19,12 +20,22 @@ export class LaunchGoblinApp extends Application<
 
   async performCreateConfig(createAction: Action): Promise<void> {
     this.store.set(
-      ['config', 'local', 'launchConfigs', createAction.details.name],
+      [
+        'config',
+        createAction.details.type,
+        'launchConfigs',
+        createAction.details.name,
+      ],
       {
         components: toLaunchConfigComponents(this.model.project.components),
       }
     )
-    await saveLocalConfig(this.model.project, this.model.config.local)
+
+    if (createAction.details.type === 'local') {
+      await saveLocalConfig(this.model.project, this.model.config.local)
+    } else {
+      await saveGlobalConfig(this.model.project, this.model.config.global)
+    }
   }
 
   async deleteConfig(deleteAction: Action): Promise<void> {
@@ -35,6 +46,10 @@ export class LaunchGoblinApp extends Application<
       'launchConfigs',
       configId,
     ])
-    await saveLocalConfig(this.model.project, this.model.config.local)
+    if (configType === 'shared') {
+      await saveLocalConfig(this.model.project, this.model.config.local)
+    } else {
+      await saveGlobalConfig(this.model.project, this.model.config.global)
+    }
   }
 }

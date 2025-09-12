@@ -232,7 +232,7 @@ class ConfigItemBox extends Controller {
       {
         right: 1,
         style: {
-          fg: model.type === 'private' ? 'orange' : 'green',
+          fg: model.type === 'private' ? 208 : 'green',
         },
       }
     )

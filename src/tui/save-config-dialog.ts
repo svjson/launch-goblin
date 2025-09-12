@@ -7,8 +7,10 @@ import {
   TextField,
   Button,
   Store,
+  Label,
 } from './framework'
 import { ModalDialogModel } from './framework/modal'
+import { OptionBar } from './framework/option-bar'
 
 export class SaveConfigDialog extends ModalDialog<
   ModalDialogModel,
@@ -25,7 +27,7 @@ export class SaveConfigDialog extends ModalDialog<
       screen,
       store,
       model: { title: ' Save Configuration ' },
-      options: { height: 8, width: 45 },
+      options: { height: 11, width: 45 },
     })
 
     const nameField = this.addChild(
@@ -36,18 +38,46 @@ export class SaveConfigDialog extends ModalDialog<
       { top: 1, left: 2, width: '100%-6' }
     )
 
+    this.addChild(
+      {
+        component: Label,
+        model: { text: 'Configuration Type:' },
+      },
+      {
+        left: 2,
+        top: 4,
+      }
+    )
+
+    const configTypeSelect = this.addChild(
+      {
+        component: OptionBar,
+        model: [
+          {
+            id: 'global',
+            label: 'Private',
+          },
+          {
+            id: 'local',
+            label: 'Shared',
+          },
+        ],
+      },
+      { top: 5 }
+    )
+
     const saveButton = this.addChild(
       {
         component: Button,
         model: { text: 'Save' },
       },
-      { top: 4, left: '50%-14' }
+      { top: 7, left: '50%-14' }
     )
     saveButton.disable()
 
     const cancelButton = this.addChild(
       { component: Button, model: { text: 'Cancel' } },
-      { top: 4, left: '50%+2' }
+      { top: 7, left: '50%+2' }
     )
 
     nameField.on('text-changed', (event: TextChangedEvent) => {
@@ -64,7 +94,7 @@ export class SaveConfigDialog extends ModalDialog<
         action: {
           type: 'create-config',
           details: {
-            type: 'local',
+            type: configTypeSelect.getSelectedItemId(),
             name: nameField.getText(),
           },
         },

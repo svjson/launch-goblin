@@ -25,7 +25,7 @@ export class ModalDialog<
   Model extends ModalDialogModel = ModalDialogModel,
   StoreModel = any,
 > extends Controller<blessed.Widgets.BoxElement, Model, StoreModel> {
-  keyMap: KeyMap = {
+  keyMap = this.extendKeyMap({
     escape: {
       propagate: true,
       legend: 'Cancel',
@@ -36,7 +36,7 @@ export class ModalDialog<
       legend: 'Next',
       handler: this.bind(this.nextChild),
     },
-  }
+  })
 
   screen: blessed.Widgets.Screen
 

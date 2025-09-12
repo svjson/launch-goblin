@@ -94,8 +94,6 @@ export class ListBox<ItemModel extends ListItem = ListItem> extends Controller<
       ? this.children.map((child) => child.getWidget())
       : this.model.map((item) => item.label)
 
-    console.log(listItems)
-
     this.widget.setItems(listItems)
     if (this.model.length > 0) {
       if (this.focusedIndex >= this.model.length)
