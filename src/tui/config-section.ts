@@ -29,6 +29,7 @@ export interface ConfigListItem extends ListItem {
 }
 
 export class ConfigSection extends CustomListBox<
+  ConfigItemBox,
   ConfigListItem[],
   ApplicationState
 > {
@@ -54,6 +55,7 @@ export class ConfigSection extends CustomListBox<
     super({
       parent,
       store,
+      itemCls: ConfigItemBox,
       model,
       keyMap,
       options: mergeLeft(
@@ -94,25 +96,8 @@ export class ConfigSection extends CustomListBox<
 
   populateList() {
     this.populateModel()
-    this.removeAllChildren()
-    for (let i = 0; i < this.model.length; i++) {
-      const item = this.model[i]
-      this.addChild(
-        {
-          component: ConfigItemBox,
-          model: item,
-        },
-        {
-          top: i + 1,
-        }
-      )
-    }
-
+    this.refreshItems()
     this.adjustHeight()
-    this.focusable = this.model.length > 0
-    if (this.focusedIndex >= this.children.length) {
-      this.nextChild(-1)
-    }
   }
 
   adjustHeight() {
