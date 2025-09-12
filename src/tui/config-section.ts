@@ -15,6 +15,7 @@ import { ItemSelectedEvent } from './framework/event'
 import { Controller } from './framework/controller'
 import { ConfirmDialog } from './framework/modal'
 import { CustomListBox } from './framework/custom-list-box'
+import { LabelItem } from './framework/label'
 
 const transformEntries = (
   launchConfigs: Record<string, LaunchConfig>,
@@ -30,6 +31,8 @@ export interface ConfigListItem extends ListItem {
 
 export class ConfigSection extends CustomListBox<
   ConfigItemBox,
+  Label,
+  LabelItem,
   ConfigListItem[],
   ApplicationState
 > {
@@ -56,6 +59,12 @@ export class ConfigSection extends CustomListBox<
       parent,
       store,
       itemCls: ConfigItemBox,
+      emptyLabel: {
+        component: Label,
+        model: {
+          text: '<No Configurations>',
+        },
+      },
       model,
       keyMap,
       options: mergeLeft(
@@ -103,7 +112,7 @@ export class ConfigSection extends CustomListBox<
   adjustHeight() {
     this.widget.height = Math.min(
       14,
-      launchConfigCount(this.store.get('config')) + 4
+      Math.max(launchConfigCount(this.store.get('config')), 1) + 4
     )
   }
 

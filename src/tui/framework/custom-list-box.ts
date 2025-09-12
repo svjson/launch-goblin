@@ -1,7 +1,12 @@
 import blessed from 'neo-blessed'
 import { mergeLeft } from '@whimbrel/walk'
 
-import { Controller, CtrlConstructor, CtrlCtorParams } from './controller'
+import {
+  ChildDescription,
+  Controller,
+  CtrlConstructor,
+  CtrlCtorParams,
+} from './controller'
 import { KeyMap } from './keymap'
 
 type Elem<T extends readonly unknown[]> = T[number]
@@ -11,14 +16,19 @@ type Elem<T extends readonly unknown[]> = T[number]
  */
 export interface CustomListBoxCtorParams<
   ItemT extends Controller,
+  EmptyT extends Controller,
+  EmptyM,
   Model extends Array<any>,
   StoreModel = Model,
 > extends CtrlCtorParams<Model, StoreModel> {
   itemCls: CtrlConstructor<ItemT, Elem<Model>, StoreModel>
+  emptyLabel?: ChildDescription<EmptyT, EmptyM, EmptyM>
 }
 
 export class CustomListBox<
   ItemT extends Controller,
+  EmptyT extends Controller,
+  EmptyM,
   Model extends Array<any>,
   Store,
 > extends Controller<blessed.Widgets.BoxElement, Model, Store> {
@@ -44,15 +54,17 @@ export class CustomListBox<
   focusedIndex = 0
 
   itemCls: CtrlConstructor<ItemT, Elem<Model>, Store>
+  emptyLabel?: ChildDescription<EmptyT, EmptyM, EmptyM>
 
   constructor({
     parent,
     itemCls,
+    emptyLabel,
     model,
     store,
     keyMap,
     options = {},
-  }: CustomListBoxCtorParams<ItemT, Model, Store>) {
+  }: CustomListBoxCtorParams<ItemT, EmptyT, EmptyM, Model, Store>) {
     super(
       blessed.box(
         mergeLeft(
@@ -71,6 +83,7 @@ export class CustomListBox<
       store
     )
     this.itemCls = itemCls
+    this.emptyLabel = emptyLabel
 
     this.inheritKeyMap(keyMap)
   }
@@ -96,6 +109,17 @@ export class CustomListBox<
         }
       )
     }
+
+    if (!this.children.length && this.emptyLabel) {
+      this.addChild(this.emptyLabel, {
+        left: 'center',
+        top: 1,
+        style: {
+          fg: 'gray',
+        },
+      })
+    }
+
     this.focusable = this.model.length > 0
     if (this.focusedIndex >= this.children.length) {
       this.nextChild(-1)
