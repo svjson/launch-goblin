@@ -260,8 +260,9 @@ export abstract class Controller<
     dir = typeof dir !== 'number' ? 1 : dir
     this.focusedIndex =
       (this.focusedIndex + dir + this.children.length) % this.children.length
+    if (isNaN(this.focusedIndex)) this.focusedIndex = 0
     const child = this.children[this.focusedIndex]
-    if (!child.isFocusable()) {
+    if (!child || !child.isFocusable()) {
       if (this.children.some((c) => c.isFocusable())) {
         return this.nextChild(dir)
       }
