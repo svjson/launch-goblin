@@ -24,12 +24,13 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@whimbrel/core": "0.0.4",
-    "@whimbrel/node": "0.0.4",
-    "@whimbrel/npm": "0.0.4",
-    "@whimbrel/pnpm": "0.0.4",
-    "@whimbrel/package-json": "0.0.4",
-    "@whimbrel/turborepo": "0.0.4",
+    "@whimbrel/core": "0.0.5",
+    "@whimbrel/node": "0.0.5",
+    "@whimbrel/npm": "0.0.5",
+    "@whimbrel/package-json": "0.0.5",
+    "@whimbrel/pnpm": "0.0.5",
+    "@whimbrel/turborepo": "0.0.5",
+    "commander": "^14.0.1",
     "neo-blessed": "^0.2.0"
   },
   "devDependencies": {
