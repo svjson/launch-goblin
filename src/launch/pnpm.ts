@@ -1,6 +1,7 @@
 import { Project, ProjectComponent } from '@src/project'
 import { Launcher } from './types'
 import { actorFacetScope } from '@whimbrel/core'
+import { LGOptions } from '@src/tui/goblin-app'
 
 export const pnpmLauncher = (
   project: Project,
@@ -26,24 +27,25 @@ export const pnpmLauncher = (
 
 export const identifyPnpmLaunchOptions = async (
   project: Project,
-  launchAction: string
+  launchAction: string,
+  options: LGOptions
 ): Promise<Launcher[]> => {
-  console.log('Evaluating pnpm...')
+  if (options.verbose) console.log('Evaluating pnpm...')
   const root = project.ctx.getActor({ root: project.root })
   const pnpmScope = actorFacetScope(root!, 'pnpm')
   if (pnpmScope) {
     if (pnpmScope?.roles.includes('pkg-manager')) {
-      console.log(' - Is package manager for project')
+      if (options.verbose) console.log(' - Is package manager for project')
       const targetComponents = project.components.filter((c) =>
         c.pkgJson.get(['scripts', launchAction])
       )
       if (targetComponents.length) {
         return [pnpmLauncher(project, launchAction, targetComponents)]
       }
-      console.log(' x No packages provide target action')
+      if (options.verbose) console.log(' x No packages provide target action')
     }
   } else {
-    console.log(' x Not present')
+    if (options.verbose) console.log(' x Not present')
   }
   return []
 }

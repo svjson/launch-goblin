@@ -8,10 +8,12 @@ import { LogEvent } from './tui/framework'
 import { ApplicationState } from './project'
 import { saveLatestLaunch } from './config'
 import { setTTYTitleString } from './tui/framework/tty'
+import { Command } from 'commander'
+import { LGOptions } from './tui/goblin-app'
 
-const main = async () => {
+const main = async (options: LGOptions) => {
   const targetAction = 'dev'
-  const model: ApplicationState = await readProject(targetAction)
+  const model: ApplicationState = await readProject(targetAction, options)
   model.originalWindowTitleString = await readTTYTitleString()
 
   if (model.project.launchers.length === 0) {
@@ -54,4 +56,15 @@ const main = async () => {
   screen.render()
 }
 
-main()
+const program = new Command()
+
+program
+  .name('launch-goblin')
+  .description('Launch Goblin project launcher')
+  .option('-v, --verbose', 'Enable verbose output')
+
+program.action(async (opts: LGOptions) => {
+  await main(opts)
+})
+
+program.parse()

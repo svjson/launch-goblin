@@ -2,6 +2,7 @@ import { applyConfig, ContextConfig, readConfig } from '@src/config'
 import { analyze } from './analyze'
 import { Project } from './types'
 import { identifyLaunchers } from '@src/launch'
+import { LGOptions } from '@src/tui/goblin-app'
 
 export type {
   Project,
@@ -26,10 +27,11 @@ export interface ApplicationState {
 }
 
 export const readProject = async (
-  launchAction: string
+  launchAction: string,
+  options: LGOptions
 ): Promise<ApplicationState> => {
   const project = await analyze(process.cwd())
-  project.launchers = await identifyLaunchers(project, launchAction)
+  project.launchers = await identifyLaunchers(project, launchAction, options)
   const config: ContextConfig = await readConfig(project)
   applyConfig(config.global.lastConfig, project)
   return { project, config }

@@ -5,6 +5,10 @@ import { Action, Application } from './framework'
 import { saveLocalConfig, toLaunchConfigComponents } from '@src/config'
 import { saveGlobalConfig } from '@src/config/io'
 
+export interface LGOptions {
+  verbose: boolean
+}
+
 export class LaunchGoblinApp extends Application<
   ApplicationState,
   MainController
