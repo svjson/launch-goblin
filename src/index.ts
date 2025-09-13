@@ -2,7 +2,7 @@
 
 import { launch } from './launch'
 import { readProject } from './project'
-import { initTui, destroy, readTTYTitleString } from './tui/framework'
+import { readTTYTitleString } from './tui/framework'
 import { LaunchGoblinApp } from './tui'
 import { LogEvent } from './tui/framework'
 import { ApplicationState } from './project'
@@ -10,6 +10,7 @@ import { saveLatestLaunch } from './config'
 import { setTTYTitleString } from './tui/framework/tty'
 import { Command } from 'commander'
 import { LGOptions } from './tui/goblin-app'
+import { BlessedBackend } from './tui/framework/blessed'
 
 /**
  * Launches the application with command-line options
@@ -26,14 +27,14 @@ const main = async (options: LGOptions) => {
     process.exit(1)
   }
 
-  const screen = initTui()
+  const backend = BlessedBackend.create()
 
   const log: string[] = []
 
-  const app = new LaunchGoblinApp(screen, model)
+  const app = new LaunchGoblinApp(backend, model)
 
   app.mainCtrl.on('launch', async () => {
-    destroy(screen)
+    backend.dispose()
     const selected = model.project.components.filter((c) => c.selected)
     await saveLatestLaunch(model)
     const cmd = model.project.launchers[0].launchCommand(selected)
@@ -46,8 +47,9 @@ const main = async (options: LGOptions) => {
 
   app.mainCtrl.focus()
 
-  screen.key(['q', 'C-c'], () => {
-    destroy(screen)
+  backend.onKeyPress(['q', 'C-c'], (ch, key) => {
+    console.log(ch, key)
+    backend.dispose()
     log.forEach((m) => console.log(m))
     process.exit(0)
   })
@@ -56,7 +58,7 @@ const main = async (options: LGOptions) => {
     setTTYTitleString(model.originalWindowTitleString ?? '')
   })
 
-  screen.render()
+  backend.render()
 }
 
 /**

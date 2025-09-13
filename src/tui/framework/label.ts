@@ -1,24 +1,29 @@
-import blessed from 'neo-blessed'
 import { mergeLeft } from '@whimbrel/walk'
 
 import { Controller, CtrlCtorParams } from './controller'
+import { LabelWidget } from './widget'
 
 export interface LabelItem {
   text: string
 }
 
 export class Label<Model extends LabelItem = LabelItem> extends Controller<
-  blessed.Widgets.TextElement,
+  LabelWidget,
   Model
 > {
   focusable = false
 
-  constructor({ parent, model = { text: '' }, options }: CtrlCtorParams) {
+  constructor({
+    backend,
+    parent,
+    model = { text: '' },
+    options,
+  }: CtrlCtorParams) {
     super(
-      blessed.text(
+      backend,
+      backend.createLabel(
         mergeLeft(
           {
-            parent: parent,
             content: model.text ?? '',
             transparent: true,
             tags: true,
@@ -29,10 +34,11 @@ export class Label<Model extends LabelItem = LabelItem> extends Controller<
       ),
       model
     )
+    this.setParent(parent)
   }
 
   setText(text: string) {
     this.model.text = text ?? ''
-    this.widget.content = this.model.text
+    this.widget.setText(this.model.text)
   }
 }

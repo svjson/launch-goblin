@@ -13,6 +13,7 @@ export default defineConfig({
   define: {
     __LG_VERSION__: JSON.stringify(pkg.version),
   },
+  onSuccess: 'tsc --noEmit',
   outExtension: ({ format }) =>
     format === 'cjs' ? { js: '.cjs' } : { js: '.js' },
   external: [...Object.keys(pkg.dependencies ?? {}), ...builtinModules],

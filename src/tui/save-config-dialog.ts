@@ -1,5 +1,3 @@
-import blessed from 'neo-blessed'
-
 import { ApplicationState } from 'src/project'
 import {
   ModalDialog,
@@ -11,6 +9,7 @@ import {
 } from './framework'
 import { ModalDialogModel } from './framework/modal'
 import { OptionBar } from './framework/option-bar'
+import { Backend } from './framework/backend'
 
 /**
  * TUI Component defining a modal dialog with options and controls for
@@ -22,14 +21,14 @@ export class SaveConfigDialog extends ModalDialog<
   ApplicationState
 > {
   constructor({
-    screen,
+    backend,
     store,
   }: {
-    screen: blessed.Widgets.Screen
+    backend: Backend
     store: Store<ApplicationState>
   }) {
     super({
-      screen,
+      backend,
       store,
       model: { title: ' Save Configuration ' },
       options: { height: 11, width: 45 },

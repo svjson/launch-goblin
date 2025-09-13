@@ -98,7 +98,11 @@ export const readTTYTitleString = async (timeoutMs = 150) => {
 
   const chunks: Buffer<ArrayBuffer>[] = []
   const onData = (d: Buffer | string) =>
-    chunks.push(typeof d === 'string' ? Buffer.from(d, 'binary') : d)
+    chunks.push(
+      typeof d === 'string'
+        ? Buffer.from(d, 'binary')
+        : (d as Buffer<ArrayBuffer>)
+    )
 
   const wasRaw = process.stdin.isRaw
   const oldEncoding = process.stdin.readableEncoding

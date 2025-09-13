@@ -1,4 +1,3 @@
-import blessed from 'neo-blessed'
 import { mergeLeft } from '@whimbrel/walk'
 
 import {
@@ -8,6 +7,7 @@ import {
   CtrlCtorParams,
 } from './controller'
 import { KeyMap } from './keymap'
+import { Widget } from './widget'
 
 type Elem<T extends readonly unknown[]> = T[number]
 
@@ -31,7 +31,7 @@ export class CustomListBox<
   EmptyM,
   Model extends Array<any>,
   Store,
-> extends Controller<blessed.Widgets.BoxElement, Model, Store> {
+> extends Controller<Widget, Model, Store> {
   keyMap: KeyMap = {
     up: {
       propagate: true,
@@ -57,7 +57,7 @@ export class CustomListBox<
   emptyLabel?: ChildDescription<EmptyT, EmptyM, EmptyM>
 
   constructor({
-    parent,
+    backend,
     itemCls,
     emptyLabel,
     model,
@@ -66,10 +66,10 @@ export class CustomListBox<
     options = {},
   }: CustomListBoxCtorParams<ItemT, EmptyT, EmptyM, Model, Store>) {
     super(
-      blessed.box(
+      backend,
+      backend.createBox(
         mergeLeft(
           {
-            parent,
             border: 'line',
             keys: true,
             mouse: true,
@@ -127,8 +127,4 @@ export class CustomListBox<
   }
 }
 
-export class CustomListBoxItem<M, SM> extends Controller<
-  blessed.Widgets.BlessedElement,
-  M,
-  SM
-> {}
+export class CustomListBoxItem<M, SM> extends Controller<Widget, M, SM> {}

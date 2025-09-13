@@ -1,9 +1,9 @@
-import blessed from 'neo-blessed'
 import { ApplicationState } from '@src/project'
 import { MainController } from './main'
 import { Action, Application } from './framework'
 import { saveLocalConfig, toLaunchConfigComponents } from '@src/config'
 import { saveGlobalConfig } from '@src/config/io'
+import { Backend } from './framework/backend'
 
 /**
  * Contains user options for running Launch Goblin.
@@ -31,8 +31,8 @@ export class LaunchGoblinApp extends Application<
     'delete-config': this.bind(this.deleteConfig),
   })
 
-  constructor(screen: blessed.Widgets.Screen, model: ApplicationState) {
-    super(screen, MainController, model)
+  constructor(backend: Backend, model: ApplicationState) {
+    super(backend, MainController, model)
   }
 
   async performCreateConfig(createAction: Action): Promise<void> {

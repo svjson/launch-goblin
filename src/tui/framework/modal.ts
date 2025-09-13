@@ -1,4 +1,3 @@
-import blessed from 'neo-blessed'
 import { mergeLeft } from '@whimbrel/walk'
 
 import { Controller } from './controller'
@@ -8,13 +7,15 @@ import { Label } from './label'
 import { Button } from './button'
 import { add, withSign } from './layout'
 import { KeyMap } from './keymap'
+import { Widget } from './widget'
+import { Backend, BoxOptions } from './backend'
 
 export interface ModalCtorParams<Model, StoreModel> {
-  screen: blessed.Widgets.Screen
+  backend: Backend
   model: Model
   store?: Store<StoreModel>
   keyMap?: KeyMap
-  options?: blessed.Widgets.ElementOptions
+  options?: BoxOptions
 }
 
 export interface ModalDialogModel {
@@ -24,7 +25,7 @@ export interface ModalDialogModel {
 export class ModalDialog<
   Model extends ModalDialogModel = ModalDialogModel,
   StoreModel = any,
-> extends Controller<blessed.Widgets.BoxElement, Model, StoreModel> {
+> extends Controller<Widget, Model, StoreModel> {
   keyMap = this.extendKeyMap({
     escape: {
       propagate: true,
@@ -38,17 +39,18 @@ export class ModalDialog<
     },
   })
 
-  screen: blessed.Widgets.Screen
+  backend: Backend
 
   constructor({
-    screen,
+    backend,
     model,
     store,
     keyMap,
     options = {},
   }: ModalCtorParams<Model, StoreModel>) {
     super(
-      blessed.box(
+      backend,
+      backend.createBox(
         mergeLeft(
           {
             top: `center`,
@@ -71,8 +73,8 @@ export class ModalDialog<
       store
     )
 
-    this.screen = screen
-    this.screen.append(this.widget)
+    this.backend = backend
+    this.backend.addRoot(this.widget)
 
     if (keyMap) {
       this.inheritKeyMap({ replace: false, keys: keyMap })
@@ -133,13 +135,13 @@ export class ConfirmDialog<
   }
 
   constructor({
-    screen,
+    backend,
     store,
     model,
     options = {},
   }: ModalCtorParams<Model, StoreModel>) {
     super({
-      screen,
+      backend,
       store,
       model,
       options: mergeLeft(
@@ -203,14 +205,14 @@ export class ConfirmDialog<
     })
 
     if (!options.width) {
-      this.widget.width = Math.max(
-        buttonBarWidth + 4,
-        (message ?? '').length + 8
+      this.widget.set(
+        'width',
+        Math.max(buttonBarWidth + 4, (message ?? '').length + 8)
       )
     }
 
     if (!options.height) {
-      this.widget.height = Math.max(4, vPos + 4)
+      this.widget.set('height', Math.max(4, vPos + 4))
     }
   }
 

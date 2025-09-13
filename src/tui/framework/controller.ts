@@ -3,6 +3,8 @@ import { DestroyEvent, Event, StringEvent } from './event'
 import { KeyMap, KeyMapArg } from './keymap'
 import { createStore, Store } from './store'
 import { ControllerLayout, LayoutProperty } from './layout'
+import { Backend } from './backend'
+import { Widget } from './widget'
 
 /**
  * Mixin-interface for anything that may listen to events.
@@ -15,7 +17,7 @@ export interface Listener {
  * Parameters for constructor an ApplicationController
  */
 export interface ApplicationCtrlCtorParams<M> {
-  screen: blessed.Widgets.Screen
+  backend: Backend
   model: M
   store: Store<M>
 }
@@ -24,7 +26,8 @@ export interface ApplicationCtrlCtorParams<M> {
  * Parameters for constructing a Controller.
  */
 export interface CtrlCtorParams<Model = any, StoreModel = Model> {
-  parent: blessed.Widgets.BlessedElement
+  backend: Backend
+  parent: Widget
   model: Model
   store: Store<StoreModel>
   keyMap?: KeyMapArg
@@ -75,7 +78,7 @@ export type ChildParam<T extends Controller, M, SM> =
  * @param StoreModel The type of the data in the store.
  */
 export abstract class Controller<
-  T extends blessed.Widgets.BlessedElement = blessed.Widgets.BlessedElement,
+  W extends Widget = Widget,
   Model = any,
   StoreModel = Model,
 > {
@@ -128,12 +131,13 @@ export abstract class Controller<
   enabled = true
 
   constructor(
-    protected widget: T,
+    protected backend: Backend,
+    protected widget: W,
     protected model: Model,
     protected store: Store<StoreModel> = createStore({}) as Store<StoreModel>
   ) {
     this.layout = new ControllerLayout(this)
-    this.widget.onScreenEvent('prerender', () => {
+    this.widget.onBeforeRender(() => {
       this.layout.apply()
     })
   }
@@ -160,6 +164,7 @@ export abstract class Controller<
 
     const child = new ctrlClass(
       {
+        backend: this.backend,
         parent: this.widget,
         store: store!,
         model: model!,
@@ -168,6 +173,7 @@ export abstract class Controller<
       },
       ...args
     )
+    child.setParent(this.widget)
     child.addListener(this)
     this.children.push(child)
 
@@ -184,6 +190,10 @@ export abstract class Controller<
       model: typeof childDesc === 'function' ? undefined : childDesc.model,
       store: typeof childDesc === 'function' ? this.store : childDesc.store,
     }
+  }
+
+  setParent(widget: Widget) {
+    this.widget.setParent(widget)
   }
 
   addListener(listener: Listener) {
@@ -275,7 +285,6 @@ export abstract class Controller<
   }
 
   destroy() {
-    this.widget.detach()
     this.widget.destroy()
     this.emit({ type: 'destroyed', component: this })
   }
@@ -320,58 +329,50 @@ export abstract class Controller<
     return Object.assign({}, this.events, events)
   }
 
-  set(prop: LayoutProperty, value: string | number) {
-    const accessors: Record<LayoutProperty, (value: string | number) => void> =
-      {
-        top: this.bind(this.top),
-        left: this.bind(this.left),
-        bg: (value: string | number) => (this.widget.style.bg = value),
-        fg: (value: string | number) => (this.widget.style.fg = value),
-      }
-
-    accessors[prop](value)
+  set(prop: LayoutProperty, value: string | number | undefined) {
+    this.widget.set(prop, value)
   }
 
   top(value?: string | number): string | number {
     if (value !== undefined) {
-      this.widget.top = value
+      this.widget.set('top', value)
     }
-    return this.widget.top
+    return this.widget.get('top')!
   }
 
   right(value?: string | number): string | number {
     if (value !== undefined) {
-      this.widget.right = value
+      this.widget.set('right', value)
     }
-    return this.widget.lpos?.xl
+    return this.widget.get('right')!
   }
 
   bottom(value?: string | number): string | number {
     if (value !== undefined) {
-      this.widget.bottom = value
+      this.widget.set('bottom', value)
     }
-    return this.widget.lpos?.yl
+    return this.widget.get('bottom')!
   }
 
   left(value?: string | number): string | number {
     if (value !== undefined) {
-      this.widget.left = value
+      this.widget.set('left', value)
     }
-    return this.widget.lpos?.xi
+    return this.widget.get('left')!
   }
 
   width(value?: string | number): string | number {
     if (value !== undefined) {
-      this.widget.width = value
+      this.widget.set('width', value)
     }
-    return this.widget.width
+    return this.widget.get('width')!
   }
 
   height(value?: string | number): string | number {
     if (value !== undefined) {
-      this.widget.height = value
+      this.widget.set('height', value)
     }
-    return this.widget.height
+    return this.widget.get('height')!
   }
 
   focus() {
@@ -394,17 +395,13 @@ export abstract class Controller<
   }
 }
 
-export class ApplicationController<M> extends Controller<
-  blessed.Widgets.BoxElement,
-  M,
-  Store<M>
-> {
-  screen: blessed.Widgets.Screen
+export class ApplicationController<M> extends Controller<Widget, M, Store<M>> {
+  backend: Backend
 
-  constructor({ screen, model, store }: ApplicationCtrlCtorParams<M>) {
+  constructor({ backend, model, store }: ApplicationCtrlCtorParams<M>) {
     super(
-      blessed.box({
-        parent: screen,
+      backend,
+      backend.createBox({
         width: '100%',
         height: '100%',
         style: { fg: 'default' },
@@ -412,6 +409,6 @@ export class ApplicationController<M> extends Controller<
       model,
       store
     )
-    this.screen = screen
+    this.backend = backend
   }
 }

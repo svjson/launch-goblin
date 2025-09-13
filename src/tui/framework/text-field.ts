@@ -1,8 +1,8 @@
-import blessed from 'neo-blessed'
 import { Controller, CtrlCtorParams } from './controller'
 import { Event } from './event'
 import { Label, LabelItem } from './label'
 import { mergeLeft } from '@whimbrel/walk'
+import { TextFieldWidget, Widget } from './widget'
 
 export interface TextFieldModel {
   label: string | LabelItem
@@ -13,18 +13,15 @@ export interface TextInputModel {
   value: string
 }
 
-export class TextField extends Controller<
-  blessed.Widgets.BoxElement,
-  TextFieldModel
-> {
+export class TextField extends Controller<Widget, TextFieldModel> {
   textInput: TextInput
 
-  constructor({ parent, model, keyMap, options }: CtrlCtorParams) {
+  constructor({ backend, parent, model, keyMap, options }: CtrlCtorParams) {
     super(
-      blessed.box(
+      backend,
+      backend.createBox(
         mergeLeft(
           {
-            parent,
             height: 2,
             width: '100%',
           },
@@ -33,6 +30,7 @@ export class TextField extends Controller<
       ),
       model
     )
+    this.setParent(parent)
 
     this.inheritKeyMap(keyMap)
 
@@ -62,14 +60,11 @@ export class TextField extends Controller<
   }
 }
 
-export class TextInput extends Controller<
-  blessed.Widgets.TextboxElement,
-  TextInputModel
-> {
-  constructor({ parent, model, keyMap, options }: CtrlCtorParams) {
+export class TextInput extends Controller<TextFieldWidget, TextInputModel> {
+  constructor({ backend, parent, model, keyMap, options }: CtrlCtorParams) {
     super(
-      blessed.textbox({
-        parent,
+      backend,
+      backend.createTextField({
         width: '100%',
         height: 1,
         keys: true,
@@ -81,16 +76,17 @@ export class TextInput extends Controller<
       }),
       model
     )
+    this.setParent(parent)
 
-    this.widget.on('submit', () => {
-      this.emit({ type: 'text-changed', value: this.widget.content })
+    this.widget.onSubmit(() => {
+      this.emit({ type: 'text-changed', value: this.widget.getText() })
     })
-    this.widget.on('cancel', () => {})
+    this.widget.onCancel(() => {})
 
     this.inheritKeyMap(keyMap)
   }
 
   getText() {
-    return this.widget.content
+    return this.widget.getText()
   }
 }

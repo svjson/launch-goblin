@@ -1,13 +1,13 @@
-import blessed from 'neo-blessed'
 import { mergeLeft } from '@whimbrel/walk'
 
 import { Controller, CtrlCtorParams } from './controller'
 import { ListItem } from './list-box'
 import { LabelItem } from './label'
+import { Widget } from './widget'
 
 export class OptionBar<
   ItemModel extends ListItem = ListItem,
-> extends Controller<blessed.Widgets.BoxElement, ItemModel[], undefined> {
+> extends Controller<Widget, ItemModel[], undefined> {
   keyMap = this.extendKeyMap({
     right: {
       propagate: true,
@@ -26,16 +26,17 @@ export class OptionBar<
   focusable = true
 
   constructor({
+    backend,
     parent,
     model = [],
     keyMap,
     options = {},
   }: CtrlCtorParams<ItemModel[]>) {
     super(
-      blessed.box(
+      backend,
+      backend.createBox(
         mergeLeft(
           {
-            parent,
             width: '100%-2',
             height: 1,
             focusable: true,
@@ -46,6 +47,7 @@ export class OptionBar<
       ),
       model
     )
+    this.setParent(parent)
     this.inheritKeyMap(keyMap)
 
     let left = 2
@@ -62,7 +64,7 @@ export class OptionBar<
       )
       left += opt.label.length + 2
       child.layout.bind('bg', () =>
-        this.widget.screen.focused === child.getWidget()
+        child.getWidget().isFocused()
           ? 'blue'
           : this.focusedIndex === i
             ? 'white'
@@ -80,23 +82,21 @@ export class OptionBar<
   }
 }
 
-export class Option<Model extends LabelItem> extends Controller<
-  blessed.Widgets.TextElement,
-  Model
-> {
+export class Option<Model extends LabelItem> extends Controller<Widget, Model> {
   focusable = true
 
   constructor({
+    backend,
     parent,
     model = { text: '' },
     keyMap,
     options,
   }: CtrlCtorParams) {
     super(
-      blessed.text(
+      backend,
+      backend.createLabel(
         mergeLeft(
           {
-            parent: parent,
             content: ` ${model.text ?? ''} `,
             transparent: true,
             tags: true,
@@ -115,6 +115,7 @@ export class Option<Model extends LabelItem> extends Controller<
       ),
       model
     )
+    this.setParent(parent)
 
     this.inheritKeyMap(keyMap)
   }

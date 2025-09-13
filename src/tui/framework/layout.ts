@@ -6,8 +6,21 @@ export const add = (...nums: number[]) => {
 
 export const withSign = (num: number): string => `${num >= 0 ? '+' : ''}${num}`
 
-export type LayoutProperty = 'top' | 'left' | 'bg' | 'fg'
-export type ValueProvider = () => string | number
+export type LayoutProperty =
+  | 'top'
+  | 'bottom'
+  | 'left'
+  | 'right'
+  | 'bg'
+  | 'fg'
+  | 'focused:fg'
+  | 'focused:bg'
+  | 'selected:fg'
+  | 'selected:bg'
+  | 'width'
+  | 'height'
+
+export type ValueProvider = () => string | number | undefined
 
 export class ControllerLayout {
   constructor(private ctrl: Controller) {}

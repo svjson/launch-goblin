@@ -8,13 +8,14 @@ import { juxt } from '@whimbrel/array'
 import blessed from 'neo-blessed'
 import { ApplicationState, ProjectComponent } from '@src/project'
 import { CheckboxItem } from './framework/checkbox'
+import { Widget } from './framework/widget'
 
 /**
  * TUI Component containing checkboxes and options for launchable
  * components.
  */
 export class ComponentSection extends Controller<
-  blessed.Widgets.BoxElement,
+  Widget,
   ProjectComponent[],
   ApplicationState
 > {
@@ -42,14 +43,15 @@ export class ComponentSection extends Controller<
   components: ProjectComponent[]
 
   constructor({
+    backend,
     parent,
     model = [],
     store,
     keyMap,
   }: CtrlCtorParams<ProjectComponent[], ApplicationState>) {
     super(
-      blessed.box({
-        parent: parent,
+      backend,
+      backend.createBox({
         label: ' Select Components to Launch ',
         focusable: true,
         width: Math.max(
@@ -68,6 +70,7 @@ export class ComponentSection extends Controller<
       model,
       store
     )
+    this.setParent(parent)
     this.inheritKeyMap(keyMap)
 
     this.components = model

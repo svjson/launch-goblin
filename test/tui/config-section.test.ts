@@ -3,10 +3,13 @@ import blessed from 'neo-blessed'
 import { ConfigSection } from '@src/tui/config-section'
 import { createStore, Store } from '@src/tui/framework'
 import { ApplicationState } from '@src/project'
+import { BlessedBackend } from '@src/tui/framework/blessed'
+import { Widget } from '@src/tui/framework/widget'
+import { Backend } from '@src/tui/framework/backend'
 
 const makeFixture = (): [
-  blessed.Widgets.Screen,
-  blessed.Widgets.BlessedElement,
+  Backend,
+  Widget,
   Store<ApplicationState>,
   ApplicationState,
 ] => {
@@ -15,7 +18,8 @@ const makeFixture = (): [
     terminal: 'ansi',
     isTTY: false,
   })
-  const container = blessed.box({
+  const backend = new BlessedBackend(screen)
+  const container = backend.createBox({
     parent: screen,
   })
   const state: ApplicationState = {
@@ -27,27 +31,29 @@ const makeFixture = (): [
 
   const store = createStore(state)
 
-  return [screen, container, store, state]
+  return [backend, container, store, state]
 }
 
 describe('ConfigSection', () => {
   describe('focusable', () => {
     test('on construction - no configs set focusable to false', () => {
       // Given
-      const [screen, container, store, state] = makeFixture()
+      const [backend, container, store, state] = makeFixture()
 
       const configSection = new ConfigSection({
+        backend,
         parent: container,
+        model: [],
         store,
-        model: state.config,
       })
+      configSection.populateModel()
 
       expect(configSection.focusable).toBe(false)
     })
 
     test('on construction - one present config sets focusable to true', () => {
       // Given
-      const [screen, container, store, state] = makeFixture()
+      const [backend, container, store, state] = makeFixture()
 
       state.config.local.launchConfigs['Prutt'] = {
         components: {
@@ -58,10 +64,12 @@ describe('ConfigSection', () => {
       }
 
       const configSection = new ConfigSection({
+        backend,
         parent: container,
         store,
-        model: state.config,
+        model: [],
       })
+      configSection.populateModel()
 
       expect(configSection.focusable).toBe(true)
     })

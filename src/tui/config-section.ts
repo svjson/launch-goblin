@@ -1,4 +1,3 @@
-import blessed from 'neo-blessed'
 import { mergeLeft } from '@whimbrel/walk'
 
 import { CtrlCtorParams, KeyMap, Label, Store } from './framework'
@@ -16,6 +15,7 @@ import { Controller } from './framework/controller'
 import { ConfirmDialog } from './framework/modal'
 import { CustomListBox } from './framework/custom-list-box'
 import { LabelItem } from './framework/label'
+import { Backend } from './framework/backend'
 
 /**
  * Transform LaunchConfig instances from the context configuration
@@ -63,6 +63,7 @@ export class ConfigSection extends CustomListBox<
   })
 
   constructor({
+    backend,
     parent,
     store,
     model,
@@ -70,6 +71,7 @@ export class ConfigSection extends CustomListBox<
     options = {},
   }: CtrlCtorParams<ConfigListItem[], ApplicationState>) {
     super({
+      backend,
       parent,
       store,
       itemCls: ConfigItemBox,
@@ -124,9 +126,9 @@ export class ConfigSection extends CustomListBox<
   }
 
   adjustHeight() {
-    this.widget.height = Math.min(
-      14,
-      Math.max(launchConfigCount(this.store.get('config')), 1) + 4
+    this.widget.set(
+      'height',
+      Math.min(14, Math.max(launchConfigCount(this.store.get('config')), 1) + 4)
     )
   }
 
@@ -148,15 +150,15 @@ export class ConfigSection extends CustomListBox<
         type: 'open-modal',
         details: {
           create: <M, SM>({
-            screen,
+            backend,
             store,
           }: {
-            screen: blessed.Widgets.Screen
+            backend: Backend
             model: M
             store: Store<SM>
           }) =>
             new ConfirmDialog({
-              screen,
+              backend,
               store,
               model: {
                 title: ' Delete Configuration ',
@@ -187,16 +189,17 @@ class ConfigItemBox extends Controller {
   selected = false
 
   constructor({
+    backend,
     parent,
     model,
     keyMap,
     options,
   }: CtrlCtorParams<ConfigListItem>) {
     super(
-      blessed.box(
+      backend,
+      backend.createBox(
         mergeLeft(
           {
-            parent,
             height: 1,
             focusable: true,
             style: {
@@ -215,10 +218,10 @@ class ConfigItemBox extends Controller {
     )
 
     const currBg = () => {
-      return this.widget.screen.focused === this.widget
-        ? this.widget.style.focus.bg
+      return this.widget.isFocused()
+        ? this.widget.get('focused:bg')
         : this.selected
-          ? this.widget.style.select.bg
+          ? this.widget.get('selected:bg')
           : undefined
     }
 

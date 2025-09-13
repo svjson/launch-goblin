@@ -1,6 +1,4 @@
-import blessed from 'neo-blessed'
-
-import { Controller, CtrlCtorParams, LegendEntry } from './framework'
+import { Controller, CtrlCtorParams, Label, LegendEntry } from './framework'
 
 /**
  * Replacement dictionary for the keyboard command legend.
@@ -22,21 +20,32 @@ const KEY_SYMBOLS: Record<string, string> = {
 export class FooterController extends Controller {
   focusable = false
 
-  constructor({ parent, model, store, keyMap }: CtrlCtorParams) {
+  label: Label
+
+  constructor({ backend, model, store, keyMap }: CtrlCtorParams) {
     super(
-      blessed.box({
-        parent: parent,
+      backend,
+      backend.createBox({
         bottom: 0,
         left: 0,
         width: '100%',
         height: 1,
-        content: ' q = quit ',
         style: { fg: 'white', bg: 'gray' },
       }),
       model,
       store
     )
     this.inheritKeyMap(keyMap)
+    this.label = this.addChild(
+      {
+        component: Label,
+      },
+      {
+        width: '100%',
+        content: ' q = quit ',
+        style: { fg: 'white', bg: 'gray' },
+      }
+    )
   }
 
   buildKeyLegend(controller: Controller) {
@@ -72,6 +81,6 @@ export class FooterController extends Controller {
 
   applyContext(controller: Controller) {
     const legend = this.buildKeyLegend(controller)
-    this.widget.content = legend
+    this.label.setText(legend)
   }
 }

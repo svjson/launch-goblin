@@ -65,7 +65,7 @@ export class MainController extends ApplicationController<ApplicationState> {
 
     this.configSection = this.addChild({
       component: ConfigSection,
-      model: this.store.get('config'),
+      model: [],
       store: this.store,
     })
     this.configSection.layout.bind('top', () => this.componentSection.top())
@@ -89,7 +89,7 @@ export class MainController extends ApplicationController<ApplicationState> {
 
   saveConfig() {
     const dialog = new SaveConfigDialog({
-      screen: this.screen,
+      backend: this.backend,
       store: this.store,
     })
 

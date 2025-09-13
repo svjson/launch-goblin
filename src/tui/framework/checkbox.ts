@@ -1,8 +1,8 @@
-import blessed from 'neo-blessed'
 import { mergeLeft } from '@whimbrel/walk'
 
 import { Controller, CtrlCtorParams } from './controller'
 import { Label } from './label'
+import { Widget } from './widget'
 
 export interface CheckboxItem {
   id: string
@@ -12,7 +12,7 @@ export interface CheckboxItem {
 }
 
 export class Checkbox<I extends CheckboxItem = CheckboxItem> extends Controller<
-  blessed.Widgets.BoxElement,
+  Widget,
   I
 > {
   keyMap = {
@@ -28,12 +28,12 @@ export class Checkbox<I extends CheckboxItem = CheckboxItem> extends Controller<
 
   focusable = true
 
-  constructor({ parent, model, keyMap, options }: CtrlCtorParams) {
+  constructor({ backend, parent, model, keyMap, options }: CtrlCtorParams) {
     super(
-      blessed.box(
+      backend,
+      backend.createBox(
         mergeLeft(
           {
-            parent: parent,
             left: 1,
             height: 1,
             width: '100%',
@@ -54,9 +54,9 @@ export class Checkbox<I extends CheckboxItem = CheckboxItem> extends Controller<
     this.inheritKeyMap(keyMap)
 
     const currBg = () => {
-      return this.widget.screen.focused === this.widget
-        ? this.widget.style.focus.bg
-        : this.widget.style.bg
+      return this.widget.isFocused()
+        ? this.widget.get('focused:bg')
+        : this.widget.get('bg')
     }
 
     this.box = this.addChild(
@@ -92,9 +92,9 @@ export class Checkbox<I extends CheckboxItem = CheckboxItem> extends Controller<
     this.label.layout.bind('fg', () =>
       this.model.checked
         ? 'white'
-        : this.widget.screen.focused === this.widget
-          ? this.widget.style.focus.fg
-          : this.widget.style.fg
+        : this.widget.isFocused()
+          ? this.widget.get('focused:fg')
+          : this.widget.get('fg')
     )
 
     this.inheritKeyMap(keyMap)
@@ -111,7 +111,7 @@ export class Checkbox<I extends CheckboxItem = CheckboxItem> extends Controller<
   setSelected(selected: boolean) {
     this.model.checked = selected
     this.box.setText(this.makeBoxContent())
-    this.widget.style.fg = this.model.checked ? 'white' : 'gray'
+    this.widget.set('fg', this.model.checked ? 'white' : 'gray')
     this.emit('dirty')
     this.emit({
       type: 'checkbox',

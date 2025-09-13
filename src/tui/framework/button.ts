@@ -3,6 +3,7 @@ import blessed from 'neo-blessed'
 import { mergeLeft } from '@whimbrel/walk'
 
 import { Controller, CtrlCtorParams } from './controller'
+import { Widget } from './widget'
 
 export interface ButtonModel {
   text: string
@@ -10,10 +11,7 @@ export interface ButtonModel {
   disabled?: any
 }
 
-export class Button extends Controller<
-  blessed.Widgets.ButtonElement,
-  ButtonModel
-> {
+export class Button extends Controller<Widget, ButtonModel> {
   focusable = true
 
   keyMap = {
@@ -23,12 +21,18 @@ export class Button extends Controller<
     },
   }
 
-  constructor({ parent, model, keyMap, options = {} }: CtrlCtorParams) {
+  constructor({
+    backend,
+    parent,
+    model,
+    keyMap,
+    options = {},
+  }: CtrlCtorParams) {
     super(
-      blessed.button(
+      backend,
+      backend.createButton(
         mergeLeft(
           {
-            parent,
             content: model.text,
             height: 1,
             left: 'center',
@@ -61,13 +65,13 @@ export class Button extends Controller<
 
   enable() {
     super.enable()
-    mergeLeft(this.widget.style, this.model.enabled)
+    //    mergeLeft(this.widget.style, this.model.enabled)
     this.emit('dirty')
   }
 
   disable() {
     super.disable()
-    mergeLeft(this.widget.style, this.model.disabled)
+    //    mergeLeft(this.widget.style, this.model.disabled)
     this.emit('dirty')
   }
 

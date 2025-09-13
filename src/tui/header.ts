@@ -1,21 +1,17 @@
-import blessed from 'neo-blessed'
-
 import { Controller, CtrlCtorParams } from './framework/controller'
 import { ApplicationState } from '@src/project'
+import { Widget } from './framework/widget'
 
 /**
  * TUI Component for the application header.
  */
-export class HeaderController extends Controller<
-  blessed.Widgets.BoxElement,
-  ApplicationState
-> {
+export class HeaderController extends Controller<Widget, ApplicationState> {
   focusable = false
 
-  constructor({ parent, model, store, keyMap }: CtrlCtorParams) {
+  constructor({ backend, parent, model, store, keyMap }: CtrlCtorParams) {
     super(
-      blessed.box({
-        parent: parent,
+      backend,
+      backend.createBox({
         top: 0,
         left: 0,
         width: '100%',

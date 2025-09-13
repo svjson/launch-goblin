@@ -3,6 +3,7 @@ import blessed from 'neo-blessed'
 import { mergeLeft } from '@whimbrel/walk'
 
 import { Controller, CtrlConstructor, CtrlCtorParams } from './controller'
+import { ListWidget, Widget } from './widget'
 
 export interface ListItem {
   id: string
@@ -10,20 +11,22 @@ export interface ListItem {
 }
 
 export class ListBox<ItemModel extends ListItem = ListItem> extends Controller<
-  blessed.Widgets.ListElement,
+  ListWidget,
   ItemModel[],
   undefined
 > {
   focusable = true
 
   constructor({
+    backend,
     parent,
     model = [],
     keyMap,
     options = {},
   }: CtrlCtorParams<ItemModel[]>) {
     super(
-      blessed.list(
+      backend,
+      backend.createList(
         mergeLeft(
           {
             parent,
@@ -44,7 +47,7 @@ export class ListBox<ItemModel extends ListItem = ListItem> extends Controller<
                 },
               },
             },
-          } as blessed.Widgets.ListOptions<blessed.Widgets.ListElementStyle>,
+          },
           options
         )
       ),
@@ -55,7 +58,7 @@ export class ListBox<ItemModel extends ListItem = ListItem> extends Controller<
       this.disable()
     }
 
-    this.widget.on('select item', (_item, index) => {
+    this.widget.onItemSelected((_item, index) => {
       this.focusedIndex = index
       this.emit({
         type: 'selected',
@@ -90,9 +93,7 @@ export class ListBox<ItemModel extends ListItem = ListItem> extends Controller<
       })
     }
 
-    const listItems = this.children.length
-      ? this.children.map((child) => child.getWidget())
-      : this.model.map((item) => item.label)
+    const listItems = this.model.map((item) => item.label)
 
     this.widget.setItems(listItems)
     if (this.model.length > 0) {

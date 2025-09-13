@@ -10,8 +10,15 @@ export class LaunchButtonController extends Button {
     },
   }
 
-  constructor({ parent, store, keyMap, options }: CtrlCtorParams) {
-    super({ parent, model: { text: 'Launch' }, store, keyMap, options })
+  constructor({ backend, parent, store, keyMap, options }: CtrlCtorParams) {
+    super({
+      backend,
+      parent,
+      model: { text: 'Launch' },
+      store,
+      keyMap,
+      options,
+    })
     this.inheritKeyMap(keyMap)
   }
 

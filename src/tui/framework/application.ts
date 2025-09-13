@@ -1,9 +1,9 @@
-import blessed from 'neo-blessed'
 import { ApplicationController, ApplicationCtrlConstructor } from './controller'
 import { Store, createStore } from './store'
 import { Action, ActionMap } from './action'
 import { KeyMap } from './keymap'
 import { ActionEvent, FocusEvent } from './event'
+import { Backend } from './backend'
 
 /**
  * Root wrapper for a tui application
@@ -26,25 +26,25 @@ export class Application<Model, MainCtrl extends ApplicationController<Model>> {
   activeKeyMap: KeyMap = {}
 
   constructor(
-    protected screen: blessed.Widgets.Screen,
+    protected backend: Backend,
     protected mainCtrlClass: ApplicationCtrlConstructor<MainCtrl, Model>,
     protected model: Model
   ) {
     this.store = createStore(model)
-    this.mainCtrl = new mainCtrlClass({ screen, model, store: this.store })
+    this.mainCtrl = new mainCtrlClass({ backend, model, store: this.store })
 
     this.#bindApplicationEvents()
   }
 
   #bindApplicationEvents() {
-    this.screen.on('keypress', (ch, key) => {
+    this.backend.onKey((ch, key) => {
       if (this.activeKeyMap[key.full]) {
         this.activeKeyMap[key.full].handler(ch, key)
       }
     })
 
     this.mainCtrl.on('dirty', () => {
-      this.screen.render()
+      this.backend.render()
     })
 
     this.mainCtrl.on('focus', (event: FocusEvent) => {
@@ -68,7 +68,7 @@ export class Application<Model, MainCtrl extends ApplicationController<Model>> {
     const dialog = action.details.create({
       model: this.model,
       store: this.store,
-      screen: this.screen,
+      backend: this.backend,
     })
     dialog.on('*', (event: Event) => {
       if (event.type === 'destroyed') {
