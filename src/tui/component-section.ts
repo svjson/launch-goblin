@@ -9,6 +9,10 @@ import blessed from 'neo-blessed'
 import { ApplicationState, ProjectComponent } from '@src/project'
 import { CheckboxItem } from './framework/checkbox'
 
+/**
+ * TUI Component containing checkboxes and options for launchable
+ * components.
+ */
 export class ComponentSection extends Controller<
   blessed.Widgets.BoxElement,
   ProjectComponent[],

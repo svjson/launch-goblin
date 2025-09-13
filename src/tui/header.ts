@@ -3,6 +3,9 @@ import blessed from 'neo-blessed'
 import { Controller, CtrlCtorParams } from './framework/controller'
 import { ApplicationState } from '@src/project'
 
+/**
+ * TUI Component for the application header.
+ */
 export class HeaderController extends Controller<
   blessed.Widgets.BoxElement,
   ApplicationState

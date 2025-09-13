@@ -17,6 +17,10 @@ import { ConfirmDialog } from './framework/modal'
 import { CustomListBox } from './framework/custom-list-box'
 import { LabelItem } from './framework/label'
 
+/**
+ * Transform LaunchConfig instances from the context configuration
+ * or application state to ConfigListItem model instances.
+ */
 const transformEntries = (
   launchConfigs: Record<string, LaunchConfig>,
   type: ConfigType
@@ -25,10 +29,20 @@ const transformEntries = (
     return { id: name, label: name, type }
   })
 
+/**
+ * Specialization of the ListItem model, adding configuration type
+ */
 export interface ConfigListItem extends ListItem {
   type: 'private' | 'shared'
 }
 
+/**
+ * TUI Component containing project local(shared) and user(private)
+ * configurations in a list box.
+ *
+ * Selection/activation of a configuration is immediate upon navigating
+ * between the list items
+ */
 export class ConfigSection extends CustomListBox<
   ConfigItemBox,
   Label,

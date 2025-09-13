@@ -1,13 +1,9 @@
-import blessed from 'neo-blessed'
-
 import { ApplicationState, Project } from '@src/project'
 import {
   ApplicationController,
   ApplicationCtrlCtorParams,
-  Controller,
   Event,
   FocusEvent,
-  Store,
 } from './framework'
 import { LaunchButtonController } from './launch-button'
 import { ComponentSection } from './component-section'
@@ -16,6 +12,9 @@ import { HeaderController } from './header'
 import { SaveConfigDialog } from './save-config-dialog'
 import { ConfigSection } from './config-section'
 
+/**
+ * The main TUI component of the Launch Goblin user interface
+ */
 export class MainController extends ApplicationController<ApplicationState> {
   keyMap = {
     'C-s': {

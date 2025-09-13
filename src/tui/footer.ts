@@ -2,6 +2,12 @@ import blessed from 'neo-blessed'
 
 import { Controller, CtrlCtorParams, LegendEntry } from './framework'
 
+/**
+ * Replacement dictionary for the keyboard command legend.
+ *
+ * The keys are blessed key aliases and the values are the symbol
+ * to display in the legend.
+ */
 const KEY_SYMBOLS: Record<string, string> = {
   down: '↓',
   up: '↑',
@@ -9,6 +15,10 @@ const KEY_SYMBOLS: Record<string, string> = {
   right: '→',
 }
 
+/**
+ * TUI Component for the application footer bar, containing a list
+ * of available keyboard commands
+ */
 export class FooterController extends Controller {
   focusable = false
 

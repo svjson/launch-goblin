@@ -11,6 +11,9 @@ import { setTTYTitleString } from './tui/framework/tty'
 import { Command } from 'commander'
 import { LGOptions } from './tui/goblin-app'
 
+/**
+ * Launches the application with command-line options
+ */
 const main = async (options: LGOptions) => {
   const targetAction = 'dev'
   const model: ApplicationState = await readProject(targetAction, options)
@@ -56,6 +59,9 @@ const main = async (options: LGOptions) => {
   screen.render()
 }
 
+/**
+ * Create Commander CLI interpreter, parse and run.
+ */
 const program = new Command()
 
 program

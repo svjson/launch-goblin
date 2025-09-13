@@ -12,6 +12,11 @@ import {
 import { ModalDialogModel } from './framework/modal'
 import { OptionBar } from './framework/option-bar'
 
+/**
+ * TUI Component defining a modal dialog with options and controls for
+ * saving the current launch configuration state as a private or shared
+ * configuration.
+ */
 export class SaveConfigDialog extends ModalDialog<
   ModalDialogModel,
   ApplicationState
