@@ -1,10 +1,9 @@
-import blessed from 'neo-blessed'
 import { DestroyEvent, Event, StringEvent } from './event'
 import { KeyMap, KeyMapArg } from './keymap'
 import { createStore, Store } from './store'
 import { ControllerLayout, LayoutProperty } from './layout'
 import { Backend } from './backend'
-import { Widget } from './widget'
+import { Widget, WidgetOptions } from './widget'
 
 /**
  * Mixin-interface for anything that may listen to events.
@@ -26,7 +25,7 @@ export interface WidgetParams {
   backend: Backend
   parent: Widget
   keyMap?: KeyMapArg
-  options?: blessed.Widgets.ElementOptions
+  options?: WidgetOptions
 }
 
 export interface StateParams<Model, StoreModel> {
@@ -150,9 +149,15 @@ export abstract class Controller<
     })
   }
 
+  addChild<T extends Controller<W, M, SM>, M, SM>(child: T): T
   addChild<T extends Controller, M = Model, SM = StoreModel>(
     childDesc: ChildParam<T, M, SM>,
-    options: blessed.Widgets.ElementOptions = {},
+    options?: WidgetOptions | StateParams<M, SM>,
+    ...args: any[]
+  ): T
+  addChild<T extends Controller, M = Model, SM = StoreModel>(
+    childDesc: ChildParam<T, M, SM> | T,
+    options?: WidgetOptions | StateParams<M, SM>,
     ...args: any[]
   ): T {
     const inheritKeys: KeyMap = Object.entries(this.keyMap).reduce(
@@ -165,6 +170,31 @@ export abstract class Controller<
       {} as KeyMap
     )
 
+    const child = this.#resolveChildInstance(
+      childDesc,
+      options,
+      inheritKeys,
+      args
+    )
+
+    child.setParent(this.widget)
+    child.addListener(this)
+    this.children.push(child)
+
+    return child
+  }
+
+  #resolveChildInstance<T extends Controller, M, SM>(
+    childDesc: ChildParam<T, M, SM> | T,
+    options: WidgetOptions | StateParams<M, SM> = {},
+    inheritKeys: KeyMap,
+    ...args: any[]
+  ): T {
+    if (childDesc instanceof Controller) {
+      childDesc.inheritKeyMap({ replace: false, keys: inheritKeys })
+      return childDesc
+    }
+
     const { ctrlClass, model, store } = this.#resolveChildParams(
       childDesc,
       options
@@ -176,7 +206,7 @@ export abstract class Controller<
           backend: this.backend,
           parent: this.widget,
           keyMap: { replace: false, keys: inheritKeys },
-          options,
+          options: options as WidgetOptions,
         },
         state: {
           store: store!,
@@ -185,20 +215,28 @@ export abstract class Controller<
       },
       ...args
     )
-    child.setParent(this.widget)
-    child.addListener(this)
-    this.children.push(child)
 
     return child
   }
 
   #resolveChildParams<T extends Controller, M, SM>(
     childDesc: ChildParam<T, M, SM>,
-    _options: blessed.Widgets.ElementOptions = {}
+    options: WidgetOptions | StateParams<M, SM> = {}
   ) {
+    const ctrlClass =
+      typeof childDesc === 'function' ? childDesc : childDesc.component
+
+    if (
+      Object.keys(options).includes('model') ||
+      Object.keys(options).includes('store')
+    ) {
+      return {
+        ctrlClass,
+        ...(options as StateParams<M, SM>),
+      }
+    }
     return {
-      ctrlClass:
-        typeof childDesc === 'function' ? childDesc : childDesc.component,
+      ctrlClass,
       model: typeof childDesc === 'function' ? undefined : childDesc.model,
       store: typeof childDesc === 'function' ? this.store : childDesc.store,
     }
@@ -416,7 +454,9 @@ export class ApplicationController<M> extends Controller<Widget, M, Store<M>> {
       backend.createBox({
         width: '100%',
         height: '100%',
-        style: { fg: 'default' },
+        raw: {
+          style: { fg: 'default' },
+        },
       }),
       model,
       store

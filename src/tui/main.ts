@@ -47,8 +47,7 @@ export class MainController extends ApplicationController<ApplicationState> {
     super(params)
 
     this.addChild(HeaderController)
-    this.componentSection = this.addChild({
-      component: ComponentSection,
+    this.componentSection = this.addChild(ComponentSection, {
       model: this.store
         .get<Project>('project')
         .components.filter((cmp) =>
@@ -63,11 +62,7 @@ export class MainController extends ApplicationController<ApplicationState> {
       () => Number(this.componentSection.bottom()) + 1
     )
 
-    this.configSection = this.addChild({
-      component: ConfigSection,
-      model: [],
-      store: this.store,
-    })
+    this.configSection = this.addChild(ConfigSection)
     this.configSection.layout.bind('top', () => this.componentSection.top())
     this.configSection.layout.bind(
       'left',

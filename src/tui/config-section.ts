@@ -75,7 +75,9 @@ export class ConfigSection extends CustomListBox<
           {
             width: 40,
             height: 14,
-            label: ' Configurations ',
+            raw: {
+              label: ' Configurations ',
+            },
           },
           options
         ),
@@ -198,13 +200,15 @@ class ConfigItemBox extends Controller {
         mergeLeft(
           {
             height: 1,
-            focusable: true,
-            style: {
-              focus: {
-                bg: 'blue',
-              },
-              select: {
-                bg: 'white',
+            raw: {
+              focusable: true,
+              style: {
+                focus: {
+                  bg: 'blue',
+                },
+                select: {
+                  bg: 'white',
+                },
               },
             },
           },
@@ -229,10 +233,12 @@ class ConfigItemBox extends Controller {
       },
       {
         left: 1,
-        style: {
-          focus: {
-            bg: 'blue',
-            fg: 'black',
+        raw: {
+          style: {
+            focus: {
+              bg: 'blue',
+              fg: 'black',
+            },
           },
         },
       }
@@ -245,8 +251,10 @@ class ConfigItemBox extends Controller {
       },
       {
         right: 1,
-        style: {
-          fg: model.type === 'private' ? 208 : 'green',
+        raw: {
+          style: {
+            fg: model.type === 'private' ? 208 : 'green',
+          },
         },
       }
     )

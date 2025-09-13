@@ -67,11 +67,13 @@ export class CustomListBox<
       backend.createBox(
         mergeLeft(
           {
-            border: 'line',
-            keys: true,
-            mouse: true,
-            scrollable: true,
-            alwaysScroll: true,
+            raw: {
+              border: 'line',
+              keys: true,
+              mouse: true,
+              scrollable: true,
+              alwaysScroll: true,
+            },
           },
           options
         )
@@ -111,8 +113,10 @@ export class CustomListBox<
       this.addChild(this.emptyLabel, {
         left: 'center',
         top: 1,
-        style: {
-          fg: 'gray',
+        raw: {
+          style: {
+            fg: 'gray',
+          },
         },
       })
     }

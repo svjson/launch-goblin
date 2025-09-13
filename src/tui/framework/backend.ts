@@ -1,13 +1,14 @@
-import blessed from 'neo-blessed'
 import { LabelWidget, ListWidget, TextFieldWidget, Widget } from './widget'
 
-export type Value = number | string | undefined
+import {
+  BoxOptions,
+  ButtonOptions,
+  LabelOptions,
+  ListOptions,
+  TextFieldOptions,
+} from './widget'
 
-export type BoxOptions = blessed.Widgets.BoxOptions
-export interface ButtonOptions {}
-export interface ListOptions {}
-export interface LabelOptions {}
-export interface TextFieldOptions {}
+export type Value = number | string | undefined
 
 export interface Backend {
   /**

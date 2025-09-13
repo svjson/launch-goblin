@@ -1,14 +1,19 @@
 import blessed from 'neo-blessed'
 
+import { Backend } from '../backend'
+
 import {
-  Backend,
   BoxOptions,
   ButtonOptions,
   LabelOptions,
   ListOptions,
   TextFieldOptions,
-} from '../backend'
-import { LabelWidget, ListWidget, TextFieldWidget, Widget } from '../widget'
+  LabelWidget,
+  ListWidget,
+  TextFieldWidget,
+  Widget,
+  WidgetOptions,
+} from '../widget'
 import {
   BlessedLabelWidget,
   BlessedListWidget,
@@ -17,6 +22,7 @@ import {
 } from './widget'
 import { initTui } from '../init'
 import { destroy } from '../destroy'
+import { Geometry } from '../geometry'
 
 export class BlessedBackend implements Backend {
   private screen: blessed.Widgets.Screen
@@ -51,18 +57,20 @@ export class BlessedBackend implements Backend {
   }
 
   createBox(options: BoxOptions): Widget {
-    return new BlessedWidget(blessed.box({ ...options, parent: this.screen }))
+    return new BlessedWidget(
+      blessed.box(toBlessedBoxOptions(options, this.screen))
+    )
   }
 
   createButton(options: ButtonOptions): Widget {
     return new BlessedWidget(
-      blessed.button({ ...options, parent: this.screen })
+      blessed.button(toBlessedButtonOptions(options, this.screen))
     )
   }
 
   createLabel(options: LabelOptions): LabelWidget {
     return new BlessedLabelWidget(
-      blessed.text({ ...options, parent: this.screen })
+      blessed.text(toBlessedLabelOptions(options, this.screen))
     )
   }
 
@@ -74,7 +82,57 @@ export class BlessedBackend implements Backend {
 
   createTextField(options: TextFieldOptions): TextFieldWidget {
     return new BlessedTextFieldWidget(
-      blessed.textbox({ ...options, parent: this.screen })
+      blessed.textbox(toBlessedTextFieldOptions(options, this.screen))
     )
   }
+}
+
+export const toBlessedGeometry = (geometry: Geometry) => {
+  return {
+    width: geometry?.width,
+    height: geometry?.height,
+    top: geometry?.top,
+    right: geometry?.right,
+    bottom: geometry?.bottom,
+    left: geometry?.left,
+  }
+}
+
+export const toBlessedElementOptions = (
+  options: WidgetOptions & { raw?: blessed.Widgets.ElementOptions },
+  parent: blessed.Widgets.Node
+) => {
+  return {
+    ...toBlessedGeometry(options),
+    ...(options.raw ?? {}),
+    ...{ parent },
+  }
+}
+
+export const toBlessedButtonOptions = (
+  options: ButtonOptions,
+  parent: blessed.Widgets.Node
+) => {
+  return toBlessedElementOptions(options, parent)
+}
+
+export const toBlessedLabelOptions = (
+  options: LabelOptions,
+  parent: blessed.Widgets.Node
+) => {
+  return toBlessedElementOptions(options, parent)
+}
+
+export const toBlessedTextFieldOptions = (
+  options: TextFieldOptions,
+  parent: blessed.Widgets.Node
+) => {
+  return toBlessedElementOptions(options, parent)
+}
+
+export const toBlessedBoxOptions = (
+  options: BoxOptions,
+  parent: blessed.Widgets.Node
+) => {
+  return toBlessedElementOptions(options, parent)
 }

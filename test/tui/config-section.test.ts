@@ -19,9 +19,7 @@ const makeFixture = (): [
     isTTY: false,
   })
   const backend = new BlessedBackend(screen)
-  const container = backend.createBox({
-    parent: screen,
-  })
+  const container = backend.createBox({})
   const state: ApplicationState = {
     config: {
       local: { launchConfigs: {} },

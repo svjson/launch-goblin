@@ -40,13 +40,15 @@ export class Checkbox<I extends CheckboxItem = CheckboxItem> extends Controller<
             left: 1,
             height: 1,
             width: '100%',
-            mouse: true,
-            keys: true,
-            shrink: true,
             padding: { left: 1 },
-            style: {
-              fg: 'gray',
-              focus: { bg: 'blue', fg: 'black' },
+            raw: {
+              mouse: true,
+              keys: true,
+              shrink: true,
+              style: {
+                fg: 'gray',
+                focus: { bg: 'blue', fg: 'black' },
+              },
             },
           },
           options
@@ -70,8 +72,10 @@ export class Checkbox<I extends CheckboxItem = CheckboxItem> extends Controller<
         },
       },
       {
-        style: {
-          fg: 'white',
+        raw: {
+          style: {
+            fg: 'white',
+          },
         },
       }
     )

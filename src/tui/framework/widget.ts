@@ -1,4 +1,20 @@
+import blessed from 'neo-blessed'
 import { LayoutProperty } from './layout'
+import { Geometry } from './geometry'
+
+export type WidgetOptions = Geometry & { raw?: blessed.Widgets.ElementOptions }
+
+export type BoxOptions = WidgetOptions & { raw?: blessed.Widgets.BoxOptions }
+export type ButtonOptions = WidgetOptions & {
+  raw: blessed.Widgets.ButtonOptions
+}
+export type ListOptions = WidgetOptions & {
+  raw: blessed.Widgets.ListOptions<blessed.Widgets.ListElementStyle>
+}
+export type LabelOptions = WidgetOptions & { raw: blessed.Widgets.TextOptions }
+export type TextFieldOptions = WidgetOptions & {
+  raw: blessed.Widgets.TextboxOptions
+}
 
 export interface Widget {
   /**

@@ -36,8 +36,10 @@ export class OptionBar<
           {
             width: '100%-2',
             height: 1,
-            focusable: true,
-            keys: true,
+            raw: {
+              focusable: true,
+              keys: true,
+            },
           },
           options
         )
@@ -91,16 +93,18 @@ export class Option<Model extends LabelItem> extends Controller<Widget, Model> {
       backend.createLabel(
         mergeLeft(
           {
-            content: ` ${model.text ?? ''} `,
-            transparent: true,
-            tags: true,
-            keys: true,
-            style: {
-              focus: {
-                bg: 'blue',
-              },
-              select: {
-                bg: 'white',
+            raw: {
+              content: ` ${model.text ?? ''} `,
+              transparent: true,
+              tags: true,
+              keys: true,
+              style: {
+                focus: {
+                  bg: 'blue',
+                },
+                select: {
+                  bg: 'white',
+                },
               },
             },
           },

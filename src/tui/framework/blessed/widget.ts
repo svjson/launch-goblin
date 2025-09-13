@@ -29,27 +29,27 @@ const accessors: Record<
     set: (lmnt, value) => (lmnt.right = value),
   },
   bg: {
-    get: (lmnt) => lmnt.style.bg,
+    get: (lmnt) => lmnt.style?.bg,
     set: (lmnt, value: string | number) => (lmnt.style.bg = value),
   },
   fg: {
-    get: (lmnt) => lmnt.style.fg,
+    get: (lmnt) => lmnt.style?.fg,
     set: (lmnt, value: string | number) => (lmnt.style.fg = value),
   },
   'focused:bg': {
-    get: (lmnt) => lmnt.style.focus.bg,
+    get: (lmnt) => lmnt.style?.focus?.bg,
     set: (lmnt, value: string | number) => (lmnt.style.focus.bg = value),
   },
   'focused:fg': {
-    get: (lmnt) => lmnt.style.focus.fg,
+    get: (lmnt) => lmnt.style?.focus?.fg,
     set: (lmnt, value: string | number) => (lmnt.style.focus.fg = value),
   },
   'selected:bg': {
-    get: (lmnt) => lmnt.style.select.bg,
+    get: (lmnt) => lmnt.style?.select?.bg,
     set: (lmnt, value: string | number) => (lmnt.style.select.bg = value),
   },
   'selected:fg': {
-    get: (lmnt) => lmnt.style.focus.fg,
+    get: (lmnt) => lmnt.style?.focus?.fg,
     set: (lmnt, value: string | number) => (lmnt.style.focus.fg = value),
   },
   width: {

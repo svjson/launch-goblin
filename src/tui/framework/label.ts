@@ -22,10 +22,12 @@ export class Label<Model extends LabelItem = LabelItem> extends Controller<
       backend.createLabel(
         mergeLeft(
           {
-            content: model.text ?? '',
-            transparent: true,
-            tags: true,
-            style: {},
+            raw: {
+              content: model.text ?? '',
+              transparent: true,
+              tags: true,
+              style: {},
+            },
           },
           options
         )

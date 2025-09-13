@@ -28,19 +28,21 @@ export class Button extends Controller<Widget, ButtonModel> {
       backend.createButton(
         mergeLeft(
           {
-            content: model.text,
+            width: model.text.length + 4,
             height: 1,
             left: 'center',
-            style: {
-              fg: 'black',
-              bg: '#888888',
-              focus: {
+            raw: {
+              content: model.text,
+              style: {
                 fg: 'black',
-                bg: 'green',
+                bg: '#888888',
+                focus: {
+                  fg: 'black',
+                  bg: 'green',
+                },
               },
+              align: 'center',
             },
-            width: model.text.length + 4,
-            align: 'center',
           },
           options
         )
@@ -60,13 +62,17 @@ export class Button extends Controller<Widget, ButtonModel> {
 
   enable() {
     super.enable()
-    //    mergeLeft(this.widget.style, this.model.enabled)
+    Object.keys(this.model.enabled).forEach((k) => {
+      this.widget.set(k, this.model.enabled[k])
+    })
     this.emit('dirty')
   }
 
   disable() {
     super.disable()
-    //    mergeLeft(this.widget.style, this.model.disabled)
+    Object.keys(this.model.disabled).forEach((k) => {
+      this.widget.set(k, this.model.disabled[k])
+    })
     this.emit('dirty')
   }
 

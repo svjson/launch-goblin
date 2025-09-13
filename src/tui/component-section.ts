@@ -49,8 +49,6 @@ export class ComponentSection extends Controller<
     super(
       backend,
       backend.createBox({
-        label: ' Select Components to Launch ',
-        focusable: true,
         width: Math.max(
           4 + ' Select Components to Launch '.length,
           10 + Math.max(...model.map((cmp) => cmp.name.length))
@@ -58,11 +56,15 @@ export class ComponentSection extends Controller<
         height: Math.max(10, model.length + 4),
         top: '25%',
         left: 'center',
-        border: 'line',
-        keys: true,
-        mouse: true,
-        scrollable: true,
-        alwaysScroll: true,
+        raw: {
+          label: ' Select Components to Launch ',
+          focusable: true,
+          border: 'line',
+          keys: true,
+          mouse: true,
+          scrollable: true,
+          alwaysScroll: true,
+        },
       }),
       model,
       store

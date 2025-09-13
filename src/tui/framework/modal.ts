@@ -7,8 +7,8 @@ import { Label } from './label'
 import { Button } from './button'
 import { add, withSign } from './layout'
 import { KeyMap } from './keymap'
-import { Widget } from './widget'
-import { Backend, BoxOptions } from './backend'
+import { Widget, BoxOptions } from './widget'
+import { Backend } from './backend'
 
 export interface ModalCtorParams<Model, StoreModel> {
   backend: Backend
@@ -57,14 +57,16 @@ export class ModalDialog<
             left: 'center',
             width: '50%',
             height: 6,
-            border: 'line',
-            label: model.title,
-            tags: true,
-            ch: ' ',
-            style: {
-              border: { fg: 'white' },
+            raw: {
+              border: 'line',
+              label: model.title,
+              tags: true,
+              ch: ' ',
+              style: {
+                border: { fg: 'white' },
+              },
+              bg: 'black',
             },
-            bg: 'black',
           },
           options
         )
