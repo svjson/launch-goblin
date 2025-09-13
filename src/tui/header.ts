@@ -8,7 +8,10 @@ import { Widget } from './framework/widget'
 export class HeaderController extends Controller<Widget, ApplicationState> {
   focusable = false
 
-  constructor({ backend, parent, model, store, keyMap }: CtrlCtorParams) {
+  constructor({
+    widget: { backend, parent, keyMap },
+    state: { model, store },
+  }: CtrlCtorParams) {
     super(
       backend,
       backend.createBox({

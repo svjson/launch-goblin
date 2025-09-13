@@ -57,13 +57,10 @@ export class CustomListBox<
   emptyLabel?: ChildDescription<EmptyT, EmptyM, EmptyM>
 
   constructor({
-    backend,
+    widget: { backend, keyMap, options = {} },
+    state: { model, store },
     itemCls,
     emptyLabel,
-    model,
-    store,
-    keyMap,
-    options = {},
   }: CustomListBoxCtorParams<ItemT, EmptyT, EmptyM, Model, Store>) {
     super(
       backend,

@@ -22,7 +22,10 @@ export class FooterController extends Controller {
 
   label: Label
 
-  constructor({ backend, model, store, keyMap }: CtrlCtorParams) {
+  constructor({
+    widget: { backend, keyMap },
+    state: { model, store },
+  }: CtrlCtorParams) {
     super(
       backend,
       backend.createBox({

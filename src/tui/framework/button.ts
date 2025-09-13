@@ -1,5 +1,3 @@
-import blessed from 'neo-blessed'
-
 import { mergeLeft } from '@whimbrel/walk'
 
 import { Controller, CtrlCtorParams } from './controller'
@@ -22,11 +20,8 @@ export class Button extends Controller<Widget, ButtonModel> {
   }
 
   constructor({
-    backend,
-    parent,
-    model,
-    keyMap,
-    options = {},
+    widget: { backend, parent, keyMap, options = {} },
+    state: { model },
   }: CtrlCtorParams) {
     super(
       backend,

@@ -63,17 +63,27 @@ export class ConfigSection extends CustomListBox<
   })
 
   constructor({
-    backend,
-    parent,
-    store,
-    model,
-    keyMap,
-    options = {},
+    widget: { backend, parent, keyMap, options = {} },
+    state: { store, model },
   }: CtrlCtorParams<ConfigListItem[], ApplicationState>) {
     super({
-      backend,
-      parent,
-      store,
+      widget: {
+        backend,
+        parent,
+        keyMap,
+        options: mergeLeft(
+          {
+            width: 40,
+            height: 14,
+            label: ' Configurations ',
+          },
+          options
+        ),
+      },
+      state: {
+        model,
+        store,
+      },
       itemCls: ConfigItemBox,
       emptyLabel: {
         component: Label,
@@ -81,16 +91,6 @@ export class ConfigSection extends CustomListBox<
           text: '<No Configurations>',
         },
       },
-      model,
-      keyMap,
-      options: mergeLeft(
-        {
-          width: 40,
-          height: 14,
-          label: ' Configurations ',
-        },
-        options
-      ),
     })
 
     this.store.subscribe('config.global', () => {
@@ -189,11 +189,8 @@ class ConfigItemBox extends Controller {
   selected = false
 
   constructor({
-    backend,
-    parent,
-    model,
-    keyMap,
-    options,
+    widget: { backend, parent, options, keyMap },
+    state: { model },
   }: CtrlCtorParams<ConfigListItem>) {
     super(
       backend,

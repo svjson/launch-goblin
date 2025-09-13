@@ -1,5 +1,3 @@
-import blessed from 'neo-blessed'
-
 import { mergeLeft } from '@whimbrel/walk'
 
 import { Controller, CtrlConstructor, CtrlCtorParams } from './controller'
@@ -18,11 +16,8 @@ export class ListBox<ItemModel extends ListItem = ListItem> extends Controller<
   focusable = true
 
   constructor({
-    backend,
-    parent,
-    model = [],
-    keyMap,
-    options = {},
+    widget: { backend, parent, keyMap, options = {} },
+    state: { model = [] },
   }: CtrlCtorParams<ItemModel[]>) {
     super(
       backend,

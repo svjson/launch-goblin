@@ -41,10 +41,14 @@ describe('ConfigSection', () => {
       const [backend, container, store, state] = makeFixture()
 
       const configSection = new ConfigSection({
-        backend,
-        parent: container,
-        model: [],
-        store,
+        widget: {
+          backend,
+          parent: container,
+        },
+        state: {
+          model: [],
+          store,
+        },
       })
       configSection.populateModel()
 
@@ -64,10 +68,14 @@ describe('ConfigSection', () => {
       }
 
       const configSection = new ConfigSection({
-        backend,
-        parent: container,
-        store,
-        model: [],
+        widget: {
+          backend,
+          parent: container,
+        },
+        state: {
+          store,
+          model: [],
+        },
       })
       configSection.populateModel()
 

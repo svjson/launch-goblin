@@ -26,11 +26,8 @@ export class OptionBar<
   focusable = true
 
   constructor({
-    backend,
-    parent,
-    model = [],
-    keyMap,
-    options = {},
+    widget: { backend, parent, keyMap, options = {} },
+    state: { model = [] },
   }: CtrlCtorParams<ItemModel[]>) {
     super(
       backend,
@@ -86,11 +83,8 @@ export class Option<Model extends LabelItem> extends Controller<Widget, Model> {
   focusable = true
 
   constructor({
-    backend,
-    parent,
-    model = { text: '' },
-    keyMap,
-    options,
+    widget: { backend, parent, keyMap, options },
+    state: { model = { text: '' } },
   }: CtrlCtorParams) {
     super(
       backend,

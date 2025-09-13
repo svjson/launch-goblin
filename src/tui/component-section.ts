@@ -43,11 +43,8 @@ export class ComponentSection extends Controller<
   components: ProjectComponent[]
 
   constructor({
-    backend,
-    parent,
-    model = [],
-    store,
-    keyMap,
+    widget: { backend, parent, keyMap },
+    state: { model = [], store },
   }: CtrlCtorParams<ProjectComponent[], ApplicationState>) {
     super(
       backend,

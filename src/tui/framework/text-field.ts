@@ -16,7 +16,10 @@ export interface TextInputModel {
 export class TextField extends Controller<Widget, TextFieldModel> {
   textInput: TextInput
 
-  constructor({ backend, parent, model, keyMap, options }: CtrlCtorParams) {
+  constructor({
+    widget: { backend, parent, keyMap, options },
+    state: { model },
+  }: CtrlCtorParams) {
     super(
       backend,
       backend.createBox(
@@ -61,7 +64,10 @@ export class TextField extends Controller<Widget, TextFieldModel> {
 }
 
 export class TextInput extends Controller<TextFieldWidget, TextInputModel> {
-  constructor({ backend, parent, model, keyMap, options }: CtrlCtorParams) {
+  constructor({
+    widget: { backend, parent, keyMap, options },
+    state: { model },
+  }: CtrlCtorParams) {
     super(
       backend,
       backend.createTextField({

@@ -22,16 +22,24 @@ export interface ApplicationCtrlCtorParams<M> {
   store: Store<M>
 }
 
+export interface WidgetParams {
+  backend: Backend
+  parent: Widget
+  keyMap?: KeyMapArg
+  options?: blessed.Widgets.ElementOptions
+}
+
+export interface StateParams<Model, StoreModel> {
+  model: Model
+  store: Store<StoreModel>
+}
+
 /**
  * Parameters for constructing a Controller.
  */
 export interface CtrlCtorParams<Model = any, StoreModel = Model> {
-  backend: Backend
-  parent: Widget
-  model: Model
-  store: Store<StoreModel>
-  keyMap?: KeyMapArg
-  options?: blessed.Widgets.ElementOptions
+  widget: WidgetParams
+  state: StateParams<Model, StoreModel>
 }
 
 /**
@@ -164,12 +172,16 @@ export abstract class Controller<
 
     const child = new ctrlClass(
       {
-        backend: this.backend,
-        parent: this.widget,
-        store: store!,
-        model: model!,
-        keyMap: { replace: false, keys: inheritKeys },
-        options,
+        widget: {
+          backend: this.backend,
+          parent: this.widget,
+          keyMap: { replace: false, keys: inheritKeys },
+          options,
+        },
+        state: {
+          store: store!,
+          model: model!,
+        },
       },
       ...args
     )

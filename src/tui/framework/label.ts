@@ -14,10 +14,8 @@ export class Label<Model extends LabelItem = LabelItem> extends Controller<
   focusable = false
 
   constructor({
-    backend,
-    parent,
-    model = { text: '' },
-    options,
+    widget: { backend, parent, options },
+    state: { model = { text: '' } },
   }: CtrlCtorParams) {
     super(
       backend,
