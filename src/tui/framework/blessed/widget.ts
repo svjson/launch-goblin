@@ -70,6 +70,10 @@ const accessors: Record<
     get: (lmnt) => lmnt.height,
     set: (lmnt, value) => (lmnt.height = value),
   },
+  text: {
+    get: (lmnt) => lmnt.content,
+    set: (lmnt, value) => (lmnt.content = String(value)),
+  },
 }
 
 export class BlessedWidget<

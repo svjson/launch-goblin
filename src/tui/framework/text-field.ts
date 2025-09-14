@@ -2,7 +2,7 @@ import { Controller, CtrlCtorParams } from './controller'
 import { Event } from './event'
 import { Label, LabelItem } from './label'
 import { mergeLeft } from '@whimbrel/walk'
-import { TextFieldWidget, Widget } from './widget'
+import { Widget } from './widget'
 
 export interface TextFieldModel {
   label: string | LabelItem
@@ -63,34 +63,131 @@ export class TextField extends Controller<Widget, TextFieldModel> {
   }
 }
 
-export class TextInput extends Controller<TextFieldWidget, TextInputModel> {
+export class TextInput extends Controller<Widget, { value: string }> {
+  private buffer = ''
+  private cursor = 0
+
+  keyMap = this.extendKeyMap({
+    left: {
+      handler: this.moveLeft.bind(this),
+    },
+    right: {
+      handler: this.moveRight.bind(this),
+    },
+    return: {
+      handler: this.submit.bind(this),
+    },
+    backspace: {
+      handler: this.killBackwards.bind(this),
+    },
+    delete: {
+      handler: this.killForwards.bind(this),
+    },
+    home: {
+      handler: this.moveStart.bind(this),
+    },
+    end: {
+      handler: this.moveEnd.bind(this),
+    },
+    '/[a-zA-Z0-9]/': {
+      handler: this.insertChar.bind(this),
+      group: 'edit',
+      legend: 'Insert',
+    },
+  })
+
   constructor({
-    widget: { backend, parent, keyMap, options },
-    state: { model },
+    widget: { backend, parent, keyMap, options = {} },
+    state: { model, store },
   }: CtrlCtorParams) {
     super(
       backend,
-      backend.createTextField({
-        width: '100%',
-        height: 1,
-        color: 'white',
-        background: 'blue',
-        keys: true,
-        ...(options ?? {}),
-      }),
-      model
+      backend.createBox(
+        mergeLeft(
+          {
+            width: '100%',
+            height: 1,
+            keys: true,
+            mouse: true,
+            background: '#888888',
+            color: 'white',
+            ':focused': {
+              background: 'blue',
+            },
+          },
+          options
+        )
+      ),
+      model ?? { value: '' }
     )
     this.setParent(parent)
-
-    this.widget.onSubmit(() => {
-      this.emit({ type: 'text-changed', value: this.widget.getText() })
-    })
-    this.widget.onCancel(() => {})
-
+    this.buffer = this.model.value || ''
     this.inheritKeyMap(keyMap)
+
+    this.widget.onBeforeRender(this.render.bind(this))
+  }
+
+  moveStart() {
+    this.cursor = 0
+    this.emit('dirty')
+  }
+
+  moveEnd() {
+    this.cursor = this.buffer.length
+    this.emit('dirty')
+  }
+
+  moveLeft() {
+    this.cursor = Math.max(0, this.cursor - 1)
+    this.emit('dirty')
+  }
+  moveRight() {
+    this.cursor = Math.min(this.buffer.length, this.cursor + 1)
+    this.emit('dirty')
+  }
+  submit() {
+    //    this.emit({ type: 'submit', value: this.buffer })
+  }
+  killBackwards() {
+    if (this.cursor > 0) {
+      this.buffer =
+        this.buffer.slice(0, this.cursor - 1) + this.buffer.slice(this.cursor)
+      this.cursor--
+    }
+    this.emit('dirty')
+  }
+  killForwards() {
+    if (this.cursor < this.buffer.length) {
+      this.buffer =
+        this.buffer.slice(0, this.cursor) + this.buffer.slice(this.cursor + 1)
+    }
+    this.emit('dirty')
+  }
+  insertChar(ch: string, _key: any) {
+    if (ch && ch.length === 1) {
+      this.buffer =
+        this.buffer.slice(0, this.cursor) + ch + this.buffer.slice(this.cursor)
+      this.cursor++
+    }
+    this.emit('dirty')
+  }
+
+  private render() {
+    if (!this.buffer) this.buffer = ''
+    if (this.isFocused()) {
+      const before = this.buffer.slice(0, this.cursor)
+      const atCursor = this.buffer[this.cursor] || ' '
+      const after = this.buffer.slice(this.cursor + 1)
+      this.widget.set(
+        'text',
+        before + '{inverse}' + atCursor + '{/inverse}' + after
+      )
+    } else {
+      this.widget.set('text', this.buffer)
+    }
   }
 
   getText() {
-    return this.widget.getText()
+    return this.buffer
   }
 }

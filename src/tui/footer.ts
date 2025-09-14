@@ -59,7 +59,9 @@ export class FooterController extends Controller {
       const keySym = KEY_SYMBOLS[key] ?? key
       let groupName = spec.group
 
-      if (groupName) {
+      if (!spec.legend) {
+        continue
+      } else if (groupName) {
         let group = groups[groupName]
         if (!group) {
           group = {

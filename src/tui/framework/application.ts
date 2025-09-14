@@ -5,7 +5,7 @@ import {
 } from './controller'
 import { Store, createStore } from './store'
 import { Action, ActionMap } from './action'
-import { KeyMap } from './keymap'
+import { keyHandler, KeyMap } from './keymap'
 import { ActionEvent, FocusEvent } from './event'
 import { Backend } from './backend'
 
@@ -43,8 +43,9 @@ export class Application<Model, MainCtrl extends ApplicationController<Model>> {
 
   #bindApplicationEvents() {
     this.backend.onKey((ch, key) => {
-      if (this.activeKeyMap[key.full]) {
-        this.activeKeyMap[key.full].handler(ch, key)
+      const handlerFn = keyHandler(this.activeKeyMap, ch, key)
+      if (typeof handlerFn === 'function') {
+        handlerFn(ch, key)
       }
     })
 

@@ -19,6 +19,7 @@ export type LayoutProperty =
   | 'selected:bg'
   | 'width'
   | 'height'
+  | 'text'
 
 export type ValueProvider = () => string | number | undefined
 

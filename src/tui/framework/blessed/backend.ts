@@ -189,7 +189,6 @@ export const toBlessedStyle = (
       ...(options.background ? { bg: options.background } : {}),
       ...(options.bold ? { bold: options.bold } : {}),
       ...(options.underline ? { underline: options.underline } : {}),
-
       // ...toBlessedStateStyle('focus', options[':focused']),
       // ...toBlessedStateStyle('select', options[':selected']),
     },
