@@ -11,7 +11,7 @@ export const launchConfigByName = (
   configName: string,
   config: ContextConfig
 ): LaunchConfig | undefined => {
-  return [config.local, config.local]
+  return [config.local, config.global]
     .map((cfg) => {
       return cfg.launchConfigs[configName]
     })
