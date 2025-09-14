@@ -21,10 +21,10 @@ export class HeaderController extends Controller<Widget, ApplicationState> {
         height: 1,
         background: 'green',
         color: 'black',
+        bold: true,
         raw: {
           align: 'center',
           content: `Launch Goblin v${__LG_VERSION__}`,
-          style: { bold: true },
         },
       }),
       model,

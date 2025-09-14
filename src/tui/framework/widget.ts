@@ -2,6 +2,7 @@ import blessed from 'neo-blessed'
 import { LayoutProperty } from './layout'
 import { Geometry } from './geometry'
 import { Appearance } from './appearance'
+import { Interaction } from './interaction'
 
 export type UIState = ':focused' | ':selected' | ':disabled'
 
@@ -10,7 +11,7 @@ export type WidgetOptions = BaseWidgetOptions &
     raw?: blessed.Widgets.ElementOptions
   }
 
-export type BaseWidgetOptions = Geometry & Appearance
+export type BaseWidgetOptions = Geometry & Appearance & Interaction
 
 export type StateVariants = Partial<Record<UIState, BaseWidgetOptions>>
 
@@ -18,16 +19,16 @@ export type BoxOptions = BaseWidgetOptions & {
   raw?: blessed.Widgets.BoxOptions
 }
 export type ButtonOptions = BaseWidgetOptions & {
-  raw: blessed.Widgets.ButtonOptions
+  raw?: blessed.Widgets.ButtonOptions
 }
 export type ListOptions = BaseWidgetOptions & {
-  raw: blessed.Widgets.ListOptions<blessed.Widgets.ListElementStyle>
+  raw?: blessed.Widgets.ListOptions<blessed.Widgets.ListElementStyle>
 }
 export type LabelOptions = BaseWidgetOptions & {
-  raw: blessed.Widgets.TextOptions
+  raw?: blessed.Widgets.TextOptions
 }
 export type TextFieldOptions = BaseWidgetOptions & {
-  raw: blessed.Widgets.TextboxOptions
+  raw?: blessed.Widgets.TextboxOptions
 }
 
 export interface Widget<O extends WidgetOptions = WidgetOptions> {
@@ -37,7 +38,7 @@ export interface Widget<O extends WidgetOptions = WidgetOptions> {
   /**
    * Register an event handler that will be called before this Widget
    * renders onto the screen or a virtual buffer of the backend
-   * implemntation
+   * implementation
    */
   onBeforeRender(callback: () => void): void
   /**

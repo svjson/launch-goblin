@@ -108,6 +108,11 @@ export class BlessedWidget<
         fg: style.color ?? 'default',
         bg: style.background ?? 'default',
       },
+      ...(typeof style.bold === 'boolean' ? { bold: style.bold } : {}),
+      ...(typeof this.inner.style.underline === 'boolean' ||
+      typeof style.underline === 'boolean'
+        ? { underline: style.underline }
+        : {}),
     }
     this.calculatedStyle = style
   }

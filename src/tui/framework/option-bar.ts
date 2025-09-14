@@ -36,9 +36,9 @@ export class OptionBar<
           {
             width: '100%-2',
             height: 1,
+            keys: true,
             raw: {
               focusable: true,
-              keys: true,
             },
           },
           options
@@ -52,7 +52,7 @@ export class OptionBar<
     let left = 2
     for (let i = 0; i < this.model.length; i++) {
       const opt = this.model[i]
-      const child = this.addChild(
+      this.addChild(
         {
           component: Option,
           model: { text: opt.label },
@@ -62,17 +62,6 @@ export class OptionBar<
         }
       )
       left += opt.label.length + 2
-      child.layout.bind('bg', () =>
-        child.getWidget().isFocused()
-          ? 'blue'
-          : this.focusedIndex === i
-            ? 'white'
-            : ''
-      )
-
-      child.layout.bind('fg', () =>
-        this.focusedIndex === i ? 'black' : 'white'
-      )
     }
   }
 
@@ -101,11 +90,11 @@ export class Option<Model extends LabelItem> extends Controller<Widget, Model> {
             ':selected': {
               background: 'white',
             },
+            keys: true,
             raw: {
               content: ` ${model.text ?? ''} `,
               transparent: true,
               tags: true,
-              keys: true,
             },
           },
           options

@@ -1,4 +1,4 @@
-import { Appearance, ColorOptions } from './appearance'
+import { Appearance, ColorOptions, TextStyle } from './appearance'
 import { Dimension, Geometry, Position } from './geometry'
 import { BaseWidgetOptions } from './widget'
 
@@ -18,7 +18,18 @@ export const COLOR_OPTIONS_KEYS = keysOf<ColorOptions>()([
   'color',
   'background',
 ])
-export const APPEARANCE_KEYS = keysOf<Appearance>()([...COLOR_OPTIONS_KEYS])
+
+export const TEXT_STYLE_KEYS = keysOf<TextStyle>()([
+  'bold',
+  'underline',
+  'italic',
+  'inverse',
+])
+
+export const APPEARANCE_KEYS = keysOf<Appearance>()([
+  ...COLOR_OPTIONS_KEYS,
+  ...TEXT_STYLE_KEYS,
+])
 
 export const GEOMETRY_KEYS = keysOf<Geometry>()([
   ...POSITION_KEYS,

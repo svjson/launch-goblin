@@ -34,6 +34,7 @@ export class Button extends Controller<Widget, ButtonModel> {
             ':focused': {
               color: 'black',
               background: 'green',
+              underline: true,
             },
             ':disabled': {
               background: 'gray',

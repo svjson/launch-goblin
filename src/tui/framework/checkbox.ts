@@ -44,10 +44,8 @@ export class Checkbox<I extends CheckboxItem = CheckboxItem> extends Controller<
             color: 'gray',
             ':selected': { color: 'white' },
             ':focused': { background: 'blue' },
-            raw: {
-              mouse: true,
-              keys: true,
-            },
+            mouse: true,
+            keys: true,
           },
           options
         )

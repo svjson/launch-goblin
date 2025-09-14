@@ -75,9 +75,7 @@ export class TextInput extends Controller<TextFieldWidget, TextInputModel> {
         height: 1,
         color: 'white',
         background: 'blue',
-        raw: {
-          keys: true,
-        },
+        keys: true,
         ...(options ?? {}),
       }),
       model

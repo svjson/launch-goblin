@@ -67,10 +67,10 @@ export class CustomListBox<
       backend.createBox(
         mergeLeft(
           {
+            keys: true,
+            mouse: true,
             raw: {
               border: 'line',
-              keys: true,
-              mouse: true,
               scrollable: true,
               alwaysScroll: true,
             },

@@ -25,6 +25,7 @@ import { initTui } from '../init'
 import { destroy } from '../destroy'
 import { Geometry } from '../geometry'
 import { Appearance } from '../appearance'
+import { Interaction } from '../interaction'
 
 export class BlessedBackend implements Backend {
   private screen: blessed.Widgets.Screen
@@ -85,7 +86,7 @@ export class BlessedBackend implements Backend {
 
   createList(options: ListOptions): ListWidget {
     return new BlessedListWidget(
-      blessed.list({ ...options, parent: this.screen }),
+      blessed.list(toBlessedListOptions(options, this.screen)),
       options
     )
   }
@@ -109,6 +110,13 @@ export const toBlessedGeometry = (geometry: Geometry) => {
   }
 }
 
+export const toBlessedInteraction = (interaction: Interaction) => {
+  return {
+    mouse: interaction.mouse,
+    keys: interaction.keys,
+  }
+}
+
 export const toBlessedElementOptions = (
   options: WidgetOptions & { raw?: blessed.Widgets.ElementOptions },
   parent: blessed.Widgets.Node
@@ -116,6 +124,7 @@ export const toBlessedElementOptions = (
   return mergeLeft(
     {
       ...toBlessedGeometry(options),
+      ...toBlessedInteraction(options),
       ...(options.raw ?? {}),
       ...{ parent },
     },
@@ -135,15 +144,26 @@ export const toBlessedStateStyle = (state: string, options?: Appearance) => {
   }
 }
 
-export const toBlessedStyle = (options: WidgetOptions) => {
+export const toBlessedStyle = (
+  options: WidgetOptions
+): blessed.Widgets.ElementOptions => {
   return {
     style: {
       ...(options.color ? { fg: options.color } : {}),
       ...(options.background ? { bg: options.background } : {}),
+      ...(options.bold ? { bold: options.bold } : {}),
+      ...(options.underline ? { underline: options.underline } : {}),
       // ...toBlessedStateStyle('focus', options[':focused']),
       // ...toBlessedStateStyle('select', options[':selected']),
     },
   }
+}
+
+export const toBlessedListOptions = (
+  options: ButtonOptions,
+  parent: blessed.Widgets.Node
+) => {
+  return toBlessedElementOptions(options, parent)
 }
 
 export const toBlessedButtonOptions = (

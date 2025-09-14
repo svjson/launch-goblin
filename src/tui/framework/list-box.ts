@@ -25,6 +25,7 @@ export class ListBox<ItemModel extends ListItem = ListItem> extends Controller<
         mergeLeft(
           {
             width: 4 + Math.max(...model.map((item) => item.label.length)),
+            keys: true,
             ':selected': {
               background: 'white',
               color: 'black',
@@ -38,9 +39,7 @@ export class ListBox<ItemModel extends ListItem = ListItem> extends Controller<
             },
             raw: {
               parent,
-              align: 'left',
               items: [],
-              keys: true,
             },
           },
           options

@@ -5,4 +5,11 @@ export interface ColorOptions {
   background?: Color
 }
 
-export type Appearance = ColorOptions
+export interface TextStyle {
+  bold?: boolean
+  underline?: boolean
+  italic?: boolean
+  inverse?: boolean
+}
+
+export type Appearance = ColorOptions & TextStyle
