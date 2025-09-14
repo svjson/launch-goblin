@@ -57,14 +57,14 @@ export class ModalDialog<
             left: 'center',
             width: '50%',
             height: 6,
-            raw: {
-              border: 'line',
+            border: {
+              type: 'line',
               label: model.title,
+              color: 'white',
+            },
+            raw: {
               tags: true,
               ch: ' ',
-              style: {
-                border: { fg: 'white' },
-              },
             },
           },
           options

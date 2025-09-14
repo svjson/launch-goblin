@@ -57,10 +57,12 @@ export class ComponentSection extends Controller<
         left: 'center',
         keys: true,
         mouse: true,
-        raw: {
+        border: {
+          type: 'line',
           label: ' Select Components to Launch ',
+        },
+        raw: {
           focusable: true,
-          border: 'line',
           scrollable: true,
           alwaysScroll: true,
         },

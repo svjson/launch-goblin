@@ -12,4 +12,17 @@ export interface TextStyle {
   inverse?: boolean
 }
 
+export type BorderType = 'none' | 'line'
+
+export interface BorderOptions {
+  type: BorderType
+  color?: Color
+  background?: Color
+  label?: string
+}
+
+export interface Border {
+  border?: BorderOptions | 'none'
+}
+
 export type Appearance = ColorOptions & TextStyle

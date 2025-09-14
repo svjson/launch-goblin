@@ -1,7 +1,7 @@
 import blessed from 'neo-blessed'
 import { LayoutProperty } from './layout'
 import { Geometry } from './geometry'
-import { Appearance } from './appearance'
+import { Appearance, Border } from './appearance'
 import { Interaction } from './interaction'
 
 export type UIState = ':focused' | ':selected' | ':disabled'
@@ -15,16 +15,19 @@ export type BaseWidgetOptions = Geometry & Appearance & Interaction
 
 export type StateVariants = Partial<Record<UIState, BaseWidgetOptions>>
 
-export type BoxOptions = BaseWidgetOptions & {
-  raw?: blessed.Widgets.BoxOptions
-}
+export type BoxOptions = BaseWidgetOptions &
+  Border & {
+    raw?: blessed.Widgets.BoxOptions
+  }
 export type ButtonOptions = BaseWidgetOptions & {
+  label: string
   raw?: blessed.Widgets.ButtonOptions
 }
 export type ListOptions = BaseWidgetOptions & {
   raw?: blessed.Widgets.ListOptions<blessed.Widgets.ListElementStyle>
 }
 export type LabelOptions = BaseWidgetOptions & {
+  label: string
   raw?: blessed.Widgets.TextOptions
 }
 export type TextFieldOptions = BaseWidgetOptions & {

@@ -31,6 +31,7 @@ export class Button extends Controller<Widget, ButtonModel> {
             left: 'center',
             color: 'black',
             background: '#888888',
+            label: model.text,
             ':focused': {
               color: 'black',
               background: 'green',
@@ -41,7 +42,6 @@ export class Button extends Controller<Widget, ButtonModel> {
               color: 'black',
             },
             raw: {
-              content: model.text,
               align: 'center',
             },
           },

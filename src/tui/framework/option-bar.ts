@@ -1,12 +1,16 @@
 import { mergeLeft } from '@whimbrel/walk'
 
 import { Controller, CtrlCtorParams } from './controller'
-import { ListItem } from './list-box'
-import { LabelItem } from './label'
 import { Widget } from './widget'
 
+export interface OptionItem {
+  id: string
+  label: string
+  selected: boolean
+}
+
 export class OptionBar<
-  ItemModel extends ListItem = ListItem,
+  ItemModel extends OptionItem = OptionItem,
 > extends Controller<Widget, ItemModel[], undefined> {
   keyMap = this.extendKeyMap({
     right: {
@@ -21,6 +25,10 @@ export class OptionBar<
       group: 'nav',
       handler: this.bind(() => this.nextChild(-1)),
     },
+  })
+
+  events = this.extendEvents({
+    focus: this.bind(this.itemFocused),
   })
 
   focusable = true
@@ -55,7 +63,7 @@ export class OptionBar<
       this.addChild(
         {
           component: Option,
-          model: { text: opt.label },
+          model: opt,
         },
         {
           left,
@@ -68,9 +76,18 @@ export class OptionBar<
   getSelectedItemId() {
     return this.model[this.focusedIndex].id
   }
+
+  itemFocused() {
+    this.model.forEach((item, i) => {
+      item.selected = this.focusedIndex === i
+    })
+  }
 }
 
-export class Option<Model extends LabelItem> extends Controller<Widget, Model> {
+export class Option<Model extends OptionItem> extends Controller<
+  Widget,
+  Model
+> {
   focusable = true
 
   constructor({
@@ -82,17 +99,18 @@ export class Option<Model extends LabelItem> extends Controller<Widget, Model> {
       backend.createLabel(
         mergeLeft(
           {
+            label: ` ${model.label ?? ''} `,
             background: 'default',
             color: 'white',
             ':focused': {
               background: 'blue',
             },
             ':selected': {
+              color: 'black',
               background: 'white',
             },
             keys: true,
             raw: {
-              content: ` ${model.text ?? ''} `,
               transparent: true,
               tags: true,
             },
@@ -105,5 +123,9 @@ export class Option<Model extends LabelItem> extends Controller<Widget, Model> {
     this.setParent(parent)
 
     this.inheritKeyMap(keyMap)
+  }
+
+  isSelected() {
+    return this.model.selected
   }
 }

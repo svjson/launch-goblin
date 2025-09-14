@@ -69,8 +69,10 @@ export class CustomListBox<
           {
             keys: true,
             mouse: true,
+            border: {
+              type: 'line',
+            },
             raw: {
-              border: 'line',
               scrollable: true,
               alwaysScroll: true,
             },

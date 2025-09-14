@@ -60,10 +60,12 @@ export class SaveConfigDialog extends ModalDialog<
           {
             id: 'global',
             label: 'Private',
+            selected: true,
           },
           {
             id: 'local',
             label: 'Shared',
+            selected: false,
           },
         ],
       },

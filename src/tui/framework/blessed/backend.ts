@@ -24,7 +24,7 @@ import {
 import { initTui } from '../init'
 import { destroy } from '../destroy'
 import { Geometry } from '../geometry'
-import { Appearance } from '../appearance'
+import { Appearance, BorderOptions } from '../appearance'
 import { Interaction } from '../interaction'
 
 export class BlessedBackend implements Backend {
@@ -117,6 +117,22 @@ export const toBlessedInteraction = (interaction: Interaction) => {
   }
 }
 
+export const toBlessedBorderOptions = (
+  options?: BorderOptions | 'none'
+): blessed.Widgets.ElementOptions => {
+  if (!options || options === 'none') return {}
+  return {
+    border: options.type === 'line' ? 'line' : 'bg',
+    ...(options.label ? { label: options.label } : {}),
+    style: {
+      border: {
+        ...(options.color ? { fg: options.color } : {}),
+        ...(options.background ? { bg: options.background } : {}),
+      },
+    },
+  }
+}
+
 export const toBlessedElementOptions = (
   options: WidgetOptions & { raw?: blessed.Widgets.ElementOptions },
   parent: blessed.Widgets.Node
@@ -159,8 +175,18 @@ export const toBlessedStyle = (
   }
 }
 
+export const toBlessedBoxOptions = (
+  options: BoxOptions,
+  parent: blessed.Widgets.Node
+) => {
+  return mergeLeft(
+    toBlessedElementOptions(options, parent),
+    toBlessedBorderOptions(options.border)
+  )
+}
+
 export const toBlessedListOptions = (
-  options: ButtonOptions,
+  options: ListOptions,
   parent: blessed.Widgets.Node
 ) => {
   return toBlessedElementOptions(options, parent)
@@ -170,25 +196,24 @@ export const toBlessedButtonOptions = (
   options: ButtonOptions,
   parent: blessed.Widgets.Node
 ) => {
-  return toBlessedElementOptions(options, parent)
+  return {
+    ...toBlessedElementOptions(options, parent),
+    content: options.label,
+  }
 }
 
 export const toBlessedLabelOptions = (
   options: LabelOptions,
   parent: blessed.Widgets.Node
 ) => {
-  return toBlessedElementOptions(options, parent)
+  return {
+    ...toBlessedElementOptions(options, parent),
+    content: options.label,
+  }
 }
 
 export const toBlessedTextFieldOptions = (
   options: TextFieldOptions,
-  parent: blessed.Widgets.Node
-) => {
-  return toBlessedElementOptions(options, parent)
-}
-
-export const toBlessedBoxOptions = (
-  options: BoxOptions,
   parent: blessed.Widgets.Node
 ) => {
   return toBlessedElementOptions(options, parent)
