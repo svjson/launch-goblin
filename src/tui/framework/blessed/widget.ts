@@ -1,7 +1,17 @@
 import blessed from 'neo-blessed'
-import { LabelWidget, ListWidget, TextFieldWidget, Widget } from '../widget'
+import {
+  BaseWidgetOptions,
+  LabelWidget,
+  ListWidget,
+  TextFieldWidget,
+  Widget,
+  WidgetOptions,
+  narrow,
+} from '../widget'
 
 import { LayoutProperty } from '../layout'
+import { Appearance } from '../appearance'
+import { APPEARANCE_KEYS, BASE_WIDGET_OPTIONS_KEYS } from '../options'
 
 export type BlessedLmnt = blessed.Widgets.BlessedElement
 
@@ -62,10 +72,21 @@ const accessors: Record<
   },
 }
 
-export class BlessedWidget<T extends BlessedLmnt = BlessedLmnt>
-  implements Widget
+export class BlessedWidget<
+  T extends BlessedLmnt = BlessedLmnt,
+  O extends WidgetOptions = WidgetOptions,
+> implements Widget<O>
 {
-  constructor(public inner: T) {}
+  calculatedStyle: BaseWidgetOptions
+  widgetOptions: O
+
+  constructor(
+    public inner: T,
+    options: O
+  ) {
+    this.calculatedStyle = {}
+    this.widgetOptions = options
+  }
 
   focus() {
     this.inner.focus()
@@ -78,6 +99,25 @@ export class BlessedWidget<T extends BlessedLmnt = BlessedLmnt>
   destroy() {
     this.inner.detach()
     this.inner.destroy()
+  }
+
+  applyStyle(style: BaseWidgetOptions) {
+    this.inner.style = {
+      ...this.inner.style,
+      ...{
+        fg: style.color ?? 'default',
+        bg: style.background ?? 'default',
+      },
+    }
+    this.calculatedStyle = style
+  }
+
+  getAppearance(): Appearance {
+    return narrow(this.widgetOptions, APPEARANCE_KEYS)
+  }
+
+  getStyleOptions(): BaseWidgetOptions {
+    return narrow(this.widgetOptions, BASE_WIDGET_OPTIONS_KEYS)
   }
 
   onBeforeRender(handler: () => void) {

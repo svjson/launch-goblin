@@ -10,6 +10,8 @@ export { createStore, Store } from './store'
 export { Label } from './label'
 export { readTTYTitleString } from './tty'
 
+export type { Backend } from './backend'
+
 export type { Action } from './action'
 export type {
   ApplicationCtrlConstructor,

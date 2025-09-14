@@ -1,9 +1,12 @@
+import { mergeLeft } from '@whimbrel/walk'
+
 import { DestroyEvent, Event, StringEvent } from './event'
 import { KeyMap, KeyMapArg } from './keymap'
 import { createStore, Store } from './store'
 import { ControllerLayout, LayoutProperty } from './layout'
 import { Backend } from './backend'
-import { Widget, WidgetOptions } from './widget'
+import { BaseWidgetOptions, Widget, WidgetOptions } from './widget'
+import { calculateWidgetStyle } from './style'
 
 /**
  * Mixin-interface for anything that may listen to events.
@@ -76,6 +79,12 @@ export interface ChildDescription<T extends Controller, M, SM> {
 export type ChildParam<T extends Controller, M, SM> =
   | CtrlConstructor<T, M, SM>
   | ChildDescription<T, M, SM>
+
+export interface ComponentState {
+  focused?: boolean
+  selected?: boolean
+  disabled?: boolean
+}
 
 /**
  * Base class for all controllers.
@@ -425,6 +434,26 @@ export abstract class Controller<
     return this.widget.get('height')!
   }
 
+  getComponentState(): ComponentState {
+    return {
+      focused: this.isFocused(),
+      selected: this.isSelected(),
+      disabled: this.isDisabled(),
+    }
+  }
+
+  isFocused(): boolean {
+    return this.widget.isFocused()
+  }
+
+  isSelected(): boolean {
+    return false
+  }
+
+  isDisabled(): boolean {
+    return !this.enabled
+  }
+
   focus() {
     let focusedChild: Controller | undefined = this.children[this.focusedIndex]
     if (focusedChild) {
@@ -443,6 +472,21 @@ export abstract class Controller<
       this.emit({ type: 'focus', component: this })
     }
   }
+
+  applyStyle(parentStyle: BaseWidgetOptions) {
+    const cmpState = this.getComponentState()
+
+    const style = calculateWidgetStyle(
+      this.widget.widgetOptions,
+      cmpState,
+      parentStyle
+    )
+
+    this.widget.applyStyle(style)
+    for (const child of this.children) {
+      child.applyStyle(style)
+    }
+  }
 }
 
 export class ApplicationController<M> extends Controller<Widget, M, Store<M>> {
@@ -454,9 +498,7 @@ export class ApplicationController<M> extends Controller<Widget, M, Store<M>> {
       backend.createBox({
         width: '100%',
         height: '100%',
-        raw: {
-          style: { fg: 'default' },
-        },
+        color: 'default',
       }),
       model,
       store

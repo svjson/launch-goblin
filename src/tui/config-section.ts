@@ -200,16 +200,11 @@ class ConfigItemBox extends Controller {
         mergeLeft(
           {
             height: 1,
-            raw: {
-              focusable: true,
-              style: {
-                focus: {
-                  bg: 'blue',
-                },
-                select: {
-                  bg: 'white',
-                },
-              },
+            ':focused': {
+              background: 'blue',
+            },
+            ':selected': {
+              background: 'white',
             },
           },
           options
@@ -233,13 +228,9 @@ class ConfigItemBox extends Controller {
       },
       {
         left: 1,
-        raw: {
-          style: {
-            focus: {
-              bg: 'blue',
-              fg: 'black',
-            },
-          },
+        ':focused': {
+          background: 'blue',
+          color: 'black',
         },
       }
     )
@@ -251,11 +242,7 @@ class ConfigItemBox extends Controller {
       },
       {
         right: 1,
-        raw: {
-          style: {
-            fg: model.type === 'private' ? 208 : 'green',
-          },
-        },
+        color: model.type === 'private' ? 208 : 'green',
       }
     )
 

@@ -65,7 +65,6 @@ export class ModalDialog<
               style: {
                 border: { fg: 'white' },
               },
-              bg: 'black',
             },
           },
           options

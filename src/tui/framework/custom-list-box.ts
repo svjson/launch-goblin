@@ -113,11 +113,7 @@ export class CustomListBox<
       this.addChild(this.emptyLabel, {
         left: 'center',
         top: 1,
-        raw: {
-          style: {
-            fg: 'gray',
-          },
-        },
+        color: 'gray',
       })
     }
 

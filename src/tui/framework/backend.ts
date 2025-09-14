@@ -11,6 +11,7 @@ import {
 export type Value = number | string | undefined
 
 export interface Backend {
+  onBeforeRender(handler: () => void): void
   /**
    * Register a key handler function that reacts to any key press
    * event in the application environment.

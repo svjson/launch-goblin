@@ -1,4 +1,5 @@
 import blessed from 'neo-blessed'
+import { mergeLeft } from '@whimbrel/walk'
 
 import { Backend } from '../backend'
 
@@ -23,6 +24,7 @@ import {
 import { initTui } from '../init'
 import { destroy } from '../destroy'
 import { Geometry } from '../geometry'
+import { Appearance } from '../appearance'
 
 export class BlessedBackend implements Backend {
   private screen: blessed.Widgets.Screen
@@ -48,6 +50,10 @@ export class BlessedBackend implements Backend {
     this.screen.append((widget as BlessedWidget).inner)
   }
 
+  onBeforeRender(handler: () => void): void {
+    this.screen.on('prerender', handler)
+  }
+
   onKey(handler: (ch: string, key: any) => void) {
     this.screen.on('keypress', handler)
   }
@@ -58,31 +64,36 @@ export class BlessedBackend implements Backend {
 
   createBox(options: BoxOptions): Widget {
     return new BlessedWidget(
-      blessed.box(toBlessedBoxOptions(options, this.screen))
+      blessed.box(toBlessedBoxOptions(options, this.screen)),
+      options
     )
   }
 
   createButton(options: ButtonOptions): Widget {
     return new BlessedWidget(
-      blessed.button(toBlessedButtonOptions(options, this.screen))
+      blessed.button(toBlessedButtonOptions(options, this.screen)),
+      options
     )
   }
 
   createLabel(options: LabelOptions): LabelWidget {
     return new BlessedLabelWidget(
-      blessed.text(toBlessedLabelOptions(options, this.screen))
+      blessed.text(toBlessedLabelOptions(options, this.screen)),
+      options
     )
   }
 
   createList(options: ListOptions): ListWidget {
     return new BlessedListWidget(
-      blessed.list({ ...options, parent: this.screen })
+      blessed.list({ ...options, parent: this.screen }),
+      options
     )
   }
 
   createTextField(options: TextFieldOptions): TextFieldWidget {
     return new BlessedTextFieldWidget(
-      blessed.textbox(toBlessedTextFieldOptions(options, this.screen))
+      blessed.textbox(toBlessedTextFieldOptions(options, this.screen)),
+      options
     )
   }
 }
@@ -101,11 +112,37 @@ export const toBlessedGeometry = (geometry: Geometry) => {
 export const toBlessedElementOptions = (
   options: WidgetOptions & { raw?: blessed.Widgets.ElementOptions },
   parent: blessed.Widgets.Node
-) => {
+): blessed.Widgets.ElementOptions => {
+  return mergeLeft(
+    {
+      ...toBlessedGeometry(options),
+      ...(options.raw ?? {}),
+      ...{ parent },
+    },
+    toBlessedStyle(options)
+  ) as blessed.Widgets.ElementOptions
+}
+
+export const toBlessedStateStyle = (state: string, options?: Appearance) => {
+  if (!options) return {}
+  const stateStyle = {
+    ...(options.color ? { fg: options.color } : {}),
+    ...(options.background ? { bg: options.background } : {}),
+  }
+  if (Object.keys(stateStyle).length === 0) return {}
   return {
-    ...toBlessedGeometry(options),
-    ...(options.raw ?? {}),
-    ...{ parent },
+    [state]: stateStyle,
+  }
+}
+
+export const toBlessedStyle = (options: WidgetOptions) => {
+  return {
+    style: {
+      ...(options.color ? { fg: options.color } : {}),
+      ...(options.background ? { bg: options.background } : {}),
+      // ...toBlessedStateStyle('focus', options[':focused']),
+      // ...toBlessedStateStyle('select', options[':selected']),
+    },
   }
 }
 

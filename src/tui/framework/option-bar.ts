@@ -93,19 +93,19 @@ export class Option<Model extends LabelItem> extends Controller<Widget, Model> {
       backend.createLabel(
         mergeLeft(
           {
+            background: 'default',
+            color: 'white',
+            ':focused': {
+              background: 'blue',
+            },
+            ':selected': {
+              background: 'white',
+            },
             raw: {
               content: ` ${model.text ?? ''} `,
               transparent: true,
               tags: true,
               keys: true,
-              style: {
-                focus: {
-                  bg: 'blue',
-                },
-                select: {
-                  bg: 'white',
-                },
-              },
             },
           },
           options

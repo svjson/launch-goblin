@@ -5,7 +5,6 @@ import {
   CtrlCtorParams,
 } from './framework'
 import { juxt } from '@whimbrel/array'
-import blessed from 'neo-blessed'
 import { ApplicationState, ProjectComponent } from '@src/project'
 import { CheckboxItem } from './framework/checkbox'
 import { Widget } from './framework/widget'

@@ -1,22 +1,39 @@
 import blessed from 'neo-blessed'
 import { LayoutProperty } from './layout'
 import { Geometry } from './geometry'
+import { Appearance } from './appearance'
 
-export type WidgetOptions = Geometry & { raw?: blessed.Widgets.ElementOptions }
+export type UIState = ':focused' | ':selected' | ':disabled'
 
-export type BoxOptions = WidgetOptions & { raw?: blessed.Widgets.BoxOptions }
-export type ButtonOptions = WidgetOptions & {
+export type WidgetOptions = BaseWidgetOptions &
+  StateVariants & {
+    raw?: blessed.Widgets.ElementOptions
+  }
+
+export type BaseWidgetOptions = Geometry & Appearance
+
+export type StateVariants = Partial<Record<UIState, BaseWidgetOptions>>
+
+export type BoxOptions = BaseWidgetOptions & {
+  raw?: blessed.Widgets.BoxOptions
+}
+export type ButtonOptions = BaseWidgetOptions & {
   raw: blessed.Widgets.ButtonOptions
 }
-export type ListOptions = WidgetOptions & {
+export type ListOptions = BaseWidgetOptions & {
   raw: blessed.Widgets.ListOptions<blessed.Widgets.ListElementStyle>
 }
-export type LabelOptions = WidgetOptions & { raw: blessed.Widgets.TextOptions }
-export type TextFieldOptions = WidgetOptions & {
+export type LabelOptions = BaseWidgetOptions & {
+  raw: blessed.Widgets.TextOptions
+}
+export type TextFieldOptions = BaseWidgetOptions & {
   raw: blessed.Widgets.TextboxOptions
 }
 
-export interface Widget {
+export interface Widget<O extends WidgetOptions = WidgetOptions> {
+  calculatedStyle: BaseWidgetOptions
+  widgetOptions: O
+
   /**
    * Register an event handler that will be called before this Widget
    * renders onto the screen or a virtual buffer of the backend
@@ -32,6 +49,10 @@ export interface Widget {
   destroy(): void
 
   isFocused(): boolean
+
+  applyStyle(style: BaseWidgetOptions): void
+  getStyleOptions(): BaseWidgetOptions
+  getAppearance(): Appearance
 
   set(prop: string, value: string | number | undefined): void
   get(prop: string): string | number | undefined
@@ -55,4 +76,26 @@ export interface TextFieldWidget extends Widget {
   onSubmit(callback: () => void): void
   onCancel(callback: () => void): void
   getText(): string
+}
+
+/**
+ * Narrow an object to only the specified keys, excluding undefined values.
+ * This is useful for extracting a subset of properties from an object
+ * while ensuring that only defined values are included in the result.
+ *
+ * @param obj - The source object to narrow down.
+ * @param keys - An array of keys to extract from the source object.
+ * @returns A new object containing only the specified keys with defined values.
+ */
+export const narrow = <T, K extends keyof T>(
+  obj: T,
+  keys: readonly K[]
+): Pick<T, K> => {
+  const result = {} as Pick<T, K>
+  for (const key of keys) {
+    if (obj[key] !== undefined) {
+      result[key] = obj[key]
+    }
+  }
+  return result
 }

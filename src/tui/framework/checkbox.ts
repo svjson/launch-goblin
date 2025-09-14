@@ -41,14 +41,12 @@ export class Checkbox<I extends CheckboxItem = CheckboxItem> extends Controller<
             height: 1,
             width: '100%',
             padding: { left: 1 },
+            color: 'gray',
+            ':selected': { color: 'white' },
+            ':focused': { background: 'blue' },
             raw: {
               mouse: true,
               keys: true,
-              shrink: true,
-              style: {
-                fg: 'gray',
-                focus: { bg: 'blue', fg: 'black' },
-              },
             },
           },
           options
@@ -58,12 +56,6 @@ export class Checkbox<I extends CheckboxItem = CheckboxItem> extends Controller<
     )
     this.inheritKeyMap(keyMap)
 
-    const currBg = () => {
-      return this.widget.isFocused()
-        ? this.widget.get('focused:bg')
-        : this.widget.get('bg')
-    }
-
     this.box = this.addChild(
       {
         component: Label,
@@ -72,16 +64,8 @@ export class Checkbox<I extends CheckboxItem = CheckboxItem> extends Controller<
         },
       },
       {
-        raw: {
-          style: {
-            fg: 'white',
-          },
-        },
+        color: 'white',
       }
-    )
-    this.box.layout.bind('bg', currBg)
-    this.box.layout.bind('fg', () =>
-      this.model.checked ? '#ffffff' : '#888888'
     )
 
     this.label = this.addChild(
@@ -95,20 +79,16 @@ export class Checkbox<I extends CheckboxItem = CheckboxItem> extends Controller<
         left: 4,
       }
     )
-    this.label.layout.bind('bg', currBg)
-    this.label.layout.bind('fg', () =>
-      this.model.checked
-        ? 'white'
-        : this.widget.isFocused()
-          ? this.widget.get('focused:fg')
-          : this.widget.get('fg')
-    )
 
     this.inheritKeyMap(keyMap)
   }
 
   toggle() {
     this.setSelected(!this.model.checked)
+  }
+
+  isSelected() {
+    return this.model.checked
   }
 
   makeBoxContent() {
@@ -118,7 +98,6 @@ export class Checkbox<I extends CheckboxItem = CheckboxItem> extends Controller<
   setSelected(selected: boolean) {
     this.model.checked = selected
     this.box.setText(this.makeBoxContent())
-    this.widget.set('fg', this.model.checked ? 'white' : 'gray')
     this.emit('dirty')
     this.emit({
       type: 'checkbox',

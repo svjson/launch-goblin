@@ -2,8 +2,10 @@ import { ApplicationState, Project } from '@src/project'
 import {
   ApplicationController,
   ApplicationCtrlCtorParams,
+  Backend,
   Event,
   FocusEvent,
+  Store,
 } from './framework'
 import { LaunchButtonController } from './launch-button'
 import { ComponentSection } from './component-section'
@@ -83,18 +85,23 @@ export class MainController extends ApplicationController<ApplicationState> {
   }
 
   saveConfig() {
-    const dialog = new SaveConfigDialog({
-      backend: this.backend,
-      store: this.store,
+    this.emit({
+      type: 'action',
+      action: {
+        type: 'open-modal',
+        details: {
+          source: this,
+          create: <M, SM>({}: {
+            backend: Backend
+            model: M
+            store: Store<SM>
+          }) =>
+            new SaveConfigDialog({
+              backend: this.backend,
+              store: this.store,
+            }),
+        },
+      },
     })
-
-    dialog.on('*', (event: Event) => {
-      if (event.type === 'destroyed') {
-        this.focus()
-      }
-      this.receive(event)
-    })
-
-    dialog.focus()
   }
 }

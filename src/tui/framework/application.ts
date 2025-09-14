@@ -1,4 +1,8 @@
-import { ApplicationController, ApplicationCtrlConstructor } from './controller'
+import {
+  ApplicationController,
+  ApplicationCtrlConstructor,
+  Controller,
+} from './controller'
 import { Store, createStore } from './store'
 import { Action, ActionMap } from './action'
 import { KeyMap } from './keymap'
@@ -18,6 +22,7 @@ import { Backend } from './backend'
 export class Application<Model, MainCtrl extends ApplicationController<Model>> {
   store: Store<Model>
   mainCtrl: MainCtrl
+  modals: Controller[] = []
 
   actions: ActionMap = {
     'open-modal': this.bind(this.openModal),
@@ -43,6 +48,11 @@ export class Application<Model, MainCtrl extends ApplicationController<Model>> {
       }
     })
 
+    this.backend.onBeforeRender(() => {
+      this.mainCtrl.applyStyle({})
+      this.modals.forEach((m) => m.applyStyle({}))
+    })
+
     this.mainCtrl.on('dirty', () => {
       this.backend.render()
     })
@@ -65,19 +75,23 @@ export class Application<Model, MainCtrl extends ApplicationController<Model>> {
   }
 
   async openModal(action: Action): Promise<void> {
-    const dialog = action.details.create({
+    const dialog: Controller = action.details.create({
       model: this.model,
       store: this.store,
       backend: this.backend,
     })
+    this.modals.push(dialog)
     dialog.on('*', (event: Event) => {
       if (event.type === 'destroyed') {
+        this.modals = this.modals.filter((m) => m !== dialog)
         action.details.source.focus()
+        this.backend.render()
       }
       action.details.source.receive(event)
     })
 
     dialog.focus()
+    this.backend.render()
   }
 
   bind<T extends (...args: any[]) => any>(

@@ -24,9 +24,7 @@ export class Label<Model extends LabelItem = LabelItem> extends Controller<
           {
             raw: {
               content: model.text ?? '',
-              transparent: true,
               tags: true,
-              style: {},
             },
           },
           options

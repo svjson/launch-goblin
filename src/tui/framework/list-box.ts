@@ -24,23 +24,23 @@ export class ListBox<ItemModel extends ListItem = ListItem> extends Controller<
       backend.createList(
         mergeLeft(
           {
-            parent,
             width: 4 + Math.max(...model.map((item) => item.label.length)),
-            align: 'left',
-            items: [],
-            keys: true,
-            style: {
-              selected: {
-                bg: 'white',
-                fg: 'black',
-                bold: true,
+            ':selected': {
+              background: 'white',
+              color: 'black',
+              bold: true,
+            },
+            ':focused': {
+              ':selected': {
+                background: 'blue',
+                color: 'white',
               },
-              focus: {
-                selected: {
-                  bg: 'blue',
-                  fg: 'white',
-                },
-              },
+            },
+            raw: {
+              parent,
+              align: 'left',
+              items: [],
+              keys: true,
             },
           },
           options

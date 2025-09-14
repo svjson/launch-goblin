@@ -33,9 +33,8 @@ export class FooterController extends Controller {
         left: 0,
         width: '100%',
         height: 1,
-        raw: {
-          style: { fg: 'white', bg: 'gray' },
-        },
+        color: 'white',
+        background: 'gray',
       }),
       model,
       store
@@ -49,7 +48,6 @@ export class FooterController extends Controller {
         width: '100%',
         raw: {
           content: ' q = quit ',
-          style: { fg: 'white', bg: 'gray' },
         },
       }
     )

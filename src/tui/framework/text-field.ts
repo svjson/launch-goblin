@@ -73,14 +73,12 @@ export class TextInput extends Controller<TextFieldWidget, TextInputModel> {
       backend.createTextField({
         width: '100%',
         height: 1,
+        color: 'white',
+        background: 'blue',
         raw: {
           keys: true,
-          style: {
-            fg: 'white',
-            bg: 'blue',
-          },
         },
-        ...options,
+        ...(options ?? {}),
       }),
       model
     )
