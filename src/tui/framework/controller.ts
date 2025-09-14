@@ -303,12 +303,20 @@ export abstract class Controller<
     return (...args: Parameters<T>): ReturnType<T> => fn.apply(self, args)
   }
 
+  setEnabled(enabledp: boolean) {
+    const curr = this.enabled
+    this.enabled = enabledp
+    if (curr !== enabledp) {
+      this.emit('dirty')
+    }
+  }
+
   enable() {
-    this.enabled = true
+    this.setEnabled(true)
   }
 
   disable() {
-    this.enabled = false
+    this.setEnabled(false)
   }
 
   isFocusable(): boolean {

@@ -65,6 +65,7 @@ export class TextField extends Controller<Widget, TextFieldModel> {
 
 export class TextInput extends Controller<Widget, { value: string }> {
   private buffer = ''
+  private prevRenderBuffer = ''
   private cursor = 0
 
   keyMap = this.extendKeyMap({
@@ -185,6 +186,13 @@ export class TextInput extends Controller<Widget, { value: string }> {
     } else {
       this.widget.set('text', this.buffer)
     }
+    if (this.prevRenderBuffer !== this.buffer) {
+      this.emit({
+        type: 'text-changed',
+        value: this.buffer,
+      })
+    }
+    this.prevRenderBuffer = this.buffer
   }
 
   getText() {
