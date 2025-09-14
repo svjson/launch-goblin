@@ -61,11 +61,9 @@ export class ComponentSection extends Controller<
           type: 'line',
           label: ' Select Components to Launch ',
         },
-        raw: {
-          focusable: true,
-          scrollable: true,
-          alwaysScroll: true,
-        },
+        focusable: true,
+        scrollable: true,
+        alwaysScroll: true,
       }),
       model,
       store

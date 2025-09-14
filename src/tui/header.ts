@@ -1,6 +1,7 @@
 import { Controller, CtrlCtorParams } from './framework/controller'
 import { ApplicationState } from '@src/project'
 import { Widget } from './framework/widget'
+import { Label } from './framework'
 
 /**
  * TUI Component for the application header.
@@ -22,14 +23,21 @@ export class HeaderController extends Controller<Widget, ApplicationState> {
         background: 'green',
         color: 'black',
         bold: true,
-        raw: {
-          align: 'center',
-          content: `Launch Goblin v${__LG_VERSION__}`,
-        },
       }),
       model,
       store
     )
+
+    this.addChild(
+      {
+        component: Label,
+        model: { text: `Launch Goblin v${__LG_VERSION__}` },
+      },
+      {
+        left: 'center',
+      }
+    )
+
     this.inheritKeyMap(keyMap)
   }
 }

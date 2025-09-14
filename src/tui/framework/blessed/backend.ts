@@ -26,6 +26,7 @@ import { destroy } from '../destroy'
 import { Geometry } from '../geometry'
 import { Appearance, BorderOptions } from '../appearance'
 import { Interaction } from '../interaction'
+import { Behavior } from '../behavior'
 
 export class BlessedBackend implements Backend {
   private screen: blessed.Widgets.Screen
@@ -110,10 +111,26 @@ export const toBlessedGeometry = (geometry: Geometry) => {
   }
 }
 
+const ifPresent = (options: any, key: string, target?: string) => {
+  if (options?.[key] === undefined) return {}
+  if (target === undefined) target = key
+  return {
+    [target]: options[key],
+  }
+}
+
 export const toBlessedInteraction = (interaction: Interaction) => {
   return {
     mouse: interaction.mouse,
     keys: interaction.keys,
+  }
+}
+
+export const toBlessedBehavior = (behavior: Behavior) => {
+  return {
+    ...ifPresent(behavior, 'focusable'),
+    ...ifPresent(behavior, 'scrollable'),
+    ...ifPresent(behavior, 'alwaysScroll'),
   }
 }
 
@@ -141,8 +158,10 @@ export const toBlessedElementOptions = (
     {
       ...toBlessedGeometry(options),
       ...toBlessedInteraction(options),
+      ...toBlessedBehavior(options),
       ...(options.raw ?? {}),
       ...{ parent },
+      tags: true,
     },
     toBlessedStyle(options)
   ) as blessed.Widgets.ElementOptions
@@ -164,11 +183,13 @@ export const toBlessedStyle = (
   options: WidgetOptions
 ): blessed.Widgets.ElementOptions => {
   return {
+    ...(options.textAlign ? { align: options.textAlign } : {}),
     style: {
       ...(options.color ? { fg: options.color } : {}),
       ...(options.background ? { bg: options.background } : {}),
       ...(options.bold ? { bold: options.bold } : {}),
       ...(options.underline ? { underline: options.underline } : {}),
+
       // ...toBlessedStateStyle('focus', options[':focused']),
       // ...toBlessedStateStyle('select', options[':selected']),
     },
@@ -189,7 +210,10 @@ export const toBlessedListOptions = (
   options: ListOptions,
   parent: blessed.Widgets.Node
 ) => {
-  return toBlessedElementOptions(options, parent)
+  return {
+    ...toBlessedElementOptions(options, parent),
+    items: options.items ?? [],
+  }
 }
 
 export const toBlessedButtonOptions = (

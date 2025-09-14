@@ -46,9 +46,6 @@ export class FooterController extends Controller {
       },
       {
         width: '100%',
-        raw: {
-          content: ' q = quit ',
-        },
       }
     )
   }

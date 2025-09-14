@@ -3,36 +3,31 @@ import { LayoutProperty } from './layout'
 import { Geometry } from './geometry'
 import { Appearance, Border } from './appearance'
 import { Interaction } from './interaction'
+import { Behavior } from './behavior'
 
 export type UIState = ':focused' | ':selected' | ':disabled'
 
-export type WidgetOptions = BaseWidgetOptions &
-  StateVariants & {
-    raw?: blessed.Widgets.ElementOptions
-  }
+export type WidgetOptions = BaseWidgetOptions & StateVariants
 
-export type BaseWidgetOptions = Geometry & Appearance & Interaction
+export type BaseWidgetOptions = Geometry & Appearance & Interaction & Behavior
 
 export type StateVariants = Partial<Record<UIState, BaseWidgetOptions>>
 
-export type BoxOptions = BaseWidgetOptions &
-  Border & {
-    raw?: blessed.Widgets.BoxOptions
-  }
+export type BoxOptions = BaseWidgetOptions & Border
+
 export type ButtonOptions = BaseWidgetOptions & {
   label: string
-  raw?: blessed.Widgets.ButtonOptions
 }
+
 export type ListOptions = BaseWidgetOptions & {
-  raw?: blessed.Widgets.ListOptions<blessed.Widgets.ListElementStyle>
+  items?: string[]
 }
+
 export type LabelOptions = BaseWidgetOptions & {
   label: string
-  raw?: blessed.Widgets.TextOptions
 }
-export type TextFieldOptions = BaseWidgetOptions & {
-  raw?: blessed.Widgets.TextboxOptions
-}
+
+export type TextFieldOptions = BaseWidgetOptions
 
 export interface Widget<O extends WidgetOptions = WidgetOptions> {
   calculatedStyle: BaseWidgetOptions

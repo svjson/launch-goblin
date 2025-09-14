@@ -24,6 +24,7 @@ export const TEXT_STYLE_KEYS = keysOf<TextStyle>()([
   'underline',
   'italic',
   'inverse',
+  'textAlign',
 ])
 
 export const APPEARANCE_KEYS = keysOf<Appearance>()([

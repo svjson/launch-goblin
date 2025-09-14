@@ -10,6 +10,8 @@ export interface TextStyle {
   underline?: boolean
   italic?: boolean
   inverse?: boolean
+
+  textAlign?: 'left' | 'center' | 'right'
 }
 
 export type BorderType = 'none' | 'line'

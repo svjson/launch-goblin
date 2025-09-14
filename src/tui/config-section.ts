@@ -75,7 +75,7 @@ export class ConfigSection extends CustomListBox<
           {
             width: 40,
             height: 14,
-            raw: {
+            border: {
               label: ' Configurations ',
             },
           },

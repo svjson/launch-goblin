@@ -37,16 +37,14 @@ export class ListBox<ItemModel extends ListItem = ListItem> extends Controller<
                 color: 'white',
               },
             },
-            raw: {
-              parent,
-              items: [],
-            },
           },
           options
         )
       ),
       model
     )
+
+    this.setParent(parent)
 
     if (this.model.length === 0) {
       this.disable()

@@ -45,9 +45,7 @@ export class OptionBar<
             width: '100%-2',
             height: 1,
             keys: true,
-            raw: {
-              focusable: true,
-            },
+            focusable: true,
           },
           options
         )
@@ -110,10 +108,6 @@ export class Option<Model extends OptionItem> extends Controller<
               background: 'white',
             },
             keys: true,
-            raw: {
-              transparent: true,
-              tags: true,
-            },
           },
           options
         )

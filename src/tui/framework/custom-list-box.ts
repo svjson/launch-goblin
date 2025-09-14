@@ -72,10 +72,8 @@ export class CustomListBox<
             border: {
               type: 'line',
             },
-            raw: {
-              scrollable: true,
-              alwaysScroll: true,
-            },
+            scrollable: true,
+            alwaysScroll: true,
           },
           options
         )

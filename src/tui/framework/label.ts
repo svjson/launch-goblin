@@ -23,9 +23,6 @@ export class Label<Model extends LabelItem = LabelItem> extends Controller<
         mergeLeft(
           {
             label: model.text ?? '',
-            raw: {
-              tags: true,
-            },
           },
           options
         )

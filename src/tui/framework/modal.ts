@@ -62,10 +62,6 @@ export class ModalDialog<
               label: model.title,
               color: 'white',
             },
-            raw: {
-              tags: true,
-              ch: ' ',
-            },
           },
           options
         )
