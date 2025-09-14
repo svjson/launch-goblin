@@ -22,7 +22,7 @@ import {
   BlessedWidget,
 } from './widget'
 import { initTui } from '../init'
-import { destroy } from '../destroy'
+import { destroy } from './destroy'
 import { Geometry } from '../geometry'
 import { Appearance, BorderOptions } from '../appearance'
 import { Interaction } from '../interaction'

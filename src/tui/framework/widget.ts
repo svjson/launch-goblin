@@ -1,4 +1,3 @@
-import blessed from 'neo-blessed'
 import { LayoutProperty } from './layout'
 import { Geometry } from './geometry'
 import { Appearance, Border } from './appearance'
