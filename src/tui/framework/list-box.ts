@@ -6,6 +6,7 @@ import { ListWidget, Widget } from './widget'
 export interface ListItem {
   id: string
   label: string
+  selected: boolean
 }
 
 export class ListBox<ItemModel extends ListItem = ListItem> extends Controller<

@@ -18,8 +18,9 @@ export interface CustomListBoxCtorParams<
   ItemT extends Controller,
   EmptyT extends Controller,
   EmptyM,
-  Model extends Array<any>,
+  Model extends Array<MT>,
   StoreModel = Model,
+  MT extends { selected: boolean } = { selected: boolean },
 > extends CtrlCtorParams<Model, StoreModel> {
   itemCls: CtrlConstructor<ItemT, Elem<Model>, StoreModel>
   emptyLabel?: ChildDescription<EmptyT, EmptyM, EmptyM>
@@ -88,9 +89,20 @@ export class CustomListBox<
   }
 
   itemFocused() {
+    this.flushSelection()
     this.receive({
       type: 'selected',
       item: this.model[this.focusedIndex],
+    })
+  }
+
+  flushSelection() {
+    if (this.model.length === 0) return
+    if (this.focusedIndex >= this.model.length)
+      this.focusedIndex = this.model.length - 1
+
+    this.model.forEach((item, i) => {
+      item.selected = this.focusedIndex === i
     })
   }
 
@@ -121,7 +133,15 @@ export class CustomListBox<
     if (this.focusedIndex >= this.children.length) {
       this.nextChild(-1)
     }
+    this.flushSelection()
   }
 }
 
-export class CustomListBoxItem<M, SM> extends Controller<Widget, M, SM> {}
+export class CustomListBoxItem<
+  M extends { selected: boolean },
+  SM,
+> extends Controller<Widget, M, SM> {
+  isSelected() {
+    return this.model.selected
+  }
+}

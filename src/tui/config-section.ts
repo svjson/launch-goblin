@@ -11,9 +11,8 @@ import {
   LaunchConfig,
 } from '@src/config'
 import { ItemSelectedEvent } from './framework/event'
-import { Controller } from './framework/controller'
 import { ConfirmDialog } from './framework/modal'
-import { CustomListBox } from './framework/custom-list-box'
+import { CustomListBox, CustomListBoxItem } from './framework/custom-list-box'
 import { LabelItem } from './framework/label'
 import { Backend } from './framework/backend'
 
@@ -26,7 +25,7 @@ const transformEntries = (
   type: ConfigType
 ): ConfigListItem[] =>
   Object.entries(launchConfigs).map(([name, _cfg]) => {
-    return { id: name, label: name, type }
+    return { id: name, label: name, type, selected: false }
   })
 
 /**
@@ -99,6 +98,7 @@ export class ConfigSection extends CustomListBox<
       this.populateList()
       return true
     })
+
     this.store.subscribe('config.local', () => {
       this.populateList()
       return true
@@ -139,9 +139,6 @@ export class ConfigSection extends CustomListBox<
     if (config) {
       applyConfig(config, this.store!.get('project'))
       this.store.set('config.activeConfigName', event.item.id)
-    }
-    for (let i = 0; i < this.children.length; i++) {
-      ;(this.children[i] as ConfigItemBox).selected = i === this.focusedIndex
     }
   }
 
@@ -185,10 +182,8 @@ export class ConfigSection extends CustomListBox<
   }
 }
 
-class ConfigItemBox extends Controller {
+class ConfigItemBox extends CustomListBoxItem<ConfigListItem, ConfigListItem> {
   focusable = true
-
-  selected = false
 
   constructor({
     widget: { backend, parent, options, keyMap },
@@ -200,11 +195,15 @@ class ConfigItemBox extends Controller {
         mergeLeft(
           {
             height: 1,
+            color: 'white',
+            background: 'default',
             ':focused': {
+              color: 'white',
               background: 'blue',
             },
             ':selected': {
               background: 'white',
+              color: 'black',
             },
           },
           options
@@ -212,16 +211,9 @@ class ConfigItemBox extends Controller {
       ),
       model
     )
+    this.setParent(parent)
 
-    const currBg = () => {
-      return this.widget.isFocused()
-        ? this.widget.get('focused:bg')
-        : this.selected
-          ? this.widget.get('selected:bg')
-          : undefined
-    }
-
-    const nameLabel = this.addChild(
+    this.addChild(
       {
         component: Label,
         model: { text: model.label },
@@ -229,13 +221,12 @@ class ConfigItemBox extends Controller {
       {
         left: 1,
         ':focused': {
-          background: 'blue',
           color: 'black',
         },
       }
     )
 
-    const typeLabel = this.addChild(
+    this.addChild(
       {
         component: Label,
         model: { text: model.type },
@@ -245,11 +236,6 @@ class ConfigItemBox extends Controller {
         color: model.type === 'private' ? 208 : 'green',
       }
     )
-
-    this.layout.bind('bg', currBg)
-    nameLabel.layout.bind('bg', currBg)
-    typeLabel.layout.bind('bg', currBg)
-    nameLabel.layout.bind('fg', () => (this.selected ? 'black' : '#ffffff'))
 
     this.inheritKeyMap(keyMap)
   }
