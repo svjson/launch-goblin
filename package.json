@@ -31,11 +31,13 @@
     "@whimbrel/pnpm": "0.0.5",
     "@whimbrel/turborepo": "0.0.5",
     "commander": "^14.0.1",
-    "neo-blessed": "^0.2.0"
+    "neo-blessed": "^0.2.0",
+    "which": "^5.0.0"
   },
   "devDependencies": {
     "@types/blessed": "^0.1.25",
     "@types/node": "^24.3.0",
+    "@types/which": "^3.0.4",
     "eslint": "^9.33.0",
     "prettier": "^3.6.2",
     "tsup": "^8.5.0",
