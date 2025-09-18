@@ -10,11 +10,18 @@ export const turboLauncher = (
   launchAction: string,
   components: ProjectComponent[]
 ): Launcher => {
+  const cliRunner = actorFacetScope(
+    project.ctx.getActor({ root: project.root })!,
+    'pnpm'
+  )
+    ? 'pnpx'
+    : 'npx'
+
   return {
     id: 'turbo',
     components: components.map((c) => c.id),
     launchCommand: (components: ProjectComponent[]) => ({
-      bin: 'npx',
+      bin: cliRunner,
       args: [
         'turbo',
         'run',
