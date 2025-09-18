@@ -34,12 +34,12 @@ export class OptionBar<
   focusable = true
 
   constructor({
-    widget: { backend, parent, keyMap, options = {} },
+    widget: { env, parent, keyMap, options = {} },
     state: { model = [] },
   }: CtrlCtorParams<ItemModel[]>) {
     super(
-      backend,
-      backend.createBox(
+      env,
+      env.backend.createBox(
         mergeLeft(
           {
             width: '100%-2',
@@ -89,12 +89,12 @@ export class Option<Model extends OptionItem> extends Controller<
   focusable = true
 
   constructor({
-    widget: { backend, parent, keyMap, options },
+    widget: { env, parent, keyMap, options },
     state: { model = { text: '' } },
   }: CtrlCtorParams) {
     super(
-      backend,
-      backend.createLabel(
+      env,
+      env.backend.createLabel(
         mergeLeft(
           {
             label: ` ${model.label ?? ''} `,

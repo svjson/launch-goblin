@@ -1,6 +1,6 @@
 import { mergeLeft } from '@whimbrel/walk'
 
-import { Controller } from './controller'
+import { ComponentEnvironment, Controller } from './controller'
 import { Event } from './event'
 import { Store } from './store'
 import { Label } from './label'
@@ -8,10 +8,9 @@ import { Button } from './button'
 import { add, withSign } from './layout'
 import { KeyMap } from './keymap'
 import { Widget, BoxOptions } from './widget'
-import { Backend } from './backend'
 
 export interface ModalCtorParams<Model, StoreModel> {
-  backend: Backend
+  env: ComponentEnvironment
   model: Model
   store?: Store<StoreModel>
   keyMap?: KeyMap
@@ -39,18 +38,16 @@ export class ModalDialog<
     },
   })
 
-  backend: Backend
-
   constructor({
-    backend,
+    env,
     model,
     store,
     keyMap,
     options = {},
   }: ModalCtorParams<Model, StoreModel>) {
     super(
-      backend,
-      backend.createBox(
+      env,
+      env.backend.createBox(
         mergeLeft(
           {
             top: `center`,
@@ -70,8 +67,7 @@ export class ModalDialog<
       store
     )
 
-    this.backend = backend
-    this.backend.addRoot(this.widget)
+    this.env.backend.addRoot(this.widget)
 
     if (keyMap) {
       this.inheritKeyMap({ replace: false, keys: keyMap })
@@ -132,13 +128,13 @@ export class ConfirmDialog<
   }
 
   constructor({
-    backend,
+    env,
     store,
     model,
     options = {},
   }: ModalCtorParams<Model, StoreModel>) {
     super({
-      backend,
+      env,
       store,
       model,
       options: mergeLeft(

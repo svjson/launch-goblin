@@ -14,7 +14,7 @@ import { ItemSelectedEvent } from './framework/event'
 import { ConfirmDialog } from './framework/modal'
 import { CustomListBox, CustomListBoxItem } from './framework/custom-list-box'
 import { LabelItem } from './framework/label'
-import { Backend } from './framework/backend'
+import { ComponentEnvironment } from './framework/controller'
 
 /**
  * Transform LaunchConfig instances from the context configuration
@@ -62,12 +62,12 @@ export class ConfigSection extends CustomListBox<
   })
 
   constructor({
-    widget: { backend, parent, keyMap, options = {} },
+    widget: { env, parent, keyMap, options = {} },
     state: { store, model },
   }: CtrlCtorParams<ConfigListItem[], ApplicationState>) {
     super({
       widget: {
-        backend,
+        env,
         parent,
         keyMap,
         options: mergeLeft(
@@ -149,15 +149,15 @@ export class ConfigSection extends CustomListBox<
         type: 'open-modal',
         details: {
           create: <M, SM>({
-            backend,
+            env,
             store,
           }: {
-            backend: Backend
+            env: ComponentEnvironment
             model: M
             store: Store<SM>
           }) =>
             new ConfirmDialog({
-              backend,
+              env,
               store,
               model: {
                 title: ' Delete Configuration ',
@@ -186,12 +186,12 @@ class ConfigItemBox extends CustomListBoxItem<ConfigListItem, ConfigListItem> {
   focusable = true
 
   constructor({
-    widget: { backend, parent, options, keyMap },
+    widget: { env, parent, options, keyMap },
     state: { model },
   }: CtrlCtorParams<ConfigListItem>) {
     super(
-      backend,
-      backend.createBox(
+      env,
+      env.backend.createBox(
         mergeLeft(
           {
             height: 1,

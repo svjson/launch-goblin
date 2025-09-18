@@ -11,12 +11,12 @@ export class LaunchButtonController extends Button {
   }
 
   constructor({
-    widget: { backend, parent, keyMap, options },
+    widget: { env, parent, keyMap, options },
     state: { store },
   }: CtrlCtorParams) {
     super({
       widget: {
-        backend,
+        env,
         parent,
         keyMap,
         options,

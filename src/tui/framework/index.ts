@@ -3,6 +3,7 @@ export { Button } from './button'
 export { Checkbox } from './checkbox'
 export { TextField, TextInput } from './text-field'
 export { ApplicationController, Controller } from './controller'
+export { OptionBar } from './option-bar'
 export { initTui } from './init'
 export { ModalDialog } from './modal'
 export { createStore, Store } from './store'
@@ -12,9 +13,11 @@ export { readTTYTitleString } from './tty'
 export type { Backend } from './backend'
 
 export type { Action } from './action'
+export type { ApplicationEnvironment } from './application'
 export type {
   ApplicationCtrlConstructor,
   ApplicationCtrlCtorParams,
+  ComponentEnvironment,
   CtrlConstructor,
   CtrlCtorParams,
 } from './controller'
@@ -35,3 +38,5 @@ export type {
   KeyIdentifier,
   LegendEntry,
 } from './keymap'
+export type { ModalDialogModel } from './modal'
+export type { Widget } from './widget'

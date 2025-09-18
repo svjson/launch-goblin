@@ -28,10 +28,11 @@ const main = async (options: LGOptions) => {
   }
 
   const backend = BlessedBackend.create()
+  const env = { backend, theme: {} }
 
   const log: string[] = []
 
-  const app = new LaunchGoblinApp(backend, model)
+  const app = new LaunchGoblinApp(env, model)
 
   app.mainCtrl.on('launch', async () => {
     backend.dispose()

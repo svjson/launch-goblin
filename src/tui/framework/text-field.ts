@@ -17,12 +17,12 @@ export class TextField extends Controller<Widget, TextFieldModel> {
   textInput: TextInput
 
   constructor({
-    widget: { backend, parent, keyMap, options },
+    widget: { env, parent, keyMap, options },
     state: { model },
   }: CtrlCtorParams) {
     super(
-      backend,
-      backend.createBox(
+      env,
+      env.backend.createBox(
         mergeLeft(
           {
             height: 2,
@@ -98,12 +98,12 @@ export class TextInput extends Controller<Widget, { value: string }> {
   })
 
   constructor({
-    widget: { backend, parent, keyMap, options = {} },
+    widget: { env, parent, keyMap, options = {} },
     state: { model, store },
   }: CtrlCtorParams) {
     super(
-      backend,
-      backend.createBox(
+      env,
+      env.backend.createBox(
         mergeLeft(
           {
             width: '100%',

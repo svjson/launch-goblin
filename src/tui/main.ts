@@ -97,7 +97,7 @@ export class MainController extends ApplicationController<ApplicationState> {
             store: Store<SM>
           }) =>
             new SaveConfigDialog({
-              backend: this.backend,
+              env: this.env,
               store: this.store,
             }),
         },

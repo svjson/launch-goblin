@@ -1,6 +1,7 @@
 import {
   ApplicationController,
   ApplicationCtrlConstructor,
+  ComponentEnvironment,
   Controller,
 } from './controller'
 import { Store, createStore } from './store'
@@ -8,6 +9,8 @@ import { Action, ActionMap } from './action'
 import { keyHandler, KeyMap } from './keymap'
 import { ActionEvent, FocusEvent } from './event'
 import { Backend } from './backend'
+
+export interface ApplicationEnvironment extends ComponentEnvironment {}
 
 /**
  * Root wrapper for a tui application
@@ -21,6 +24,7 @@ import { Backend } from './backend'
  */
 export class Application<Model, MainCtrl extends ApplicationController<Model>> {
   store: Store<Model>
+  backend: Backend
   mainCtrl: MainCtrl
   modals: Controller[] = []
 
@@ -31,12 +35,13 @@ export class Application<Model, MainCtrl extends ApplicationController<Model>> {
   activeKeyMap: KeyMap = {}
 
   constructor(
-    protected backend: Backend,
+    protected env: ComponentEnvironment,
     protected mainCtrlClass: ApplicationCtrlConstructor<MainCtrl, Model>,
     protected model: Model
   ) {
     this.store = createStore(model)
-    this.mainCtrl = new mainCtrlClass({ backend, model, store: this.store })
+    this.backend = env.backend
+    this.mainCtrl = new mainCtrlClass({ env, model, store: this.store })
 
     this.#bindApplicationEvents()
   }

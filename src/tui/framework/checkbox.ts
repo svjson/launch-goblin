@@ -29,12 +29,12 @@ export class Checkbox<I extends CheckboxItem = CheckboxItem> extends Controller<
   focusable = true
 
   constructor({
-    widget: { backend, parent, keyMap, options },
+    widget: { env, parent, keyMap, options },
     state: { model },
   }: CtrlCtorParams) {
     super(
-      backend,
-      backend.createBox(
+      env,
+      env.backend.createBox(
         mergeLeft(
           {
             left: 1,

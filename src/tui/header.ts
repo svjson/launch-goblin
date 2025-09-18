@@ -10,12 +10,12 @@ export class HeaderController extends Controller<Widget, ApplicationState> {
   focusable = false
 
   constructor({
-    widget: { backend, parent, keyMap },
+    widget: { env, keyMap },
     state: { model, store },
   }: CtrlCtorParams) {
     super(
-      backend,
-      backend.createBox({
+      env,
+      env.backend.createBox({
         top: 0,
         left: 0,
         width: '100%',

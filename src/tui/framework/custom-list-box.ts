@@ -58,14 +58,14 @@ export class CustomListBox<
   emptyLabel?: ChildDescription<EmptyT, EmptyM, EmptyM>
 
   constructor({
-    widget: { backend, keyMap, options = {} },
+    widget: { env, keyMap, options = {} },
     state: { model, store },
     itemCls,
     emptyLabel,
   }: CustomListBoxCtorParams<ItemT, EmptyT, EmptyM, Model, Store>) {
     super(
-      backend,
-      backend.createBox(
+      env,
+      env.backend.createBox(
         mergeLeft(
           {
             keys: true,

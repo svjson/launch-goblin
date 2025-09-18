@@ -42,12 +42,12 @@ export class ComponentSection extends Controller<
   components: ProjectComponent[]
 
   constructor({
-    widget: { backend, parent, keyMap },
+    widget: { env, parent, keyMap },
     state: { model = [], store },
   }: CtrlCtorParams<ProjectComponent[], ApplicationState>) {
     super(
-      backend,
-      backend.createBox({
+      env,
+      env.backend.createBox({
         width: Math.max(
           4 + ' Select Components to Launch '.length,
           10 + Math.max(...model.map((cmp) => cmp.name.length))

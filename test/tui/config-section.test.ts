@@ -1,14 +1,13 @@
 import { describe, expect, test } from 'vitest'
 import blessed from 'neo-blessed'
 import { ConfigSection } from '@src/tui/config-section'
-import { createStore, Store } from '@src/tui/framework'
+import { ComponentEnvironment, createStore, Store } from '@src/tui/framework'
 import { ApplicationState } from '@src/project'
 import { BlessedBackend } from '@src/tui/framework/blessed'
-import { Widget } from '@src/tui/framework/widget'
-import { Backend } from '@src/tui/framework/backend'
+import { Widget } from '@src/tui/framework'
 
 const makeFixture = (): [
-  Backend,
+  ComponentEnvironment,
   Widget,
   Store<ApplicationState>,
   ApplicationState,
@@ -19,6 +18,8 @@ const makeFixture = (): [
     isTTY: false,
   })
   const backend = new BlessedBackend(screen)
+  const theme = {}
+  const env = { backend, theme }
   const container = backend.createBox({})
   const state: ApplicationState = {
     config: {
@@ -29,18 +30,18 @@ const makeFixture = (): [
 
   const store = createStore(state)
 
-  return [backend, container, store, state]
+  return [env, container, store, state]
 }
 
 describe('ConfigSection', () => {
   describe('focusable', () => {
     test('on construction - no configs set focusable to false', () => {
       // Given
-      const [backend, container, store, state] = makeFixture()
+      const [env, container, store, _state] = makeFixture()
 
       const configSection = new ConfigSection({
         widget: {
-          backend,
+          env,
           parent: container,
         },
         state: {
@@ -55,7 +56,7 @@ describe('ConfigSection', () => {
 
     test('on construction - one present config sets focusable to true', () => {
       // Given
-      const [backend, container, store, state] = makeFixture()
+      const [env, container, store, state] = makeFixture()
 
       state.config.local.launchConfigs['Prutt'] = {
         components: {
@@ -67,7 +68,7 @@ describe('ConfigSection', () => {
 
       const configSection = new ConfigSection({
         widget: {
-          backend,
+          env,
           parent: container,
         },
         state: {

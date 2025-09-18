@@ -14,12 +14,12 @@ export class Label<Model extends LabelItem = LabelItem> extends Controller<
   focusable = false
 
   constructor({
-    widget: { backend, parent, options },
+    widget: { env, parent, options },
     state: { model = { text: '' } },
   }: CtrlCtorParams) {
     super(
-      backend,
-      backend.createLabel(
+      env,
+      env.backend.createLabel(
         mergeLeft(
           {
             label: model.text ?? '',

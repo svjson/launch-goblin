@@ -1,15 +1,16 @@
 import { ApplicationState } from 'src/project'
 import {
+  Backend,
   ModalDialog,
   TextChangedEvent,
   TextField,
   Button,
   Store,
   Label,
+  ModalDialogModel,
+  OptionBar,
+  ComponentEnvironment,
 } from './framework'
-import { ModalDialogModel } from './framework/modal'
-import { OptionBar } from './framework/option-bar'
-import { Backend } from './framework/backend'
 
 /**
  * TUI Component defining a modal dialog with options and controls for
@@ -21,14 +22,14 @@ export class SaveConfigDialog extends ModalDialog<
   ApplicationState
 > {
   constructor({
-    backend,
+    env,
     store,
   }: {
-    backend: Backend
+    env: ComponentEnvironment
     store: Store<ApplicationState>
   }) {
     super({
-      backend,
+      env,
       store,
       model: { title: ' Save Configuration ' },
       options: { height: 11, width: 45 },

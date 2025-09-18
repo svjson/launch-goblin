@@ -7,6 +7,12 @@ import { ControllerLayout, LayoutProperty } from './layout'
 import { Backend } from './backend'
 import { BaseWidgetOptions, Widget, WidgetOptions } from './widget'
 import { calculateWidgetStyle } from './style'
+import { Theme } from './theme'
+
+export interface ComponentEnvironment {
+  backend: Backend
+  theme: Theme
+}
 
 /**
  * Mixin-interface for anything that may listen to events.
@@ -19,13 +25,13 @@ export interface Listener {
  * Parameters for constructor an ApplicationController
  */
 export interface ApplicationCtrlCtorParams<M> {
-  backend: Backend
+  env: ComponentEnvironment
   model: M
   store: Store<M>
 }
 
 export interface WidgetParams {
-  backend: Backend
+  env: ComponentEnvironment
   parent: Widget
   keyMap?: KeyMapArg
   options?: WidgetOptions
@@ -147,7 +153,7 @@ export abstract class Controller<
   enabled = true
 
   constructor(
-    protected backend: Backend,
+    protected env: ComponentEnvironment,
     protected widget: W,
     protected model: Model,
     protected store: Store<StoreModel> = createStore({}) as Store<StoreModel>
@@ -212,7 +218,7 @@ export abstract class Controller<
     const child = new ctrlClass(
       {
         widget: {
-          backend: this.backend,
+          env: this.env,
           parent: this.widget,
           keyMap: { replace: false, keys: inheritKeys },
           options: options as WidgetOptions,
@@ -498,12 +504,10 @@ export abstract class Controller<
 }
 
 export class ApplicationController<M> extends Controller<Widget, M, Store<M>> {
-  backend: Backend
-
-  constructor({ backend, model, store }: ApplicationCtrlCtorParams<M>) {
+  constructor({ env, model, store }: ApplicationCtrlCtorParams<M>) {
     super(
-      backend,
-      backend.createBox({
+      env,
+      env.backend.createBox({
         width: '100%',
         height: '100%',
         color: 'default',
@@ -511,6 +515,5 @@ export class ApplicationController<M> extends Controller<Widget, M, Store<M>> {
       model,
       store
     )
-    this.backend = backend
   }
 }

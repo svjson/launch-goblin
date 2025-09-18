@@ -17,12 +17,12 @@ export class ListBox<ItemModel extends ListItem = ListItem> extends Controller<
   focusable = true
 
   constructor({
-    widget: { backend, parent, keyMap, options = {} },
+    widget: { env, parent, keyMap, options = {} },
     state: { model = [] },
   }: CtrlCtorParams<ItemModel[]>) {
     super(
-      backend,
-      backend.createList(
+      env,
+      env.backend.createList(
         mergeLeft(
           {
             width: 4 + Math.max(...model.map((item) => item.label.length)),

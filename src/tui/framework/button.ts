@@ -18,12 +18,12 @@ export class Button extends Controller<Widget, ButtonModel> {
   }
 
   constructor({
-    widget: { backend, parent, keyMap, options = {} },
+    widget: { env, parent, keyMap, options = {} },
     state: { model },
   }: CtrlCtorParams) {
     super(
-      backend,
-      backend.createButton(
+      env,
+      env.backend.createButton(
         mergeLeft(
           {
             width: model.text.length + 4,
