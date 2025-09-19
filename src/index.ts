@@ -68,6 +68,8 @@ program
     console.log(`TTY: ${env.tty}`)
     console.log(`Color Mode: ${env.colorMode}`)
     console.log(`TERM: ${env.TERM}`)
+    console.log(`Terminal: ${env.terminal}`)
+    console.log(`Session name: ${env.nt ?? ''}`)
     process.exit(0)
   })
 
