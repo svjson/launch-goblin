@@ -32,4 +32,6 @@ export interface Backend {
   createLabel(options: LabelOptions): LabelWidget
   createList(options: ListOptions): ListWidget
   createTextField(options: TextFieldOptions): TextFieldWidget
+
+  dispose(): void
 }

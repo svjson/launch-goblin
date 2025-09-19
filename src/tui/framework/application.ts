@@ -10,7 +10,9 @@ import { keyHandler, KeyMap } from './keymap'
 import { ActionEvent, FocusEvent } from './event'
 import { Backend } from './backend'
 
-export interface ApplicationEnvironment extends ComponentEnvironment {}
+export interface ApplicationEnvironment extends ComponentEnvironment {
+  log: string[]
+}
 
 /**
  * Root wrapper for a tui application

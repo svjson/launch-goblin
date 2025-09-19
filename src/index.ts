@@ -1,41 +1,25 @@
 #!/usr/bin/env node
 
 import { launch } from './launch'
-import { readProject } from './project'
-import { readTTYTitleString } from './tui/framework'
 import { LaunchGoblinApp } from './tui'
 import { LogEvent } from './tui/framework'
-import { ApplicationState } from './project'
 import { saveLatestLaunch } from './config'
 import { setTTYTitleString } from './tui/framework/tty'
 import { Command } from 'commander'
 import { LGOptions } from './tui/goblin-app'
-import { BlessedBackend } from './tui/framework/blessed'
+import { bootstrap, inspectEnvironment } from './bootstrap'
 
 /**
  * Launches the application with command-line options
  */
 const main = async (options: LGOptions) => {
   const targetAction = 'dev'
-  const model: ApplicationState = await readProject(targetAction, options)
-  model.originalWindowTitleString = await readTTYTitleString()
-
-  if (model.project.launchers.length === 0) {
-    console.error(
-      `No launch strategy available for target action '${targetAction}'`
-    )
-    process.exit(1)
-  }
-
-  const backend = BlessedBackend.create()
-  const env = { backend, theme: {} }
-
-  const log: string[] = []
+  const { env, model } = await bootstrap(targetAction, options)
 
   const app = new LaunchGoblinApp(env, model)
 
   app.mainCtrl.on('launch', async () => {
-    backend.dispose()
+    env.backend.dispose()
     const selected = model.project.components.filter((c) => c.selected)
     await saveLatestLaunch(model)
     const cmd = model.project.launchers[0].launchCommand(selected)
@@ -43,15 +27,14 @@ const main = async (options: LGOptions) => {
   })
 
   app.mainCtrl.on('log', (event: LogEvent) => {
-    log.push(event.message)
+    env.log.push(event.message)
   })
 
   app.mainCtrl.focus()
 
-  backend.onKeyPress(['q', 'C-c'], (ch, key) => {
-    console.log(ch, key)
-    backend.dispose()
-    log.forEach((m) => console.log(m))
+  env.backend.onKeyPress(['q', 'C-c'], (_ch, _key) => {
+    env.backend.dispose()
+    env.log.forEach((m) => console.log(m))
     process.exit(0)
   })
 
@@ -59,7 +42,7 @@ const main = async (options: LGOptions) => {
     setTTYTitleString(model.originalWindowTitleString ?? '')
   })
 
-  backend.render()
+  env.backend.render()
 }
 
 /**
@@ -75,5 +58,17 @@ program
 program.action(async (opts: LGOptions) => {
   await main(opts)
 })
+
+program
+  .command('env')
+  .description('Output execution environment details')
+  .action(async () => {
+    const env = await inspectEnvironment()
+    console.log(`Shell: ${env.shell}`)
+    console.log(`TTY: ${env.tty}`)
+    console.log(`Color Mode: ${env.colorMode}`)
+    console.log(`TERM: ${env.TERM}`)
+    process.exit(0)
+  })
 
 program.parse()
