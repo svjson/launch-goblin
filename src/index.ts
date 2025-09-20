@@ -16,33 +16,39 @@ const main = async (options: LGOptions) => {
   const targetAction = 'dev'
   const { env, model } = await bootstrap(targetAction, options)
 
-  const app = new LaunchGoblinApp(env, model)
-
-  app.mainCtrl.on('launch', async () => {
+  const doLaunch = async () => {
     env.backend.dispose()
     const selected = model.project.components.filter((c) => c.selected)
     await saveLatestLaunch(model)
     const cmd = model.project.launchers[0].launchCommand(selected)
     await launch(cmd)
-  })
+  }
 
-  app.mainCtrl.on('log', (event: LogEvent) => {
-    env.log.push(event.message)
-  })
+  if (options.autoLaunch) {
+    await doLaunch()
+  } else {
+    const app = new LaunchGoblinApp(env, model)
 
-  app.mainCtrl.focus()
+    app.mainCtrl.on('launch', doLaunch)
 
-  env.backend.onKeyPress(['q', 'C-c'], (_ch, _key) => {
-    env.backend.dispose()
-    env.log.forEach((m) => console.log(m))
-    process.exit(0)
-  })
+    app.mainCtrl.on('log', (event: LogEvent) => {
+      env.log.push(event.message)
+    })
 
-  process.on('exit', () => {
-    setTTYTitleString(model.originalWindowTitleString ?? '')
-  })
+    app.mainCtrl.focus()
 
-  env.backend.render()
+    env.backend.onKeyPress(['q', 'C-c'], (_ch, _key) => {
+      env.backend.dispose()
+      env.log.forEach((m) => console.log(m))
+      process.exit(0)
+    })
+
+    process.on('exit', () => {
+      setTTYTitleString(model.originalWindowTitleString ?? '')
+    })
+
+    env.backend.render()
+  }
 }
 
 /**
@@ -56,7 +62,10 @@ program
   .option('-v, --verbose', 'Enable verbose output')
 
 program.action(async (opts: LGOptions) => {
-  await main(opts)
+  await main({
+    ...opts,
+    autoLaunch: false,
+  })
 })
 
 program
@@ -71,6 +80,18 @@ program
     console.log(`Terminal: ${env.terminal}`)
     console.log(`Session name: ${env.nt ?? ''}`)
     process.exit(0)
+  })
+
+program
+  .command('last')
+  .description(
+    'Launch with the most recent launch configuration, bypassing the tui.'
+  )
+  .action(async () => {
+    await main({
+      verbose: false,
+      autoLaunch: true,
+    })
   })
 
 program.parse()

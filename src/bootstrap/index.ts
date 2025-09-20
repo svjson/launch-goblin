@@ -1,5 +1,5 @@
 import { ApplicationState, readProject } from '@src/project'
-import { ApplicationEnvironment } from '@src/tui/framework'
+import { ApplicationEnvironment, noBackend } from '@src/tui/framework'
 import { BlessedBackend } from '@src/tui/framework/blessed'
 import { LGOptions } from '@src/tui/goblin-app'
 
@@ -21,7 +21,8 @@ export const bootstrap = async (
     process.exit(1)
   }
 
-  const backend = BlessedBackend.create()
+  const backend = options.autoLaunch ? noBackend() : BlessedBackend.create()
+
   const env = { backend, theme: {}, log: [] }
   return { env, model }
 }

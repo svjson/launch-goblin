@@ -12,6 +12,16 @@ export interface LGOptions {
    * Instructs the application to enable all optional log output.
    */
   verbose: boolean
+  /**
+   * Instructs the application to bypass the Launch Goblin TUI and
+   * immediately launch a named configuration or the last launched
+   * configuration.
+   *
+   * true - launch the most recently launched configuration immediately
+   * false - run the Launch Goblin TUI normally
+   * string - launch a named configuration immediately
+   */
+  autoLaunch: boolean | string
 }
 
 /**

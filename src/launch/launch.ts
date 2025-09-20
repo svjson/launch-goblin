@@ -45,6 +45,7 @@ export const launch = async (cmd: LaunchCommand) => {
   const executable = await findExecutable(bin)
 
   const child = spawn(executable, args, {
+    shell: process.platform === 'win32',
     stdio: 'inherit',
   })
 
