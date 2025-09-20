@@ -19,7 +19,7 @@ Instead of juggling `turbo run` and `pnpm dev` with endless `--filter` sequences
 
 
 
-## Features (0.1.0)
+## Features (0.1.1)
 
 - **Turborepo integration** – browse and run `turbo run` targets per module.  
 - **pnpm integration** – run `pnpm` scripts directly from the interface.  
@@ -33,8 +33,14 @@ Instead of juggling `turbo run` and `pnpm dev` with endless `--filter` sequences
 
 To install `launch-goblin` as a global command on your system, you typically use a package manager. 
 
-```bash
-npm install -g launch-goblin
+```sh
+$ npm install -g launch-goblin
+```
+
+Then run it from your repository/multi-module product root:
+
+```sh
+$ launch-goblin
 ```
 
 ### NodeJS project
@@ -54,6 +60,24 @@ $ npm add -D launch-goblin
 }
 ```
 
+## Running Launch Goblin
+
+By default, Launch Goblin attempts to run the `dev` target/script of your project or turborepo configuration.
+
+### Commands / Arguments
+
+| Argument  | Command                                                                                                |
+|-----------|--------------------------------------------------------------------------------------------------------|
+| <no-args> | Open the Launch Goblin TUI                                                                             |
+| last      | Bypasses the TUI component selection and immediately launches the most recently launched configuration |
+| env       | Outputs the information about the terminal environment you are running in                              |
+
+When running the Launch Goblin TUI, you can use `--color-mode <mode>` to force a specific color mode. 
+This is helpful if the terminal misreports its capabilities, which can otherwise cause issues like 
+black text on a black background.
+
+Valid Color Modes are: `truecolor`, `16`, `8` and `monochrome`
+
 ## Configuration and Project Discovery
 
 Launch Goblin aims to be zero- or low-conf, and will automatically discover facets of projects - to a point.  
@@ -62,6 +86,20 @@ In the early version that it is currently in, there is no way to configure Launc
 The aim will always be to not force the user to configure or specify what could or should be inferred, 
 [dwim](https://en.wikipedia.org/wiki/DWIM)-style there may still be plenty of cases where one might tweak
 or inform the project setup, and this will be enabled as the project matures.
+
+## Version History
+
+### 0.1.1 - Windows support & Color Theme adjustment - 2025-09-20
+
+- Proper/better resolution of executables
+- Support for launching child process on Windows
+- Query terminal environment for capabilities and adjustment of color theme / launch strategy
+- Added `env` and `last` commands
+
+### 0.1.0 - Initial Release - 2025-09-14
+
+- Basic Project Discovery and launching capabilities for NodeJS projects
+- Basic component selection and create/launch/delete launch configurations
 
 ## Roadmap
 
@@ -75,9 +113,6 @@ or inform the project setup, and this will be enabled as the project matures.
 - Configurable keymaps and themes.
 - Persisted state across sessions.
 - Support for parallel vs sequential launch strategies.
-
-
-
 
 ## License
 
