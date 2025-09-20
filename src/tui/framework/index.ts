@@ -24,6 +24,10 @@ export type {
   CtrlCtorParams,
 } from './controller'
 export type {
+  ColorMode,
+  TTYEnv,
+} from './environment'
+export type {
   ActionEvent,
   CheckboxEvent,
   Event,

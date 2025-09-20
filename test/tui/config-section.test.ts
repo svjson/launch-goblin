@@ -4,7 +4,7 @@ import { ConfigSection } from '@src/tui/config-section'
 import { ComponentEnvironment, createStore, Store } from '@src/tui/framework'
 import { ApplicationState } from '@src/project'
 import { BlessedBackend } from '@src/tui/framework/blessed'
-import { Widget } from '@src/tui/framework'
+import { TTYEnv, Widget } from '@src/tui/framework'
 
 const makeFixture = (): [
   ComponentEnvironment,
@@ -19,7 +19,14 @@ const makeFixture = (): [
   })
   const backend = new BlessedBackend(screen)
   const theme = {}
-  const env = { backend, theme }
+  const env = { backend, theme, tty: {
+    colorMode: 'truecolor',
+    shell: '/bin/sh',
+    TERM: '256-truecolor',
+    tty: true,
+    terminal: 'Terminator',
+    nt: ''
+  } satisfies TTYEnv}
   const container = backend.createBox({})
   const state: ApplicationState = {
     config: {

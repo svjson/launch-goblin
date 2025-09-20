@@ -8,10 +8,12 @@ import { Backend } from './backend'
 import { BaseWidgetOptions, Widget, WidgetOptions } from './widget'
 import { calculateWidgetStyle } from './style'
 import { Theme } from './theme'
+import { TTYEnv } from './environment'
 
 export interface ComponentEnvironment {
   backend: Backend
-  theme: Theme
+  theme: Theme,
+  tty: TTYEnv
 }
 
 /**

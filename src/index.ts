@@ -20,14 +20,18 @@ const main = async (options: LGOptions) => {
     env.backend.dispose()
     const selected = model.project.components.filter((c) => c.selected)
     await saveLatestLaunch(model)
-    const cmd = model.project.launchers[0].launchCommand(selected)
-    await launch(cmd)
+    const cmd = model.project.launchers[0].launchCommand(env, selected)
+    await launch(env, cmd)
   }
 
   if (options.autoLaunch) {
     await doLaunch()
   } else {
     const app = new LaunchGoblinApp(env, model)
+
+    app.mainCtrl.on('log', (event: LogEvent) => {
+      env.log.push(event.message)
+    })
 
     app.mainCtrl.on('launch', doLaunch)
 

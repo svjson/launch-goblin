@@ -4,6 +4,7 @@ import { Project, ProjectComponent } from '@src/project'
 import { Launcher } from './types'
 import { actorFacetScope } from '@whimbrel/core'
 import { LGOptions } from '@src/tui/goblin-app'
+import { ApplicationEnvironment } from '@src/tui/framework'
 
 export const turboLauncher = (
   project: Project,
@@ -14,13 +15,13 @@ export const turboLauncher = (
     project.ctx.getActor({ root: project.root })!,
     'pnpm'
   )
-    ? 'pnpx'
+    ? 'npx'
     : 'npx'
 
   return {
     id: 'turbo',
     components: components.map((c) => c.id),
-    launchCommand: (components: ProjectComponent[]) => ({
+    launchCommand: (env: ApplicationEnvironment, components: ProjectComponent[]) => ({
       bin: cliRunner,
       args: [
         'turbo',

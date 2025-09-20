@@ -2,6 +2,7 @@ import { Project, ProjectComponent } from '@src/project'
 import { Launcher } from './types'
 import { actorFacetScope } from '@whimbrel/core'
 import { LGOptions } from '@src/tui/goblin-app'
+import { ApplicationEnvironment } from '@src/tui/framework'
 
 export const pnpmLauncher = (
   project: Project,
@@ -11,7 +12,7 @@ export const pnpmLauncher = (
   return {
     id: 'pnpm',
     components: components.map((c) => c.id),
-    launchCommand: (components: ProjectComponent[]) => ({
+    launchCommand: (env: ApplicationEnvironment, components: ProjectComponent[]) => ({
       bin: 'pnpm',
       args: [
         '-r',
