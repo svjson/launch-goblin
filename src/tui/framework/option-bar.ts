@@ -2,6 +2,7 @@ import { mergeLeft } from '@whimbrel/walk'
 
 import { Controller, CtrlCtorParams } from './controller'
 import { Widget } from './widget'
+import { resolveComponentStyle } from './theme'
 
 export interface OptionItem {
   id: string
@@ -98,17 +99,9 @@ export class Option<Model extends OptionItem> extends Controller<
         mergeLeft(
           {
             label: ` ${model.label ?? ''} `,
-            background: 'default',
-            color: 'white',
-            ':focused': {
-              background: 'blue',
-            },
-            ':selected': {
-              color: 'black',
-              background: 'white',
-            },
             keys: true,
           },
+          resolveComponentStyle(env.theme, 'Option', env.tty.colorMode),
           options
         )
       ),

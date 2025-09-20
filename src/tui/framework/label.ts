@@ -2,6 +2,7 @@ import { mergeLeft } from '@whimbrel/walk'
 
 import { Controller, CtrlCtorParams } from './controller'
 import { LabelWidget } from './widget'
+import { resolveComponentStyle } from './theme'
 
 export interface LabelItem {
   text: string
@@ -24,6 +25,7 @@ export class Label<Model extends LabelItem = LabelItem> extends Controller<
           {
             label: model.text ?? '',
           },
+          resolveComponentStyle(env.theme, 'Label', env.tty.colorMode),
           options
         )
       ),

@@ -1,9 +1,13 @@
 import { ApplicationState, readProject } from '@src/project'
-import { ApplicationEnvironment, noBackend } from '@src/tui/framework'
+import {
+  ApplicationEnvironment,
+  DefaultTheme,
+  inspectEnvironment,
+  noBackend,
+} from '@src/tui/framework'
 import { BlessedBackend } from '@src/tui/framework/blessed'
 import { LGOptions } from '@src/tui/goblin-app'
-import { inspectEnvironment } from '../tui/framework/environment'
-export { inspectEnvironment } from '../tui/framework/environment'
+export { inspectEnvironment } from '@src/tui/framework'
 
 export const bootstrap = async (
   targetAction: string,
@@ -21,11 +25,12 @@ export const bootstrap = async (
     process.exit(1)
   }
   const tty = await inspectEnvironment()
-  const backend = options.autoLaunch
-    ? noBackend()
-    : BlessedBackend.create()
+  if (options.colorMode) {
+    tty.colorMode = options.colorMode
+  }
+  const backend = options.autoLaunch ? noBackend() : BlessedBackend.create()
 
-  const env = { backend, tty, theme: {}, log: [] }
+  const env = { backend, tty, theme: DefaultTheme, log: [] }
 
   return { env, model }
 }

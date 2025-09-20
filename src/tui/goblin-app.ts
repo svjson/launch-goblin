@@ -1,6 +1,11 @@
 import { ApplicationState } from '@src/project'
 import { MainController } from './main'
-import { Action, Application, ApplicationEnvironment } from './framework'
+import {
+  Action,
+  Application,
+  ApplicationEnvironment,
+  ColorMode,
+} from './framework'
 import { saveLocalConfig, toLaunchConfigComponents } from '@src/config'
 import { saveGlobalConfig } from '@src/config/io'
 
@@ -12,6 +17,13 @@ export interface LGOptions {
    * Instructs the application to enable all optional log output.
    */
   verbose: boolean
+
+  /**
+   * Overrides detected ColorMode and forces TUI color to use theme options
+   * suitable for the selected mode.
+   */
+  colorMode?: ColorMode
+
   /**
    * Instructs the application to bypass the Launch Goblin TUI and
    * immediately launch a named configuration or the last launched

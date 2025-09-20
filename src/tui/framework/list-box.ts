@@ -2,6 +2,7 @@ import { mergeLeft } from '@whimbrel/walk'
 
 import { Controller, CtrlConstructor, CtrlCtorParams } from './controller'
 import { ListWidget, Widget } from './widget'
+import { resolveComponentStyle } from './theme'
 
 export interface ListItem {
   id: string
@@ -27,18 +28,8 @@ export class ListBox<ItemModel extends ListItem = ListItem> extends Controller<
           {
             width: 4 + Math.max(...model.map((item) => item.label.length)),
             keys: true,
-            ':selected': {
-              background: 'white',
-              color: 'black',
-              bold: true,
-            },
-            ':focused': {
-              ':selected': {
-                background: 'blue',
-                color: 'white',
-              },
-            },
           },
+          resolveComponentStyle(env.theme, 'ListBox', env.tty.colorMode),
           options
         )
       ),

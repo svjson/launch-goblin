@@ -64,6 +64,7 @@ program
   .name('launch-goblin')
   .description('Launch Goblin project launcher')
   .option('-v, --verbose', 'Enable verbose output')
+  .option('--color-mode <colorMode>', 'Force color mode')
 
 program.action(async (opts: LGOptions) => {
   await main({

@@ -1,7 +1,12 @@
 import { describe, expect, test } from 'vitest'
 import blessed from 'neo-blessed'
 import { ConfigSection } from '@src/tui/config-section'
-import { ComponentEnvironment, createStore, Store } from '@src/tui/framework'
+import {
+  ComponentEnvironment,
+  createStore,
+  DefaultTheme,
+  Store,
+} from '@src/tui/framework'
 import { ApplicationState } from '@src/project'
 import { BlessedBackend } from '@src/tui/framework/blessed'
 import { TTYEnv, Widget } from '@src/tui/framework'
@@ -18,15 +23,19 @@ const makeFixture = (): [
     isTTY: false,
   })
   const backend = new BlessedBackend(screen)
-  const theme = {}
-  const env = { backend, theme, tty: {
-    colorMode: 'truecolor',
-    shell: '/bin/sh',
-    TERM: '256-truecolor',
-    tty: true,
-    terminal: 'Terminator',
-    nt: ''
-  } satisfies TTYEnv}
+  const theme = DefaultTheme
+  const env = {
+    backend,
+    theme,
+    tty: {
+      colorMode: 'truecolor',
+      shell: '/bin/sh',
+      TERM: '256-truecolor',
+      tty: true,
+      terminal: 'Terminator',
+      nt: '',
+    } satisfies TTYEnv,
+  }
   const container = backend.createBox({})
   const state: ApplicationState = {
     config: {

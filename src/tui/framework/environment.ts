@@ -25,7 +25,7 @@ export type ColorMode = 'truecolor' | '256' | '16' | '8' | 'monochrome'
  * @return {string} The path to the shell or command interpreter, or 'none' if
  *                  it cannot be determined.
  */
-const determineTTY = () => {
+const determineTTY = (): string => {
   return process.env.SHELL || process.env.ComSpec || 'none'
 }
 

@@ -3,6 +3,7 @@ import { Event } from './event'
 import { Label, LabelItem } from './label'
 import { mergeLeft } from '@whimbrel/walk'
 import { Widget } from './widget'
+import { resolveComponentStyle } from './theme'
 
 export interface TextFieldModel {
   label: string | LabelItem
@@ -110,12 +111,8 @@ export class TextInput extends Controller<Widget, { value: string }> {
             height: 1,
             keys: true,
             mouse: true,
-            background: '#888888',
-            color: 'white',
-            ':focused': {
-              background: 'blue',
-            },
           },
+          resolveComponentStyle(env.theme, 'TextInput', env.tty.colorMode),
           options
         )
       ),

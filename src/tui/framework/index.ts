@@ -6,6 +6,7 @@ export { ApplicationController, Controller } from './controller'
 export { OptionBar } from './option-bar'
 export { initTui } from './init'
 export { ModalDialog } from './modal'
+export { DefaultTheme } from './theme'
 export { createStore, Store } from './store'
 export { Label } from './label'
 export { readTTYTitleString } from './tty'
@@ -23,10 +24,7 @@ export type {
   CtrlConstructor,
   CtrlCtorParams,
 } from './controller'
-export type {
-  ColorMode,
-  TTYEnv,
-} from './environment'
+export type { ColorMode, TTYEnv } from './environment'
 export type {
   ActionEvent,
   CheckboxEvent,

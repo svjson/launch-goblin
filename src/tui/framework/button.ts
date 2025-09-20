@@ -2,6 +2,7 @@ import { mergeLeft } from '@whimbrel/walk'
 
 import { Controller, CtrlCtorParams } from './controller'
 import { Widget } from './widget'
+import { resolveComponentStyle } from './theme'
 
 export interface ButtonModel {
   text: string
@@ -29,20 +30,10 @@ export class Button extends Controller<Widget, ButtonModel> {
             width: model.text.length + 4,
             height: 1,
             left: 'center',
-            color: 'black',
-            background: '#888888',
             label: model.text,
             textAlign: 'center',
-            ':focused': {
-              color: 'black',
-              background: 'green',
-              underline: true,
-            },
-            ':disabled': {
-              background: 'gray',
-              color: 'black',
-            },
           },
+          resolveComponentStyle(env.theme, 'Button', env.tty.colorMode),
           options
         )
       ),

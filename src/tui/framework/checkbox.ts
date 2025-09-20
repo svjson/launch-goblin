@@ -3,6 +3,7 @@ import { mergeLeft } from '@whimbrel/walk'
 import { Controller, CtrlCtorParams } from './controller'
 import { Label } from './label'
 import { Widget } from './widget'
+import { resolveComponentStyle } from './theme'
 
 export interface CheckboxItem {
   id: string
@@ -41,12 +42,10 @@ export class Checkbox<I extends CheckboxItem = CheckboxItem> extends Controller<
             height: 1,
             width: '100%',
             padding: { left: 1 },
-            color: 'gray',
-            ':selected': { color: 'white' },
-            ':focused': { background: 'blue' },
             mouse: true,
             keys: true,
           },
+          resolveComponentStyle(env.theme, 'CheckBox', env.tty.colorMode),
           options
         )
       ),
