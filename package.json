@@ -17,6 +17,9 @@
       "import": "./dist/index.js"
     }
   },
+  "engines": {
+    "node": ">=20"
+  },
   "scripts": {
     "build": "tsup",
     "dev": "tsx src/index.ts",
