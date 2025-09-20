@@ -15,7 +15,7 @@ export interface TTYEnv {
 }
 
 /**
- * Ccolor mode supported by a terminal environment.
+ * Color mode supported by a terminal environment.
  */
 export type ColorMode = 'truecolor' | '256' | '16' | '8' | 'monochrome'
 
@@ -55,6 +55,21 @@ const determineColorMode = (): ColorMode => {
   const colorMode = supportsColor.stdout
   if (colorMode === false) {
     return 'monochrome'
+  }
+
+  if (process.platform === 'win32') {
+    if (
+      // supports-color is a bit optimistic about color support on Windows, and
+      // the regular CMD.exe terminal actually only supports 8 colors, so unless
+      // we are running in a fancy environment on Windows, downgrade to 8 colors
+      !(
+        process.env.WT_SESSION || // Windows Terminal
+        process.env.TERM_PROGRAM === 'vsconsole' || // VSCode embedded terminal
+        process.env.ComEmuANSI === 'ON' // ConEmu or cmder
+      )
+    ) {
+      return '8'
+    }
   }
 
   switch (colorMode.level) {

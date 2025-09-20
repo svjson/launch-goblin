@@ -61,6 +61,16 @@ export const DefaultTheme: Theme = {
     Button: {
       color: 'black',
       background: '#888888',
+      colorMode: {
+	'8': {
+	  color: 'black',
+	  background: 'white'
+	},
+	'16': {
+	  color: 'black',
+	  background: 'lightwhite'
+	}
+      },
       ':focused': {
         color: 'black',
         background: 'green',
@@ -80,6 +90,14 @@ export const DefaultTheme: Theme = {
             color: 'white',
             background: 'black',
           },
+	  '8': {
+	    color: 'black',
+	    background: 'red'
+	  },
+	  '16': {
+	    color: 'black',
+	    background: 'white'
+	  }
         },
       },
     },
@@ -89,6 +107,9 @@ export const DefaultTheme: Theme = {
         monochrome: {
           color: 'white',
         },
+	'8': {
+	  color: 'yellow'
+	}
       },
       ':selected': {
         color: 'white',
@@ -128,8 +149,19 @@ export const DefaultTheme: Theme = {
     TextInput: {
       background: '#888888',
       color: 'white',
+      colorMode: {
+	'8': {
+	  color: 'black',
+	  background: 'white',
+	},
+      },
       ':focused': {
         background: 'blue',
+	colorMode: {
+	  '8': {
+	    color: 'white'
+	  }
+	}
       },
     },
   },
