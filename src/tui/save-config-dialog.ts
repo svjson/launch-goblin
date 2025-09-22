@@ -1,6 +1,5 @@
 import { ApplicationState } from 'src/project'
 import {
-  Backend,
   ModalDialog,
   TextChangedEvent,
   TextField,

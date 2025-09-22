@@ -42,51 +42,49 @@ export class MainController extends ApplicationController<ApplicationState> {
 
   components = this.defineComponents({
     header: HeaderController,
-  })
 
-  componentSection: ComponentSection
-  configSection: ConfigSection
-  launchButton: Button
-  footer: FooterController
-
-  constructor(params: ApplicationCtrlCtorParams<ApplicationState>) {
-    super(params)
-
-    this.componentSection = this.addChild(ComponentSection, {
+    componentSection: {
+      component: ComponentSection,
       model: this.store
         .get<Project>('project')
         .components.filter((cmp) =>
           this.model.project.launchers[0].components.includes(cmp.id)
         ),
       store: this.store,
-    })
+    },
 
-    this.launchButton = this.addChild({
+    configSection: ConfigSection,
+
+    launchButton: {
       component: Button,
       model: { text: 'Launch' },
-    })
-    this.launchButton.layout.bind(
-      'top',
-      () => Number(this.componentSection.bottom()) + 1
-    )
-    this.launchButton.on('pressed', () => {
+    },
+
+    footer: FooterController,
+  })
+
+  constructor(params: ApplicationCtrlCtorParams<ApplicationState>) {
+    super(params)
+
+    const { componentSection, configSection, launchButton } = this.components
+
+    launchButton.layout.bind('top', () => Number(componentSection.bottom()) + 1)
+    launchButton.on('pressed', () => {
       this.emit({ type: 'action', action: { type: 'launch' } })
     })
 
-    this.configSection = this.addChild(ConfigSection)
-    this.configSection.layout.bind('top', () => this.componentSection.top())
-    this.configSection.layout.bind(
+    configSection.layout.bind('top', () => componentSection.top())
+    configSection.layout.bind(
       'left',
       () =>
-        Number(this.componentSection.left()) +
-        Number(this.componentSection.width()) +
-        4
+        Number(componentSection.left()) + Number(componentSection.width()) + 4
     )
-    this.footer = this.addChild(FooterController)
+
+    this.focusedIndex = 3
   }
 
   componentFocused(event: FocusEvent) {
-    this.footer.applyContext(event.component)
+    this.components.footer.applyContext(event.component)
   }
 
   emit(event: Event) {
