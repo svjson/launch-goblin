@@ -3,11 +3,11 @@ import {
   ApplicationController,
   ApplicationCtrlCtorParams,
   Backend,
+  Button,
   Event,
   FocusEvent,
   Store,
 } from './framework'
-import { LaunchButtonController } from './launch-button'
 import { ComponentSection } from './component-section'
 import { FooterController } from './footer'
 import { HeaderController } from './header'
@@ -42,7 +42,7 @@ export class MainController extends ApplicationController<ApplicationState> {
 
   componentSection: ComponentSection
   configSection: ConfigSection
-  launchButton: LaunchButtonController
+  launchButton: Button
   footer: FooterController
 
   constructor(params: ApplicationCtrlCtorParams<ApplicationState>) {
@@ -58,11 +58,17 @@ export class MainController extends ApplicationController<ApplicationState> {
       store: this.store,
     })
 
-    this.launchButton = this.addChild(LaunchButtonController)
+    this.launchButton = this.addChild({
+      component: Button,
+      model: { text: 'Launch' },
+    })
     this.launchButton.layout.bind(
       'top',
       () => Number(this.componentSection.bottom()) + 1
     )
+    this.launchButton.on('pressed', () => {
+      this.emit({ type: 'action', action: { type: 'launch' } })
+    })
 
     this.configSection = this.addChild(ConfigSection)
     this.configSection.layout.bind('top', () => this.componentSection.top())
