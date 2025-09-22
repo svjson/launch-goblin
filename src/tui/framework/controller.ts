@@ -12,7 +12,7 @@ import { TTYEnv } from './environment'
 
 export interface ComponentEnvironment {
   backend: Backend
-  theme: Theme,
+  theme: Theme
   tty: TTYEnv
 }
 
@@ -93,6 +93,12 @@ export interface ComponentState {
   selected?: boolean
   disabled?: boolean
 }
+
+export type ComponentsDeclaration<
+  C extends Controller = Controller,
+  M = any,
+  SM = M,
+> = Record<string, ChildParam<C, M, SM>>
 
 /**
  * Base class for all controllers.
@@ -398,6 +404,17 @@ export abstract class Controller<
   extendKeyMap(keyMap: KeyMap): KeyMap {
     this.inheritKeyMap({ replace: false, keys: keyMap })
     return this.keyMap
+  }
+
+  defineComponents<T extends ComponentsDeclaration>(components: T) {
+    const cmps: any = {}
+
+    for (const [name, spec] of Object.entries(components)) {
+      const ctrl = this.addChild(spec)
+      cmps[name] = ctrl
+    }
+
+    return cmps
   }
 
   extendEvents(events: Record<string, Function>): Record<string, Function> {

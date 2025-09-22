@@ -40,6 +40,10 @@ export class MainController extends ApplicationController<ApplicationState> {
     focus: this.bind(this.componentFocused),
   }
 
+  components = this.defineComponents({
+    header: HeaderController,
+  })
+
   componentSection: ComponentSection
   configSection: ConfigSection
   launchButton: Button
@@ -48,7 +52,6 @@ export class MainController extends ApplicationController<ApplicationState> {
   constructor(params: ApplicationCtrlCtorParams<ApplicationState>) {
     super(params)
 
-    this.addChild(HeaderController)
     this.componentSection = this.addChild(ComponentSection, {
       model: this.store
         .get<Project>('project')
