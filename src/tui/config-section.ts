@@ -57,8 +57,8 @@ export class ConfigSection extends CustomListBox<
     },
   })
 
-  events = this.extendEvents({
-    selected: this.bind(this.configSelected),
+  events = this.defineEvents({
+    selected: this.configSelected,
   })
 
   constructor({

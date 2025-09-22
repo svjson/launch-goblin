@@ -1,6 +1,6 @@
 import { mergeLeft } from '@whimbrel/walk'
 
-import { DestroyEvent, Event, StringEvent } from './event'
+import { DestroyEvent, Event, EventMap, StringEvent } from './event'
 import { KeyMap, KeyMapArg } from './keymap'
 import { createStore, Store } from './store'
 import { ControllerLayout, LayoutProperty } from './layout'
@@ -431,8 +431,14 @@ export abstract class Controller<
     return cmps
   }
 
-  extendEvents(events: Record<string, Function>): Record<string, Function> {
-    return Object.assign({}, this.events, events)
+  defineEvents(events: EventMap): Record<string, Function> {
+    return Object.entries({ ...this.events, ...events }).reduce(
+      (map, [event, handler]) => {
+        map[event] = /^bound /.test(handler.name) ? handler : handler.bind(this)
+        return map
+      },
+      {} as EventMap
+    )
   }
 
   set(prop: LayoutProperty, value: string | number | undefined) {

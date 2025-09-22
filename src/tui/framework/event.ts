@@ -58,3 +58,5 @@ export type Event =
   | ItemSelectedEvent<any>
   | LogEvent
   | TextChangedEvent
+
+export type EventMap = Record<string, Function>

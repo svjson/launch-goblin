@@ -28,8 +28,8 @@ export class OptionBar<
     },
   })
 
-  events = this.extendEvents({
-    focus: this.bind(this.itemFocused),
+  events = this.defineEvents({
+    focus: this.itemFocused,
   })
 
   focusable = true

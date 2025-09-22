@@ -33,9 +33,9 @@ export class ComponentSection extends Controller<
     },
   }
 
-  events = {
-    checkbox: this.bind(this.onChecked),
-  }
+  events = this.defineEvents({
+    checkbox: this.onChecked,
+  })
 
   focusedIndex = 0
 

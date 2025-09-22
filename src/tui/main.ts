@@ -36,9 +36,9 @@ export class MainController extends ApplicationController<ApplicationState> {
     },
   }
 
-  events = {
-    focus: this.bind(this.componentFocused),
-  }
+  events = this.defineEvents({
+    focus: this.componentFocused,
+  })
 
   components = this.defineComponents({
     header: HeaderController,
