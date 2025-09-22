@@ -53,12 +53,12 @@ export class MainController extends ApplicationController<ApplicationState> {
       store: this.store,
     },
 
-    configSection: ConfigSection,
-
     launchButton: {
       component: Button,
       model: { text: 'Launch' },
     },
+
+    configSection: ConfigSection,
 
     footer: FooterController,
   })
@@ -80,7 +80,7 @@ export class MainController extends ApplicationController<ApplicationState> {
         Number(componentSection.left()) + Number(componentSection.width()) + 4
     )
 
-    this.focusedIndex = 3
+    this.focusedIndex = 1
   }
 
   componentFocused(event: FocusEvent) {

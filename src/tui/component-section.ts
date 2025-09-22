@@ -74,20 +74,18 @@ export class ComponentSection extends Controller<
     this.components = model
 
     model.forEach((c, i) => {
-      this.addChild(
-        {
-          component: Checkbox,
-          model: {
-            id: c.id,
-            label: c.name,
-            index: i,
-            checked: c.selected,
-          } as CheckboxItem,
-        },
-        {
+      this.addChild({
+        component: Checkbox,
+        model: {
+          id: c.id,
+          label: c.name,
+          index: i,
+          checked: c.selected,
+        } as CheckboxItem,
+        style: {
           top: i + 1,
-        }
-      )
+        },
+      })
     })
 
     this.store!.subscribe('config.activeConfigName', () => {

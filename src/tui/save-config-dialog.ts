@@ -20,6 +20,50 @@ export class SaveConfigDialog extends ModalDialog<
   ModalDialogModel,
   ApplicationState
 > {
+  components = this.defineComponents({
+    nameField: {
+      component: TextField,
+      model: { label: 'Configuration Name:', value: '' },
+      style: { top: 1, left: 2, width: '100%-6' },
+    },
+    configTypeLabel: {
+      component: Label,
+      model: { text: 'Configuration Type:' },
+      style: {
+        left: 2,
+        top: 4,
+      },
+    },
+    configTypeSelect: {
+      component: OptionBar,
+      model: [
+        {
+          id: 'global',
+          label: 'Private',
+          selected: true,
+        },
+        {
+          id: 'local',
+          label: 'Shared',
+          selected: false,
+        },
+      ],
+      style: { top: 5 },
+    },
+
+    saveButton: {
+      component: Button,
+      model: { text: 'Save' },
+      style: { top: 7, left: '50%-14' },
+    },
+
+    cancelButton: {
+      component: Button,
+      model: { text: 'Cancel' },
+      style: { top: 7, left: '50%+2' },
+    },
+  })
+
   constructor({
     env,
     store,
@@ -34,59 +78,12 @@ export class SaveConfigDialog extends ModalDialog<
       options: { height: 11, width: 45 },
     })
 
-    const nameField = this.addChild(
-      {
-        component: TextField,
-        model: { label: 'Configuration Name:', value: '' },
-      },
-      { top: 1, left: 2, width: '100%-6' }
-    )
+    const { nameField, configTypeSelect, saveButton, cancelButton } =
+      this.components
 
-    this.addChild(
-      {
-        component: Label,
-        model: { text: 'Configuration Type:' },
-      },
-      {
-        left: 2,
-        top: 4,
-      }
-    )
-
-    const configTypeSelect = this.addChild(
-      {
-        component: OptionBar,
-        model: [
-          {
-            id: 'global',
-            label: 'Private',
-            selected: true,
-          },
-          {
-            id: 'local',
-            label: 'Shared',
-            selected: false,
-          },
-        ],
-      },
-      { top: 5 }
-    )
-
-    const saveButton = this.addChild(
-      {
-        component: Button,
-        model: { text: 'Save' },
-      },
-      { top: 7, left: '50%-14' }
-    )
     saveButton.disable()
 
-    const cancelButton = this.addChild(
-      { component: Button, model: { text: 'Cancel' } },
-      { top: 7, left: '50%+2' }
-    )
-
-    nameField.on('text-changed', (event: TextChangedEvent) => {
+    this.components.nameField.on('text-changed', (event: TextChangedEvent) => {
       if (!event.value || event.value.trim() === '') {
         saveButton.disable()
       } else {

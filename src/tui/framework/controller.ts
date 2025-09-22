@@ -77,6 +77,7 @@ export interface ChildDescription<T extends Controller, M, SM> {
   component: CtrlConstructor<T, M, SM>
   model?: M
   store?: Store<SM>
+  style?: WidgetOptions
 }
 
 /**
@@ -218,7 +219,7 @@ export abstract class Controller<
       return childDesc
     }
 
-    const { ctrlClass, model, store } = this.#resolveChildParams(
+    const { ctrlClass, model, store, style } = this.#resolveChildParams(
       childDesc,
       options
     )
@@ -229,7 +230,7 @@ export abstract class Controller<
           env: this.env,
           parent: this.widget,
           keyMap: { replace: false, keys: inheritKeys },
-          options: options as WidgetOptions,
+          options: style as WidgetOptions,
         },
         state: {
           store: store!,
@@ -256,12 +257,20 @@ export abstract class Controller<
       return {
         ctrlClass,
         ...(options as StateParams<M, SM>),
+        style: typeof childDesc !== 'function' ? (childDesc.style ?? {}) : {},
       }
     }
+
+    const opts = { ...options }
+    if (typeof childDesc !== 'function' && childDesc.style) {
+      Object.assign(opts, childDesc.style)
+    }
+
     return {
       ctrlClass,
       model: typeof childDesc === 'function' ? undefined : childDesc.model,
       store: typeof childDesc === 'function' ? this.store : childDesc.store,
+      style: opts,
     }
   }
 

@@ -9,6 +9,16 @@ import { Label } from './framework'
 export class HeaderController extends Controller<Widget, ApplicationState> {
   focusable = false
 
+  components = this.defineComponents({
+    title: {
+      component: Label,
+      model: { text: `Launch Goblin v${__LG_VERSION__}` },
+      style: {
+        left: 'center',
+      },
+    },
+  })
+
   constructor({
     widget: { env, keyMap },
     state: { model, store },
@@ -26,16 +36,6 @@ export class HeaderController extends Controller<Widget, ApplicationState> {
       }),
       model,
       store
-    )
-
-    this.addChild(
-      {
-        component: Label,
-        model: { text: `Launch Goblin v${__LG_VERSION__}` },
-      },
-      {
-        left: 'center',
-      }
     )
 
     this.inheritKeyMap(keyMap)

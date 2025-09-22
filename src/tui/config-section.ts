@@ -185,6 +185,28 @@ export class ConfigSection extends CustomListBox<
 class ConfigItemBox extends CustomListBoxItem<ConfigListItem, ConfigListItem> {
   focusable = true
 
+  components = this.defineComponents({
+    nameLabel: {
+      component: Label,
+      model: { text: this.model.label },
+      style: {
+        left: 1,
+        ':focused': {
+          color: 'black',
+        },
+      },
+    },
+
+    typeLabel: {
+      component: Label,
+      model: { text: this.model.type },
+      style: {
+        right: 1,
+        color: this.model.type === 'private' ? 208 : 'green',
+      },
+    },
+  })
+
   constructor({
     widget: { env, parent, options, keyMap },
     state: { model },
@@ -212,30 +234,6 @@ class ConfigItemBox extends CustomListBoxItem<ConfigListItem, ConfigListItem> {
       model
     )
     this.setParent(parent)
-
-    this.addChild(
-      {
-        component: Label,
-        model: { text: model.label },
-      },
-      {
-        left: 1,
-        ':focused': {
-          color: 'black',
-        },
-      }
-    )
-
-    this.addChild(
-      {
-        component: Label,
-        model: { text: model.type },
-      },
-      {
-        right: 1,
-        color: model.type === 'private' ? 208 : 'green',
-      }
-    )
 
     this.inheritKeyMap(keyMap)
   }
