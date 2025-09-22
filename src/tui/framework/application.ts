@@ -55,7 +55,7 @@ export class Application<Model, MainCtrl extends ApplicationController<Model>> {
       }
       proto = Object.getPrototypeOf(proto)
     }
-    this.actions = merged
+    this.actions = this.defineActions(merged)
   }
 
   #bindApplicationEvents() {
@@ -84,8 +84,14 @@ export class Application<Model, MainCtrl extends ApplicationController<Model>> {
     })
   }
 
-  protected defineActions<ActionMap>(actions: ActionMap): ActionMap {
-    return { ...this.actions, ...actions } as ActionMap
+  protected defineActions(actions: ActionMap): ActionMap {
+    return Object.entries({ ...this.actions, ...actions }).reduce(
+      (map, [event, handler]) => {
+        map[event] = /^bound /.test(handler.name) ? handler : this.bind(handler)
+        return map
+      },
+      {} as ActionMap
+    )
   }
 
   async performAction(action: Action) {

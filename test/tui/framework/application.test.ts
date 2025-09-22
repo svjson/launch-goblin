@@ -11,8 +11,10 @@ describe('Application', () => {
           'ponder-consequence': this.ponderConsequence,
         })
 
+        thing = 'Consequences'
+
         ponderConsequence(_action: Action) {
-          console.log('Consequences - how do they work?')
+          return `${this.thing} - how do they work?`
         }
       }
 
@@ -28,6 +30,9 @@ describe('Application', () => {
         'ponder-consequence': expect.any(Function),
         'open-modal': expect.any(Function),
       })
+      expect(myApp.actions['ponder-consequence']({} as Action)).toEqual(
+        'Consequences - how do they work?'
+      )
     })
   })
 })

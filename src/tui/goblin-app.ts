@@ -48,8 +48,8 @@ export class LaunchGoblinApp extends Application<
   MainController
 > {
   actions = this.defineActions({
-    'create-config': this.bind(this.performCreateConfig),
-    'delete-config': this.bind(this.deleteConfig),
+    'create-config': this.performCreateConfig,
+    'delete-config': this.deleteConfig,
   })
 
   constructor(env: ApplicationEnvironment, model: ApplicationState) {
