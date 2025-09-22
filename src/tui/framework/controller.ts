@@ -62,12 +62,25 @@ export type CtrlConstructor<T extends Controller, M, SM> = new (
 ) => T
 
 /**
+ * Type for a Controller class/constructor.
+ */
+export type CtrlType<
+  C extends Controller<any, any, any> = Controller<any, any, any>,
+> = new (...args: any[]) => C
+
+/**
  * Type for an ApplicationController class/constructor.
  */
 export type ApplicationCtrlConstructor<
   T extends ApplicationController<M>,
   M,
 > = new (ctorParams: ApplicationCtrlCtorParams<M>) => T
+
+export interface ComponentState {
+  focused?: boolean
+  selected?: boolean
+  disabled?: boolean
+}
 
 /**
  * Description of a child controller to be added.
@@ -86,21 +99,25 @@ export interface ChildDescription<T extends Controller, M, SM> {
  * Can be either a controller class (in which case model and store are
  * inherited), or a full ChildDescription object.
  */
-export type ChildParam<T extends Controller, M, SM> =
-  | CtrlConstructor<T, M, SM>
-  | ChildDescription<T, M, SM>
+export type ChildParam<C extends Controller, M, SM> =
+  | CtrlConstructor<C, M, SM>
+  | ChildDescription<C, M, SM>
 
-export interface ComponentState {
-  focused?: boolean
-  selected?: boolean
-  disabled?: boolean
+/**
+ * Argument type for defineComponents
+ */
+export type ComponentsDeclaration = Record<string, ChildParam<any, any, any>>
+
+type InferComponent<T> =
+  T extends CtrlType<infer C>
+    ? C
+    : T extends { component: CtrlType<infer C> }
+      ? C
+      : never
+
+type InferComponents<T extends Record<string, any>> = {
+  [K in keyof T]: InferComponent<T[K]>
 }
-
-export type ComponentsDeclaration<
-  C extends Controller = Controller,
-  M = any,
-  SM = M,
-> = Record<string, ChildParam<C, M, SM>>
 
 /**
  * Base class for all controllers.
@@ -407,7 +424,9 @@ export abstract class Controller<
     }
   }
 
-  defineComponents<T extends ComponentsDeclaration>(components: T) {
+  defineComponents<T extends ComponentsDeclaration>(
+    components: T
+  ): InferComponents<T> {
     const cmps: any = {}
 
     for (const [name, spec] of Object.entries(components)) {

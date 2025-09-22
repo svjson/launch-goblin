@@ -53,29 +53,25 @@ export class Checkbox<I extends CheckboxItem = CheckboxItem> extends Controller<
     )
     this.inheritKeyMap(keyMap)
 
-    this.box = this.addChild(
-      {
-        component: Label,
-        model: {
-          text: this.makeBoxContent(),
-        },
+    this.box = this.addChild({
+      component: Label,
+      model: {
+        text: this.makeBoxContent(),
       },
-      {
+      style: {
         color: 'white',
-      }
-    )
-
-    this.label = this.addChild(
-      {
-        component: Label,
-        model: {
-          text: this.model.label,
-        },
       },
-      {
+    })
+
+    this.label = this.addChild({
+      component: Label,
+      model: {
+        text: this.model.label,
+      },
+      style: {
         left: 4,
-      }
-    )
+      },
+    })
 
     this.inheritKeyMap(keyMap)
   }
