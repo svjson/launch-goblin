@@ -50,10 +50,19 @@ export class LaunchGoblinApp extends Application<
   actions = this.defineActions({
     'create-config': this.performCreateConfig,
     'delete-config': this.deleteConfig,
+    launch: this.launch,
   })
 
-  constructor(env: ApplicationEnvironment, model: ApplicationState) {
+  constructor(
+    env: ApplicationEnvironment,
+    model: ApplicationState,
+    private launchFunction: () => Promise<void>
+  ) {
     super(env, MainController, model)
+  }
+
+  async launch() {
+    await this.launchFunction()
   }
 
   async performCreateConfig(createAction: Action): Promise<void> {

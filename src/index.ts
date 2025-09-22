@@ -27,13 +27,7 @@ const main = async (options: LGOptions) => {
   if (options.autoLaunch) {
     await doLaunch()
   } else {
-    const app = new LaunchGoblinApp(env, model)
-
-    app.mainCtrl.on('log', (event: LogEvent) => {
-      env.log.push(event.message)
-    })
-
-    app.mainCtrl.on('launch', doLaunch)
+    const app = new LaunchGoblinApp(env, model, doLaunch)
 
     app.mainCtrl.on('log', (event: LogEvent) => {
       env.log.push(event.message)

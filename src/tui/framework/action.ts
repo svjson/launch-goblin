@@ -1,6 +1,8 @@
 export type ActionMap = Record<string, ActionHandler>
 
-export type ActionHandler = (action: Action) => Promise<any> | any
+export type ActionHandler =
+  | ((action: Action) => Promise<any> | any)
+  | (() => Promise<any> | any)
 
 export const ActionsMeta = Symbol('actions-meta')
 

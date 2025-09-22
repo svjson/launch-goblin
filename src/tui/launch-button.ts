@@ -30,6 +30,6 @@ export class LaunchButtonController extends Button {
   }
 
   launch() {
-    this.emit('launch')
+    this.emit({ type: 'action', action: { type: 'launch' } })
   }
 }
