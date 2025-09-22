@@ -11,12 +11,12 @@ export interface ButtonModel {
 export class Button extends Controller<Widget, ButtonModel> {
   focusable = true
 
-  keyMap = {
+  keyMap = this.defineKeys({
     enter: {
       legend: 'Press Button',
-      handler: this.bind(this.pressed),
+      handler: this.pressed,
     },
-  }
+  })
 
   constructor({
     widget: { env, parent, keyMap, options = {} },

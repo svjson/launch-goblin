@@ -49,11 +49,11 @@ export class ConfigSection extends CustomListBox<
   ConfigListItem[],
   ApplicationState
 > {
-  keyMap: KeyMap = this.extendKeyMap({
+  keyMap = this.defineKeys({
     delete: {
       legend: 'Delete Config',
       propagate: true,
-      handler: this.bind(this.confirmDelete),
+      handler: this.confirmDelete,
     },
   })
 

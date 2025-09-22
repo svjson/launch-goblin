@@ -319,14 +319,6 @@ export abstract class Controller<
     }
   }
 
-  bind<T extends (...args: any[]) => any>(
-    this: any,
-    fn: T
-  ): (...args: Parameters<T>) => ReturnType<T> {
-    const self = this
-    return (...args: Parameters<T>): ReturnType<T> => fn.apply(self, args)
-  }
-
   setEnabled(enabledp: boolean) {
     const curr = this.enabled
     this.enabled = enabledp
@@ -415,11 +407,6 @@ export abstract class Controller<
     }
   }
 
-  extendKeyMap(keyMap: KeyMap): KeyMap {
-    this.inheritKeyMap({ replace: false, keys: keyMap })
-    return this.keyMap
-  }
-
   defineComponents<T extends ComponentsDeclaration>(components: T) {
     const cmps: any = {}
 
@@ -439,6 +426,21 @@ export abstract class Controller<
       },
       {} as EventMap
     )
+  }
+
+  defineKeys(keyMap: KeyMap): KeyMap {
+    const keys = Object.entries(keyMap).reduce((map, [key, handler]) => {
+      map[key] = {
+        ...handler,
+        handler: /^bound /.test(handler.handler.name)
+          ? handler.handler
+          : handler.handler.bind(this),
+      }
+      return map
+    }, {} as KeyMap)
+
+    this.inheritKeyMap({ replace: false, keys })
+    return this.keyMap
   }
 
   set(prop: LayoutProperty, value: string | number | undefined) {

@@ -18,23 +18,23 @@ import { ConfigSection } from './config-section'
  * The main TUI component of the Launch Goblin user interface
  */
 export class MainController extends ApplicationController<ApplicationState> {
-  keyMap = {
+  keyMap = this.defineKeys({
     'C-s': {
       propagate: true,
       legend: 'Save Configuration',
-      handler: this.bind(this.saveConfig),
+      handler: this.saveConfig,
     },
     tab: {
       propagate: true,
       legend: 'Next Section',
-      handler: this.bind(this.nextChild),
+      handler: this.nextChild,
     },
     'S-tab': {
       propagate: true,
       legend: 'Prev Section',
-      handler: this.bind(() => this.nextChild(-1)),
+      handler: () => this.nextChild(-1),
     },
-  }
+  })
 
   events = this.defineEvents({
     focus: this.componentFocused,

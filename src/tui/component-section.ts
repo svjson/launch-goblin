@@ -18,20 +18,20 @@ export class ComponentSection extends Controller<
   ProjectComponent[],
   ApplicationState
 > {
-  keyMap = {
+  keyMap = this.defineKeys({
     up: {
       propagate: true,
       legend: 'Navigate',
       group: 'nav',
-      handler: this.bind(this.moveUp),
+      handler: this.moveUp,
     },
     down: {
       propagate: true,
       legend: 'Navigate',
       group: 'nav',
-      handler: this.bind(this.moveDown),
+      handler: this.moveDown,
     },
-  }
+  })
 
   events = this.defineEvents({
     checkbox: this.onChecked,

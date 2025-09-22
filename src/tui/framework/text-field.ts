@@ -69,7 +69,7 @@ export class TextInput extends Controller<Widget, { value: string }> {
   private prevRenderBuffer = ''
   private cursor = 0
 
-  keyMap = this.extendKeyMap({
+  keyMap = this.defineKeys({
     left: {
       handler: this.moveLeft.bind(this),
     },

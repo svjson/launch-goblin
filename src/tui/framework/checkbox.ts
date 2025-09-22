@@ -16,13 +16,13 @@ export class Checkbox<I extends CheckboxItem = CheckboxItem> extends Controller<
   Widget,
   I
 > {
-  keyMap = {
+  keyMap = this.defineKeys({
     enter: {
       legend: 'Toggle Selection',
       group: 'focused',
-      handler: this.bind(this.toggle),
+      handler: this.toggle,
     },
-  }
+  })
 
   box: Label
   label: Label

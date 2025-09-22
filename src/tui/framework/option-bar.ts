@@ -13,18 +13,18 @@ export interface OptionItem {
 export class OptionBar<
   ItemModel extends OptionItem = OptionItem,
 > extends Controller<Widget, ItemModel[], undefined> {
-  keyMap = this.extendKeyMap({
+  keyMap = this.defineKeys({
     right: {
       propagate: true,
       legend: 'Select Next',
       group: 'nav',
-      handler: this.bind(this.nextChild),
+      handler: this.nextChild,
     },
     left: {
       propagate: true,
       legend: 'Select Previous',
       group: 'nav',
-      handler: this.bind(() => this.nextChild(-1)),
+      handler: () => this.nextChild(-1),
     },
   })
 

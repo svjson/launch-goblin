@@ -25,16 +25,16 @@ export class ModalDialog<
   Model extends ModalDialogModel = ModalDialogModel,
   StoreModel = any,
 > extends Controller<Widget, Model, StoreModel> {
-  keyMap = this.extendKeyMap({
+  keyMap = this.defineKeys({
     escape: {
       propagate: true,
       legend: 'Cancel',
-      handler: this.bind(this.destroy),
+      handler: this.destroy,
     },
     tab: {
       propagate: true,
       legend: 'Next',
-      handler: this.bind(this.nextChild),
+      handler: this.nextChild,
     },
   })
 
@@ -109,23 +109,23 @@ export class ConfirmDialog<
   StoreModel = any,
 > extends ModalDialog<Model, StoreModel> {
   btnActions = {
-    yes: this.bind(this.onConfirm),
-    no: this.bind(this.onDecline),
-    cancel: this.bind(this.onCancel),
+    yes: this.onConfirm.bind(this),
+    no: this.onDecline.bind(this),
+    cancel: this.onCancel.bind(this),
   }
 
-  keyMap = {
+  keyMap = this.defineKeys({
     escape: {
       legend: 'Cancel',
       propagate: true,
-      handler: this.bind(this.onCancel),
+      handler: this.onCancel,
     },
     tab: {
       propagate: true,
       legend: 'Next',
-      handler: this.bind(this.nextChild),
+      handler: this.nextChild,
     },
-  }
+  })
 
   constructor({
     env,
@@ -161,16 +161,14 @@ export class ConfirmDialog<
     let vPos = 1
 
     if (message) {
-      this.addChild(
-        {
-          component: Label,
-          model: { text: message },
-        },
-        {
+      this.addChild({
+        component: Label,
+        model: { text: message },
+        style: {
           top: vPos,
           left: 2,
-        }
-      )
+        },
+      })
       vPos += 2
     }
 
@@ -182,16 +180,14 @@ export class ConfirmDialog<
     }, 0)
 
     buttons.forEach((btn, i) => {
-      const button = this.addChild(
-        {
-          component: Button,
-          model: { text: btn.buttonText },
-        },
-        {
+      const button = this.addChild({
+        component: Button,
+        model: { text: btn.buttonText },
+        style: {
           top: vPos,
           left: `50%${withSign(-(buttonBarWidth / 2) + add(...buttonWidths.slice(0, i)) + i * buttonSpacing)}`,
-        }
-      )
+        },
+      })
       button.on('pressed', () => {
         this.btnActions[btn.option]()
       })

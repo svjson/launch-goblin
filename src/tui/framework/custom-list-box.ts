@@ -33,24 +33,24 @@ export class CustomListBox<
   Model extends Array<any>,
   Store,
 > extends Controller<Widget, Model, Store> {
-  keyMap: KeyMap = {
+  keyMap: KeyMap = this.defineKeys({
     up: {
       propagate: true,
       legend: 'Navigate',
       group: 'nav',
-      handler: this.bind(() => this.nextChild(-1)),
+      handler: () => this.nextChild(-1),
     },
     down: {
       propagate: true,
       legend: 'Navigate',
       group: 'nav',
-      handler: this.bind(this.nextChild),
+      handler: this.nextChild,
     },
-  }
+  })
 
-  events: Record<string, Function> = {
-    focus: this.bind(this.itemFocused),
-  }
+  events = this.defineEvents({
+    focus: this.itemFocused,
+  })
 
   focusedIndex = 0
 

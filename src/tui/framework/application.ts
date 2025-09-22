@@ -87,7 +87,7 @@ export class Application<Model, MainCtrl extends ApplicationController<Model>> {
   protected defineActions(actions: ActionMap): ActionMap {
     return Object.entries({ ...this.actions, ...actions }).reduce(
       (map, [event, handler]) => {
-        map[event] = /^bound /.test(handler.name) ? handler : this.bind(handler)
+        map[event] = /^bound /.test(handler.name) ? handler : handler.bind(this)
         return map
       },
       {} as ActionMap
@@ -103,7 +103,7 @@ export class Application<Model, MainCtrl extends ApplicationController<Model>> {
     const dialog: Controller = action.details.create({
       model: this.model,
       store: this.store,
-      backend: this.backend,
+      env: this.env,
     })
     this.modals.push(dialog)
     dialog.on('*', (event: Event) => {
