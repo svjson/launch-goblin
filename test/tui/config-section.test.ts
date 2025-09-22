@@ -6,10 +6,11 @@ import {
   createStore,
   DefaultTheme,
   Store,
+  Widget,
 } from '@src/tui/framework'
 import { ApplicationState } from '@src/project'
 import { BlessedBackend } from '@src/tui/framework/blessed'
-import { TTYEnv, Widget } from '@src/tui/framework'
+import { ttyEnv } from './framework/fixtures'
 
 const makeFixture = (): [
   ComponentEnvironment,
@@ -27,14 +28,7 @@ const makeFixture = (): [
   const env = {
     backend,
     theme,
-    tty: {
-      colorMode: 'truecolor',
-      shell: '/bin/sh',
-      TERM: '256-truecolor',
-      tty: true,
-      terminal: 'Terminator',
-      nt: '',
-    } satisfies TTYEnv,
+    tty: ttyEnv(),
   }
   const container = backend.createBox({})
   const state: ApplicationState = {
