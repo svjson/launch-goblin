@@ -47,7 +47,7 @@ export class LaunchGoblinApp extends Application<
   ApplicationState,
   MainController
 > {
-  actions = this.withActions({
+  actions = this.defineActions({
     'create-config': this.bind(this.performCreateConfig),
     'delete-config': this.bind(this.deleteConfig),
   })

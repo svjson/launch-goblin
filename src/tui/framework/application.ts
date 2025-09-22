@@ -5,7 +5,7 @@ import {
   Controller,
 } from './controller'
 import { Store, createStore } from './store'
-import { Action, ActionMap } from './action'
+import { action, Action, ActionMap, ActionsMeta } from './action'
 import { keyHandler, KeyMap } from './keymap'
 import { ActionEvent, FocusEvent } from './event'
 import { Backend } from './backend'
@@ -25,14 +25,11 @@ export interface ApplicationEnvironment extends ComponentEnvironment {
  * @param model - the initial application model
  */
 export class Application<Model, MainCtrl extends ApplicationController<Model>> {
+  actions: ActionMap = {}
   store: Store<Model>
   backend: Backend
   mainCtrl: MainCtrl
   modals: Controller[] = []
-
-  actions: ActionMap = {
-    'open-modal': this.bind(this.openModal),
-  }
 
   activeKeyMap: KeyMap = {}
 
@@ -45,7 +42,20 @@ export class Application<Model, MainCtrl extends ApplicationController<Model>> {
     this.backend = env.backend
     this.mainCtrl = new mainCtrlClass({ env, model, store: this.store })
 
+    this.#roundUpActions()
     this.#bindApplicationEvents()
+  }
+
+  #roundUpActions() {
+    const merged: ActionMap = {}
+    let proto: any = this.constructor
+    while (proto && proto !== Object) {
+      for (const [id, methodName] of Object.entries(proto[ActionsMeta] ?? {})) {
+        merged[id] = (this as any)[methodName as string].bind(this)
+      }
+      proto = Object.getPrototypeOf(proto)
+    }
+    this.actions = merged
   }
 
   #bindApplicationEvents() {
@@ -74,14 +84,15 @@ export class Application<Model, MainCtrl extends ApplicationController<Model>> {
     })
   }
 
-  protected withActions<ActionMap>(extra: ActionMap): ActionMap {
-    return { ...this.actions, ...extra } as ActionMap
+  protected defineActions<ActionMap>(actions: ActionMap): ActionMap {
+    return { ...this.actions, ...actions } as ActionMap
   }
 
   async performAction(action: Action) {
     await this.actions[action.type]?.(action)
   }
 
+  @action('open-modal')
   async openModal(action: Action): Promise<void> {
     const dialog: Controller = action.details.create({
       model: this.model,
