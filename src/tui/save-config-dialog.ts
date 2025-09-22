@@ -92,14 +92,11 @@ export class SaveConfigDialog extends ModalDialog<
     })
 
     saveButton.on('pressed', () => {
-      this.emit({
-        type: 'action',
-        action: {
-          type: 'create-config',
-          details: {
-            type: configTypeSelect.getSelectedItemId(),
-            name: nameField.getText(),
-          },
+      this.dispatch({
+        type: 'create-config',
+        details: {
+          type: configTypeSelect.getSelectedItemId(),
+          name: nameField.getText(),
         },
       })
       this.destroy()

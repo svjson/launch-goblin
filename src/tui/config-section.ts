@@ -143,40 +143,37 @@ export class ConfigSection extends CustomListBox<
   }
 
   confirmDelete() {
-    this.emit({
-      type: 'action',
-      action: {
-        type: 'open-modal',
-        details: {
-          create: <M, SM>({
+    this.dispatch({
+      type: 'open-modal',
+      details: {
+        create: <M, SM>({
+          env,
+          store,
+        }: {
+          env: ComponentEnvironment
+          model: M
+          store: Store<SM>
+        }) =>
+          new ConfirmDialog({
             env,
             store,
-          }: {
-            env: ComponentEnvironment
-            model: M
-            store: Store<SM>
-          }) =>
-            new ConfirmDialog({
-              env,
-              store,
-              model: {
-                title: ' Delete Configuration ',
-                message: `Are you sure you want to delete the configuration?`,
-                options: [{ option: 'yes', buttonText: 'Delete' }, 'cancel'],
-                onConfirm: {
-                  type: 'action',
-                  action: {
-                    type: 'delete-config',
-                    details: {
-                      configId: this.store.get('config.activeConfigName'),
-                      configType: this.model[this.focusedIndex]?.type,
-                    },
+            model: {
+              title: ' Delete Configuration ',
+              message: `Are you sure you want to delete the configuration?`,
+              options: [{ option: 'yes', buttonText: 'Delete' }, 'cancel'],
+              onConfirm: {
+                type: 'action',
+                action: {
+                  type: 'delete-config',
+                  details: {
+                    configId: this.store.get('config.activeConfigName'),
+                    configType: this.model[this.focusedIndex]?.type,
                   },
                 },
               },
-            }),
-          source: this,
-        },
+            },
+          }),
+        source: this,
       },
     })
   }

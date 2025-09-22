@@ -70,7 +70,7 @@ export class MainController extends ApplicationController<ApplicationState> {
 
     launchButton.layout.bind('top', () => Number(componentSection.bottom()) + 1)
     launchButton.on('pressed', () => {
-      this.emit({ type: 'action', action: { type: 'launch' } })
+      this.dispatch({ type: 'launch' })
     })
 
     configSection.layout.bind('top', () => componentSection.top())
@@ -92,22 +92,15 @@ export class MainController extends ApplicationController<ApplicationState> {
   }
 
   saveConfig() {
-    this.emit({
-      type: 'action',
-      action: {
-        type: 'open-modal',
-        details: {
-          source: this,
-          create: <M, SM>({}: {
-            backend: Backend
-            model: M
-            store: Store<SM>
-          }) =>
-            new SaveConfigDialog({
-              env: this.env,
-              store: this.store,
-            }),
-        },
+    this.dispatch({
+      type: 'open-modal',
+      details: {
+        source: this,
+        create: <M, SM>({}: { backend: Backend; model: M; store: Store<SM> }) =>
+          new SaveConfigDialog({
+            env: this.env,
+            store: this.store,
+          }),
       },
     })
   }

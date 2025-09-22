@@ -9,6 +9,7 @@ import { BaseWidgetOptions, Widget, WidgetOptions } from './widget'
 import { calculateWidgetStyle } from './style'
 import { Theme } from './theme'
 import { TTYEnv } from './environment'
+import { Action } from './action'
 
 export interface ComponentEnvironment {
   backend: Backend
@@ -385,6 +386,10 @@ export abstract class Controller<
 
     component.destroy()
     this.children.splice(index, 1)
+  }
+
+  dispatch(action: Action) {
+    this.emit({ type: 'action', action })
   }
 
   emit(event: Event | StringEvent) {
