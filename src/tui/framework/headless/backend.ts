@@ -1,7 +1,13 @@
-import { Backend } from '../backend'
+import {
+  Backend,
+  BackendCallback,
+  BackendKeyHandler,
+  BackendKeyPressHandler,
+} from '../backend'
 import {
   BoxOptions,
   ButtonOptions,
+  CheckboxOptions,
   LabelOptions,
   LabelWidget,
   ListWidget,
@@ -9,39 +15,95 @@ import {
   TextFieldOptions,
   TextFieldWidget,
   Widget,
+  CheckboxWidget,
 } from '../widget'
-import { HeadlessWidget } from './widget'
+import { genKeyPress } from './keygen'
+import {
+  HeadlessCheckboxWidget,
+  HeadlessLabelWidget,
+  HeadlessListWidget,
+  HeadlessTextFieldWidget,
+  HeadlessWidget,
+} from './widget'
 
 export const noopHandler = (_handler: () => void) => {}
-export const noopKeyHandler = (_handler: (_ch: string, _key: any) => void) => {}
+export const noopKeyHandler = (
+  _handler: (_ch: string | undefined, _key: any) => void
+) => {}
 export const noopKeyPress = (
-  _key: string | string[],
+  _key: string | string[] | undefined,
   _handler: (ch: string, key: any) => void
 ) => {}
 
+export interface HeadlessBackend extends Backend {
+  focused?: HeadlessWidget
+  performKeyPress(key: string): Promise<void>
+  getFocusedWidget(): Widget | undefined
+  getFocused<T extends Widget>(): T
+}
+
 export const noBackend = (): Backend => {
-  return {
-    onBeforeRender: noopHandler,
-    onKey: noopKeyHandler,
-    onKeyPress: noopKeyPress,
+  const keyHandlers: BackendKeyHandler[] = []
+  const keyPressHandlers: BackendKeyPressHandler[] = []
+  const preRenderHandlers: BackendCallback[] = []
+
+  const backend: HeadlessBackend = {
+    onBeforeRender: (handler: BackendCallback) => {
+      preRenderHandlers.push(handler)
+    },
+    onKey: (handler: BackendKeyHandler) => {
+      keyHandlers.push(handler)
+    },
+    onKeyPress: (key: string | string[], handler: BackendKeyHandler) => {
+      key = Array.isArray(key) ? key : [key]
+      keyPressHandlers.push({ key, handler })
+    },
     addRoot(_widget: Widget) {},
-    render() {},
+    render() {
+      preRenderHandlers.forEach((h) => h())
+    },
     createBox(options: BoxOptions): Widget {
-      return new HeadlessWidget<BoxOptions>({}, options)
+      return new HeadlessWidget<BoxOptions>(this, {}, options)
     },
-    createButton(_options: ButtonOptions): Widget {
-      throw new Error('Cannot create widget')
+    createButton(options: ButtonOptions): Widget {
+      return new HeadlessWidget<ButtonOptions>(this, {}, options)
     },
-    createLabel(_options: LabelOptions): LabelWidget {
-      throw new Error('Cannot create widget')
+    createCheckbox(options: CheckboxOptions): CheckboxWidget {
+      return new HeadlessCheckboxWidget(this, {}, options)
     },
-    createList(_options: ListOptions): ListWidget {
-      throw new Error('Cannot create widget')
+    createLabel(options: LabelOptions): LabelWidget {
+      return new HeadlessLabelWidget(this, {}, options)
     },
-    createTextField(_options: TextFieldOptions): TextFieldWidget {
-      throw new Error('Cannot create widget')
+    createList(options: ListOptions): ListWidget {
+      return new HeadlessListWidget(this, {}, options)
+    },
+    createTextField(options: TextFieldOptions): TextFieldWidget {
+      return new HeadlessTextFieldWidget(this, {}, options)
+    },
+
+    async performKeyPress(keyName: string) {
+      const [ch, key] = genKeyPress(keyName)
+
+      keyHandlers.forEach((handler) => {
+        handler(ch, key)
+      })
+
+      keyPressHandlers.forEach((handler) => {
+        if (handler.key.includes(key.full)) {
+          handler.handler(ch, key)
+        }
+      })
+    },
+
+    getFocusedWidget() {
+      return backend.focused
+    },
+    getFocused<T extends Widget>(): T {
+      return backend.getFocusedWidget() as T
     },
 
     dispose() {},
-  }
+  } satisfies HeadlessBackend
+
+  return backend as Backend
 }

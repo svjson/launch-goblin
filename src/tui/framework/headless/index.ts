@@ -1,1 +1,1 @@
-export { noBackend } from './backend'
+export { noBackend, HeadlessBackend } from './backend'

@@ -1,4 +1,9 @@
-import { DefaultTheme, noBackend, TTYEnv } from '@src/tui/framework'
+import {
+  ApplicationEnvironment,
+  DefaultTheme,
+  noBackend,
+  TTYEnv,
+} from '@src/tui/framework'
 
 export const ttyEnv = () => {
   return {
@@ -11,10 +16,11 @@ export const ttyEnv = () => {
   } satisfies TTYEnv
 }
 
-export const applicationEnvironment = () => {
+export const applicationEnvironment = (): ApplicationEnvironment => {
   return {
     backend: noBackend(),
     theme: DefaultTheme,
     tty: ttyEnv(),
+    log: [],
   }
 }

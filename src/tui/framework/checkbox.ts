@@ -2,7 +2,7 @@ import { mergeLeft } from '@whimbrel/walk'
 
 import { Controller, CtrlCtorParams } from './controller'
 import { Label } from './label'
-import { Widget } from './widget'
+import { CheckboxWidget, Widget } from './widget'
 import { resolveComponentStyle } from './theme'
 
 export interface CheckboxItem {
@@ -13,7 +13,7 @@ export interface CheckboxItem {
 }
 
 export class Checkbox<I extends CheckboxItem = CheckboxItem> extends Controller<
-  Widget,
+  CheckboxWidget,
   I
 > {
   keyMap = this.defineKeys({
@@ -35,7 +35,7 @@ export class Checkbox<I extends CheckboxItem = CheckboxItem> extends Controller<
   }: CtrlCtorParams) {
     super(
       env,
-      env.backend.createBox(
+      env.backend.createCheckbox(
         mergeLeft(
           {
             left: 1,
@@ -52,6 +52,7 @@ export class Checkbox<I extends CheckboxItem = CheckboxItem> extends Controller<
       model
     )
     this.inheritKeyMap(keyMap)
+    this.setParent(parent)
 
     this.box = this.addChild({
       component: Label,
@@ -74,6 +75,7 @@ export class Checkbox<I extends CheckboxItem = CheckboxItem> extends Controller<
     })
 
     this.inheritKeyMap(keyMap)
+    this.setSelected(this.model.checked)
   }
 
   toggle() {
@@ -89,6 +91,7 @@ export class Checkbox<I extends CheckboxItem = CheckboxItem> extends Controller<
   }
 
   setSelected(selected: boolean) {
+    this.widget.setChecked(selected)
     this.model.checked = selected
     this.box.setText(this.makeBoxContent())
     this.emit('dirty')

@@ -18,6 +18,8 @@ export type ButtonOptions = BaseWidgetOptions & {
   label: string
 }
 
+export type CheckboxOptions = BaseWidgetOptions & {}
+
 export type ListOptions = BaseWidgetOptions & {
   items?: string[]
 }
@@ -48,6 +50,8 @@ export interface Widget<O extends WidgetOptions = WidgetOptions> {
 
   isFocused(): boolean
 
+  children(): Widget[]
+
   applyStyle(style: BaseWidgetOptions): void
   getStyleOptions(): BaseWidgetOptions
   getAppearance(): Appearance
@@ -74,6 +78,11 @@ export interface TextFieldWidget extends Widget {
   onSubmit(callback: () => void): void
   onCancel(callback: () => void): void
   getText(): string
+}
+
+export interface CheckboxWidget extends Widget {
+  isChecked(): boolean
+  setChecked(checked: boolean): void
 }
 
 /**

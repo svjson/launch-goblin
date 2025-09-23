@@ -1,15 +1,14 @@
 import { describe, expect, test } from 'vitest'
-import blessed from 'neo-blessed'
 import { ConfigSection } from '@src/tui/config-section'
 import {
   ComponentEnvironment,
   createStore,
   DefaultTheme,
+  noBackend,
   Store,
   Widget,
 } from '@src/tui/framework'
 import { ApplicationState } from '@src/project'
-import { BlessedBackend } from '@src/tui/framework/blessed'
 import { ttyEnv } from './framework/fixtures'
 
 const makeFixture = (): [
@@ -18,12 +17,7 @@ const makeFixture = (): [
   Store<ApplicationState>,
   ApplicationState,
 ] => {
-  const screen = blessed.screen({
-    smartCSR: false,
-    terminal: 'ansi',
-    isTTY: false,
-  })
-  const backend = new BlessedBackend(screen)
+  const backend = noBackend()
   const theme = DefaultTheme
   const env = {
     backend,

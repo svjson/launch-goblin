@@ -11,7 +11,7 @@ export { createStore, Store } from './store'
 export { Label } from './label'
 export { readTTYTitleString } from './tty'
 export { inspectEnvironment } from './environment'
-export { noBackend } from './headless'
+export { noBackend, HeadlessBackend } from './headless'
 
 export type { Backend } from './backend'
 

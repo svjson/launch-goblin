@@ -44,6 +44,8 @@ export class Application<Model, MainCtrl extends ApplicationController<Model>> {
 
     this.#roundUpActions()
     this.#bindApplicationEvents()
+
+    this.mainCtrl.focus()
   }
 
   #roundUpActions() {

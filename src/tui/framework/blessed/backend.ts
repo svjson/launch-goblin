@@ -6,6 +6,7 @@ import { Backend } from '../backend'
 import {
   BoxOptions,
   ButtonOptions,
+  CheckboxWidget,
   LabelOptions,
   ListOptions,
   TextFieldOptions,
@@ -14,8 +15,10 @@ import {
   TextFieldWidget,
   Widget,
   WidgetOptions,
+  CheckboxOptions,
 } from '../widget'
 import {
+  BlessedCheckboxWidget,
   BlessedLabelWidget,
   BlessedListWidget,
   BlessedTextFieldWidget,
@@ -74,6 +77,13 @@ export class BlessedBackend implements Backend {
   createButton(options: ButtonOptions): Widget {
     return new BlessedWidget(
       blessed.button(toBlessedButtonOptions(options, this.screen)),
+      options
+    )
+  }
+
+  createCheckbox(options: CheckboxOptions): CheckboxWidget {
+    return new BlessedCheckboxWidget(
+      blessed.box(toBlessedBoxOptions(options, this.screen)),
       options
     )
   }

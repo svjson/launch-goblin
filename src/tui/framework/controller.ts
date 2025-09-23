@@ -1,5 +1,3 @@
-import { mergeLeft } from '@whimbrel/walk'
-
 import { DestroyEvent, Event, EventMap, StringEvent } from './event'
 import { KeyMap, KeyMapArg } from './keymap'
 import { createStore, Store } from './store'

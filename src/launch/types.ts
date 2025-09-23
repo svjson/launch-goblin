@@ -5,7 +5,7 @@ export type LauncherId = 'turbo' | 'pnpm'
 
 export type MakeLaunchCommand = (
   env: ApplicationEnvironment,
-  components: ProjectComponent[],  
+  components: ProjectComponent[]
 ) => LaunchCommand
 
 export interface Launcher {

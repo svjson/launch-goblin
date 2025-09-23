@@ -65,7 +65,6 @@ export class MainController extends ApplicationController<ApplicationState> {
 
   constructor(params: ApplicationCtrlCtorParams<ApplicationState>) {
     super(params)
-
     const { componentSection, configSection, launchButton } = this.components
 
     launchButton.layout.bind('top', () => Number(componentSection.bottom()) + 1)

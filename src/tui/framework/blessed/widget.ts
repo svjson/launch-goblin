@@ -1,6 +1,7 @@
 import blessed from 'neo-blessed'
 import {
   BaseWidgetOptions,
+  CheckboxWidget,
   LabelWidget,
   ListWidget,
   TextFieldWidget,
@@ -81,6 +82,7 @@ export class BlessedWidget<
   O extends WidgetOptions = WidgetOptions,
 > implements Widget<O>
 {
+  _children: BlessedWidget[] = []
   calculatedStyle: BaseWidgetOptions
   widgetOptions: O
 
@@ -103,6 +105,10 @@ export class BlessedWidget<
   destroy() {
     this.inner.detach()
     this.inner.destroy()
+  }
+
+  children() {
+    return this._children
   }
 
   applyStyle(style: BaseWidgetOptions) {
@@ -153,6 +159,21 @@ export class BlessedWidget<
 
   setLayout(prop: LayoutProperty, value: string | number): void {
     throw new Error('Method not implemented.')
+  }
+}
+
+export class BlessedCheckboxWidget
+  extends BlessedWidget<blessed.Widgets.BoxElement>
+  implements CheckboxWidget
+{
+  private checked: boolean = false
+
+  isChecked(): boolean {
+    return this.checked
+  }
+
+  setChecked(checked: boolean) {
+    this.checked = checked
   }
 }
 
