@@ -19,7 +19,7 @@ Instead of juggling `turbo run` and `pnpm dev` with endless `--filter` sequences
 
 
 
-## Features (0.1.1)
+## Features (0.1.2)
 
 - **Turborepo integration** – browse and run `turbo run` targets per module.  
 - **pnpm integration** – run `pnpm` scripts directly from the interface.  
