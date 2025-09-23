@@ -6,5 +6,6 @@ export type {
   ConfigType,
   ContextConfig,
   LaunchConfig,
+  LegacyConfigType,
   LGConfig,
 } from './types'

@@ -3,11 +3,13 @@
 import { launch } from './launch'
 import { LaunchGoblinApp } from './tui'
 import { LogEvent } from './tui/framework'
-import { saveLatestLaunch } from './config'
+import { LegacyConfigType, saveLatestLaunch, saveLocalConfig } from './config'
 import { setTTYTitleString } from './tui/framework/tty'
 import { Command } from 'commander'
-import { LGOptions } from './tui/goblin-app'
+import { ActionFacade, LGOptions } from './tui/goblin-app'
 import { bootstrap, inspectEnvironment } from './bootstrap'
+import { ApplicationState } from './project'
+import { saveGlobalConfig } from './config/io'
 
 /**
  * Launches the application with command-line options
@@ -16,18 +18,27 @@ const main = async (options: LGOptions) => {
   const targetAction = 'dev'
   const { env, model } = await bootstrap(targetAction, options)
 
-  const doLaunch = async () => {
-    env.backend.dispose()
-    const selected = model.project.components.filter((c) => c.selected)
-    await saveLatestLaunch(model)
-    const cmd = model.project.launchers[0].launchCommand(env, selected)
-    await launch(env, cmd)
+  const facade: ActionFacade = {
+    launch: async () => {
+      env.backend.dispose()
+      const selected = model.project.components.filter((c) => c.selected)
+      await saveLatestLaunch(model)
+      const cmd = model.project.launchers[0].launchCommand(env, selected)
+      await launch(env, cmd)
+    },
+    saveConfig: async (state: ApplicationState, type: LegacyConfigType) => {
+      if (type === 'local') {
+        await saveLocalConfig(state.project, state.config.local)
+      } else {
+        await saveGlobalConfig(state.project, state.config.global)
+      }
+    },
   }
 
   if (options.autoLaunch) {
-    await doLaunch()
+    await facade.launch()
   } else {
-    const app = new LaunchGoblinApp(env, model, doLaunch)
+    const app = new LaunchGoblinApp(env, model, facade)
 
     app.mainCtrl.on('log', (event: LogEvent) => {
       env.log.push(event.message)

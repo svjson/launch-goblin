@@ -1,4 +1,5 @@
 export type ConfigType = 'private' | 'shared'
+export type LegacyConfigType = 'global' | 'local'
 
 export interface ComponentLaunchConfig {
   selected?: boolean

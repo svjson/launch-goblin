@@ -6,8 +6,7 @@ import {
   ApplicationEnvironment,
   ColorMode,
 } from './framework'
-import { saveLocalConfig, toLaunchConfigComponents } from '@src/config'
-import { saveGlobalConfig } from '@src/config/io'
+import { LegacyConfigType, toLaunchConfigComponents } from '@src/config'
 
 /**
  * Contains user options for running Launch Goblin.
@@ -37,6 +36,17 @@ export interface LGOptions {
 }
 
 /**
+ * Injectable facade, providing functionality to actions
+ */
+export interface ActionFacade {
+  launch: () => Promise<void>
+  saveConfig: (
+    state: ApplicationState,
+    configType: LegacyConfigType
+  ) => Promise<void>
+}
+
+/**
  * The main Launch Goblin TUI Application abstraction, based on
  * Appliation from `tui/framework`.
  *
@@ -56,13 +66,13 @@ export class LaunchGoblinApp extends Application<
   constructor(
     env: ApplicationEnvironment,
     model: ApplicationState,
-    private launchFunction: () => Promise<void>
+    private facade: ActionFacade
   ) {
     super(env, MainController, model)
   }
 
   async launch() {
-    await this.launchFunction()
+    await this.facade.launch()
   }
 
   async performCreateConfig(createAction: Action): Promise<void> {
@@ -78,11 +88,7 @@ export class LaunchGoblinApp extends Application<
       }
     )
 
-    if (createAction.details.type === 'local') {
-      await saveLocalConfig(this.model.project, this.model.config.local)
-    } else {
-      await saveGlobalConfig(this.model.project, this.model.config.global)
-    }
+    await this.facade.saveConfig(this.model, createAction.details.type)
   }
 
   async deleteConfig(deleteAction: Action): Promise<void> {
@@ -93,10 +99,6 @@ export class LaunchGoblinApp extends Application<
       'launchConfigs',
       configId,
     ])
-    if (configType === 'shared') {
-      await saveLocalConfig(this.model.project, this.model.config.local)
-    } else {
-      await saveGlobalConfig(this.model.project, this.model.config.global)
-    }
+    await this.facade.saveConfig(this.model, deleteAction.details.type)
   }
 }

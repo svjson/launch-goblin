@@ -6,6 +6,7 @@ import { PackageJSON } from '@whimbrel/package-json'
 import { mergeLeft } from '@whimbrel/walk'
 import { applicationEnvironment } from './tui/framework/fixtures'
 import { ApplicationEnvironment, HeadlessBackend } from '@src/tui/framework'
+import { ActionFacade } from '@src/tui/goblin-app'
 
 export type TestProjectId = 'dummy-project'
 
@@ -53,7 +54,7 @@ const TEST_PROJECTS: Record<TestProjectId, TestProject> = {
             'mock-provider-a',
             'mock-provider-b',
           ],
-          launchCommand: (env, components) => ({
+          launchCommand: (_env, _components) => ({
             bin: 'pnpm',
             args: [],
           }),
@@ -171,11 +172,11 @@ export const makeAppState = (
 export const runGoblinApp = ({
   projectId,
   configs = {},
-  launchFunction = async () => {},
+  facade = {},
 }: {
   projectId: TestProjectId
   configs?: { private?: string[]; shared?: string[] }
-  launchFunction?: () => Promise<void>
+  facade?: Partial<ActionFacade>
 }): {
   app: LaunchGoblinApp
   env: ApplicationEnvironment
@@ -184,7 +185,13 @@ export const runGoblinApp = ({
   const env = applicationEnvironment()
   const state = makeAppState(projectId, configs)
 
-  const app = new LaunchGoblinApp(env, state, launchFunction)
+  const concreteFacade: ActionFacade = {
+    launch: async () => {},
+    saveConfig: async (_state, _type) => {},
+    ...facade,
+  }
+
+  const app = new LaunchGoblinApp(env, state, concreteFacade)
 
   env.backend.render()
   return { env, app, backend: env.backend as HeadlessBackend }
