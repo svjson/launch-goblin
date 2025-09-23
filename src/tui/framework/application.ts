@@ -32,6 +32,12 @@ export class Application<Model, MainCtrl extends ApplicationController<Model>> {
   modals: Controller[] = []
 
   activeKeyMap: KeyMap = {}
+  /**
+   * The currently focused component.
+   *
+   * Added here for testing purposes.
+   */
+  focusedComponent?: Controller
 
   constructor(
     protected env: ComponentEnvironment,
@@ -79,6 +85,7 @@ export class Application<Model, MainCtrl extends ApplicationController<Model>> {
 
     this.mainCtrl.on('focus', (event: FocusEvent) => {
       this.activeKeyMap = event.component.keyMap
+      this.focusedComponent = event.component
     })
 
     this.mainCtrl.on('action', async (event: ActionEvent) => {

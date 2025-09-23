@@ -21,6 +21,23 @@ export interface TestProject {
   }
 }
 
+const TEST_SAVED_CONFIGS: Record<TestProjectId, Record<string, string[]>> = {
+  'dummy-project': {
+    'Full Dev Environment': [
+      'backend-service',
+      'frontend-portal',
+      'mock-provider-a',
+      'mock-provider-b',
+    ],
+    'Backend Dev Environment': [
+      'backend-service',
+      'mock-provider-a',
+      'mock-provider-b',
+    ],
+    'No Mocks': ['backend-service', 'frontend-portal'],
+  },
+}
+
 const TEST_PROJECTS: Record<TestProjectId, TestProject> = {
   'dummy-project': {
     project: {
@@ -88,30 +105,76 @@ const TEST_PROJECTS: Record<TestProjectId, TestProject> = {
   },
 }
 
-export const makeAppState = (projectId: TestProjectId): ApplicationState => {
+const constructLaunchConfig = (
+  state: ApplicationState,
+  activeComponents: string[]
+): LaunchConfig => {
+  return state.project.components.reduce(
+    (cfg, cmp) => {
+      cfg.components[cmp.id] = {
+        selected: activeComponents.includes(cmp.id),
+      }
+      return cfg
+    },
+    {
+      components: {},
+    } as LaunchConfig
+  )
+}
+
+export const makeAppState = (
+  projectId: TestProjectId,
+  configs: { private?: string[]; shared?: string[] } = {}
+): ApplicationState => {
   const testProject = TEST_PROJECTS[projectId]
-  return {
+  const state: ApplicationState = {
     project: mergeLeft({}, testProject.project),
     config: {
       local: {
-        launchConfigs: testProject.configs.local.launchConfigs,
+        launchConfigs: {},
       },
 
       global: {
-        launchConfigs: testProject.configs.global.launchConfigs,
+        launchConfigs: {},
         lastConfig: {
           components: {},
         },
       },
     },
   }
+
+  for (const configId of configs.private ?? []) {
+    const launchCfg = TEST_SAVED_CONFIGS[projectId][configId]
+    if (launchCfg === undefined)
+      throw new Error(`Test Config does not exist: ${configId}`)
+
+    state.config.global.launchConfigs[configId] = constructLaunchConfig(
+      state,
+      launchCfg
+    )
+  }
+
+  for (const configId of configs.shared ?? []) {
+    const launchCfg = TEST_SAVED_CONFIGS[projectId][configId]
+    if (launchCfg === undefined)
+      throw new Error(`Test Config does not exist: ${configId}`)
+
+    state.config.local.launchConfigs[configId] = constructLaunchConfig(
+      state,
+      launchCfg
+    )
+  }
+
+  return state
 }
 
 export const runGoblinApp = ({
   projectId,
+  configs = {},
   launchFunction = async () => {},
 }: {
   projectId: TestProjectId
+  configs?: { private?: string[]; shared?: string[] }
   launchFunction?: () => Promise<void>
 }): {
   app: LaunchGoblinApp
@@ -119,7 +182,7 @@ export const runGoblinApp = ({
   backend: HeadlessBackend
 } => {
   const env = applicationEnvironment()
-  const state = makeAppState(projectId)
+  const state = makeAppState(projectId, configs)
 
   const app = new LaunchGoblinApp(env, state, launchFunction)
 

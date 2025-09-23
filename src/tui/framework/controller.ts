@@ -180,7 +180,7 @@ export abstract class Controller<
   constructor(
     protected env: ComponentEnvironment,
     protected widget: W,
-    protected model: Model,
+    public model: Model,
     protected store: Store<StoreModel> = createStore({}) as Store<StoreModel>
   ) {
     this.layout = new ControllerLayout(this)

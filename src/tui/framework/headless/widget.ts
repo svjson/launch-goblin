@@ -62,7 +62,7 @@ export class HeadlessWidget<O extends WidgetOptions = WidgetOptions>
 
   set(prop: string, value: string | number | undefined): void {}
   get(prop: string): string | number | undefined {
-    return undefined
+    return (this.widgetOptions as any).text || (this.widgetOptions as any).label
   }
   setParent(parent: Widget): void {
     this.parent = parent
@@ -86,6 +86,7 @@ export class HeadlessCheckboxWidget
     if (prop === 'text') {
       return this._children[1]?.get('text')
     }
+    return super.get(prop)
   }
 
   isChecked(): boolean {
@@ -111,6 +112,7 @@ export class HeadlessLabelWidget
     if (prop === 'text') {
       return this.widgetOptions.label
     }
+    return super.get(prop)
   }
 
   setText(text: string): void {
