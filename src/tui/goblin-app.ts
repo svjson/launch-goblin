@@ -99,6 +99,9 @@ export class LaunchGoblinApp extends Application<
       'launchConfigs',
       configId,
     ])
-    await this.facade.saveConfig(this.model, deleteAction.details.type)
+    await this.facade.saveConfig(
+      this.model,
+      configType === 'shared' ? 'local' : 'global'
+    )
   }
 }
