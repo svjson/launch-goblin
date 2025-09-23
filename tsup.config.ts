@@ -16,5 +16,5 @@ export default defineConfig({
   onSuccess: 'tsc --noEmit',
   outExtension: ({ format }) =>
     format === 'cjs' ? { js: '.cjs' } : { js: '.js' },
-  external: [...Object.keys(pkg.dependencies ?? {}), ...builtinModules],
+  external: [/^(?!@src)([^./].*)/],
 })
