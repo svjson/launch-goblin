@@ -44,8 +44,15 @@ export class HeadlessWidget<O extends WidgetOptions = WidgetOptions>
     return this._children
   }
 
+  removeChild(widget: Widget) {
+    this._children = this._children.filter((c) => c !== widget)
+  }
+
   destroy(): void {
-    throw new Error('HeadlessWidget::destroy() - Method not implemented.')
+    this._children.forEach((c) => {
+      c.destroy()
+    })
+    ;(this.parent as HeadlessWidget)?.removeChild(this)
   }
   isFocused(): boolean {
     return this.backend.focused === this

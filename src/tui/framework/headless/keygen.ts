@@ -14,6 +14,18 @@ export interface KeyPress {
 }
 
 export const KeyGen: Record<string, KeyPress> = {
+  delete: {
+    ch: undefined,
+    key: {
+      sequence: '\\x1B[3~',
+      name: 'delete',
+      ctrl: false,
+      meta: false,
+      shift: false,
+      code: '[3~',
+      full: 'delete',
+    },
+  },
   down: {
     ch: undefined,
     key: {
