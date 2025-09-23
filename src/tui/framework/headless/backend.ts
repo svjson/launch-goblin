@@ -37,15 +37,18 @@ export const noopKeyPress = (
 
 export interface HeadlessBackend extends Backend {
   focused?: HeadlessWidget
-  performKeyPress(key: string): Promise<void>
   getFocusedWidget(): Widget | undefined
   getFocused<T extends Widget>(): T
+  performKeyPress(key: string): Promise<void>
+  typeString(string: string): Promise<void>
 }
 
 export const noBackend = (): Backend => {
   const keyHandlers: BackendKeyHandler[] = []
   const keyPressHandlers: BackendKeyPressHandler[] = []
   const preRenderHandlers: BackendCallback[] = []
+
+  const rootWidgets: Widget[] = []
 
   const backend: HeadlessBackend = {
     onBeforeRender: (handler: BackendCallback) => {
@@ -58,9 +61,15 @@ export const noBackend = (): Backend => {
       key = Array.isArray(key) ? key : [key]
       keyPressHandlers.push({ key, handler })
     },
-    addRoot(_widget: Widget) {},
+    addRoot(widget: Widget) {
+      rootWidgets.push(widget)
+    },
     render() {
       preRenderHandlers.forEach((h) => h())
+
+      rootWidgets.forEach((w) => {
+        w.render()
+      })
     },
     createBox(options: BoxOptions): Widget {
       return new HeadlessWidget<BoxOptions>(this, {}, options)
@@ -93,6 +102,12 @@ export const noBackend = (): Backend => {
           handler.handler(ch, key)
         }
       })
+    },
+
+    async typeString(string: string) {
+      for (const ch of string.split('')) {
+        await backend.performKeyPress(ch)
+      }
     },
 
     getFocusedWidget() {

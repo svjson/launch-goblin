@@ -1,4 +1,5 @@
 import { Appearance } from '../appearance'
+import { BackendCallback } from '../backend'
 import { LayoutProperty } from '../layout'
 import {
   BaseWidgetOptions,
@@ -25,6 +26,8 @@ export class HeadlessWidget<O extends WidgetOptions = WidgetOptions>
   widgetOptions: O
   parent?: Widget<WidgetOptions>
 
+  preRenderListeners: BackendCallback[] = []
+
   constructor(
     public backend: HeadlessBackend,
     public inner: HeadlessElement,
@@ -34,8 +37,13 @@ export class HeadlessWidget<O extends WidgetOptions = WidgetOptions>
     this.widgetOptions = options
   }
 
-  onBeforeRender(callback: () => void): void {}
-  render(): void {}
+  onBeforeRender(callback: BackendCallback) {
+    this.preRenderListeners.push(callback)
+  }
+  render(): void {
+    this.preRenderListeners.forEach((l) => l())
+    this._children.forEach((c) => c.render())
+  }
   focus(): void {
     this.backend.focused = this
   }

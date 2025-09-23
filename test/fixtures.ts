@@ -22,6 +22,10 @@ export interface TestProject {
   }
 }
 
+export const wait = (ms: number) => {
+  return new Promise<void>((resolve) => setTimeout(resolve, ms))
+}
+
 const TEST_SAVED_CONFIGS: Record<TestProjectId, Record<string, string[]>> = {
   'dummy-project': {
     'Full Dev Environment': [
@@ -181,6 +185,7 @@ export const runGoblinApp = ({
   app: LaunchGoblinApp
   env: ApplicationEnvironment
   backend: HeadlessBackend
+  state: ApplicationState
 } => {
   const env = applicationEnvironment()
   const state = makeAppState(projectId, configs)
@@ -194,5 +199,5 @@ export const runGoblinApp = ({
   const app = new LaunchGoblinApp(env, state, concreteFacade)
 
   env.backend.render()
-  return { env, app, backend: env.backend as HeadlessBackend }
+  return { env, app, state, backend: env.backend as HeadlessBackend }
 }

@@ -1,73 +1,22 @@
 import { LegacyConfigType } from '@src/config'
 import { ApplicationState } from '@src/project'
-import { runGoblinApp } from 'test/fixtures'
+import { runGoblinApp, wait } from 'test/fixtures'
 import { describe, expect, test, it } from 'vitest'
 
 describe('Interaction', () => {
   describe('Launch Config Management', () => {
-    test('DEL should open cancellable confirmation modal', () => {
-      const { backend, app } = runGoblinApp({
-        projectId: 'dummy-project',
-        configs: {
-          private: ['Backend Dev Environment'],
-          shared: ['Full Dev Environment', 'No Mocks'],
-        },
-      })
-      // Tab into config section
-      backend.performKeyPress('tab')
-      backend.performKeyPress('tab')
-
-      // When
-      backend.performKeyPress('delete')
-      // Then
-      expect(app.modals.length === 1)
-      expect(app.focusedComponent!.model.text).toEqual('Delete')
-
-      // When
-      backend.performKeyPress('tab')
-      // Then
-      expect(app.focusedComponent!.model.text).toEqual('Cancel')
-
-      // When
-      backend.performKeyPress('enter')
-      expect(app.focusedComponent!.model.label).toEqual('Full Dev Environment')
-    })
-
-    it('should save private config when a private launch configuration is deleted', async () => {
-      const saved = new Promise<{
-        state?: ApplicationState
-        type: LegacyConfigType
-      }>((resolve) => {
+    describe('Deleting launch configurations', () => {
+      test('DEL should open cancellable confirmation modal', () => {
         const { backend, app } = runGoblinApp({
           projectId: 'dummy-project',
           configs: {
             private: ['Backend Dev Environment'],
             shared: ['Full Dev Environment', 'No Mocks'],
           },
-          facade: {
-            saveConfig: async (state, type) => {
-              resolve({ state, type })
-            },
-          },
         })
-
         // Tab into config section
         backend.performKeyPress('tab')
         backend.performKeyPress('tab')
-
-        // Then - First shared config is selected
-        expect(app.focusedComponent!.model.label).toEqual(
-          'Full Dev Environment'
-        )
-        // Move to next config
-        backend.performKeyPress('down')
-        expect(app.focusedComponent!.model.label).toEqual('No Mocks')
-
-        // Move to next config
-        backend.performKeyPress('down')
-        expect(app.focusedComponent!.model.label).toEqual(
-          'Backend Dev Environment'
-        )
 
         // When
         backend.performKeyPress('delete')
@@ -76,62 +25,277 @@ describe('Interaction', () => {
         expect(app.focusedComponent!.model.text).toEqual('Delete')
 
         // When
+        backend.performKeyPress('tab')
+        // Then
+        expect(app.focusedComponent!.model.text).toEqual('Cancel')
+
+        // When
         backend.performKeyPress('enter')
         expect(app.focusedComponent!.model.label).toEqual(
           'Full Dev Environment'
         )
       })
 
-      const { state, type } = await saved
-      expect(state).toBeDefined()
-      expect(Object.keys(state!.config.global.launchConfigs)).toEqual([])
-      expect(type).toEqual('global')
+      it('should save private config when a private launch configuration is deleted', async () => {
+        const saved = new Promise<{
+          state?: ApplicationState
+          type: LegacyConfigType
+        }>((resolve) => {
+          const { backend, app } = runGoblinApp({
+            projectId: 'dummy-project',
+            configs: {
+              private: ['Backend Dev Environment'],
+              shared: ['Full Dev Environment', 'No Mocks'],
+            },
+            facade: {
+              saveConfig: async (state, type) => {
+                resolve({ state, type })
+              },
+            },
+          })
+
+          // Tab into config section
+          backend.performKeyPress('tab')
+          backend.performKeyPress('tab')
+
+          // Then - First shared config is selected
+          expect(app.focusedComponent!.model.label).toEqual(
+            'Full Dev Environment'
+          )
+          // Move to next config
+          backend.performKeyPress('down')
+          expect(app.focusedComponent!.model.label).toEqual('No Mocks')
+
+          // Move to next config
+          backend.performKeyPress('down')
+          expect(app.focusedComponent!.model.label).toEqual(
+            'Backend Dev Environment'
+          )
+
+          // When
+          backend.performKeyPress('delete')
+          // Then
+          expect(app.modals.length === 1)
+          expect(app.focusedComponent!.model.text).toEqual('Delete')
+
+          // When
+          backend.performKeyPress('enter')
+          expect(app.focusedComponent!.model.label).toEqual(
+            'Full Dev Environment'
+          )
+        })
+
+        const { state, type } = await saved
+        expect(state).toBeDefined()
+        expect(Object.keys(state!.config.global.launchConfigs)).toEqual([])
+        expect(type).toEqual('global')
+      })
+
+      it('should save shared config when a shared launch configuration is deleted', async () => {
+        const saved = new Promise<{
+          state?: ApplicationState
+          type: LegacyConfigType
+        }>((resolve) => {
+          const { backend, app } = runGoblinApp({
+            projectId: 'dummy-project',
+            configs: {
+              private: ['Backend Dev Environment'],
+              shared: ['Full Dev Environment', 'No Mocks'],
+            },
+            facade: {
+              saveConfig: async (state, type) => {
+                resolve({ state, type })
+              },
+            },
+          })
+
+          // Tab into config section
+          backend.performKeyPress('tab')
+          backend.performKeyPress('tab')
+
+          // Then - First shared config is selected
+          expect(app.focusedComponent!.model.label).toEqual(
+            'Full Dev Environment'
+          )
+
+          // When
+          backend.performKeyPress('delete')
+          // Then
+          expect(app.modals.length === 1)
+          expect(app.focusedComponent!.model.text).toEqual('Delete')
+
+          // When
+          backend.performKeyPress('enter')
+          expect(app.focusedComponent!.model.label).toEqual('No Mocks')
+        })
+
+        const { state, type } = await saved
+        expect(state).toBeDefined()
+        expect(Object.keys(state!.config.local.launchConfigs)).toEqual([
+          'No Mocks',
+        ])
+        expect(type).toEqual('local')
+      })
     })
 
-    it('should save shared config when a shared launch configuration is deleted', async () => {
-      const saved = new Promise<{
-        state?: ApplicationState
-        type: LegacyConfigType
-      }>((resolve) => {
-        const { backend, app } = runGoblinApp({
+    describe('Creating launch configurations', () => {
+      test('C-s should open a cancellable save dialog', async () => {
+        let saved = false
+        const { backend, app, state } = runGoblinApp({
           projectId: 'dummy-project',
-          configs: {
-            private: ['Backend Dev Environment'],
-            shared: ['Full Dev Environment', 'No Mocks'],
-          },
           facade: {
-            saveConfig: async (state, type) => {
-              resolve({ state, type })
+            saveConfig: async (_s, _t) => {
+              saved = true
             },
           },
         })
 
-        // Tab into config section
-        backend.performKeyPress('tab')
-        backend.performKeyPress('tab')
-
-        // Then - First shared config is selected
-        expect(app.focusedComponent!.model.label).toEqual(
-          'Full Dev Environment'
-        )
+        expect(app.modals.length).toEqual(0)
 
         // When
-        backend.performKeyPress('delete')
-        // Then
-        expect(app.modals.length === 1)
-        expect(app.focusedComponent!.model.text).toEqual('Delete')
+        backend.performKeyPress('C-s')
+        // Then - Save config dialog opens
+        expect(app.modals.length).toEqual(1)
+        expect(app.focusedComponent!.model).toEqual({ value: '' })
 
-        // When
+        // When - Tab to Cancel-button
+        backend.performKeyPress('tab')
+        expect(app.focusedComponent!.model.label).toEqual('Private')
+
+        backend.performKeyPress('tab')
+        expect(app.focusedComponent!.model.text).toEqual('Cancel')
+
+        // When - Press button
         backend.performKeyPress('enter')
-        expect(app.focusedComponent!.model.label).toEqual('No Mocks')
+        // THen - Modal has been closed
+        expect(app.modals.length).toEqual(0)
+
+        // Then - focused item is the first project component
+        expect(app.focusedComponent!.model.id).toEqual('backend-service')
+
+        // Then - No config save has been triggered
+        await wait(100)
+        expect(saved).toBe(false)
       })
 
-      const { state, type } = await saved
-      expect(state).toBeDefined()
-      expect(Object.keys(state!.config.local.launchConfigs)).toEqual([
-        'No Mocks',
-      ])
-      expect(type).toEqual('local')
+      it('Should save private config when a private launch configuration is created', async () => {
+        const saved = new Promise<{
+          state?: ApplicationState
+          type: LegacyConfigType
+        }>(async (resolve) => {
+          const { backend, app } = runGoblinApp({
+            projectId: 'dummy-project',
+            configs: {
+              private: ['Backend Dev Environment'],
+              shared: ['Full Dev Environment', 'No Mocks'],
+            },
+            facade: {
+              saveConfig: async (state, type) => {
+                resolve({ state, type })
+              },
+            },
+          })
+
+          expect(app.modals.length).toEqual(0)
+
+          // When
+          backend.performKeyPress('C-s')
+          // Then - Save config dialog opens
+          expect(app.modals.length).toEqual(1)
+          expect(app.focusedComponent!.model).toEqual({ value: '' })
+
+          // When - Type config name
+          backend.typeString('New Config')
+          await wait(100)
+          expect(app.focusedComponent!.model).toEqual({ value: 'New Config' })
+
+          // When - Tab to Save-button
+          backend.performKeyPress('tab')
+          expect(app.focusedComponent!.model.label).toEqual('Private')
+
+          backend.performKeyPress('tab')
+          expect(app.focusedComponent!.model.text).toEqual('Save')
+
+          // When - Press button
+          backend.performKeyPress('enter')
+          // THen - Modal has been closed
+          expect(app.modals.length).toEqual(0)
+
+          // Then - focused item is the first project component
+          expect(app.focusedComponent!.model.id).toEqual('backend-service')
+        })
+
+        const { state, type } = await saved
+
+        expect(type).toEqual('global')
+        expect(Object.keys(state!.config.global.launchConfigs)).toEqual([
+          'Backend Dev Environment',
+          'New Config',
+        ])
+      })
+
+      it('Should save shared config when a shared launch configuration is created', async () => {
+        const saved = new Promise<{
+          state?: ApplicationState
+          type: LegacyConfigType
+        }>(async (resolve) => {
+          const { backend, app } = runGoblinApp({
+            projectId: 'dummy-project',
+            configs: {
+              private: ['Backend Dev Environment'],
+              shared: ['Full Dev Environment', 'No Mocks'],
+            },
+            facade: {
+              saveConfig: async (state, type) => {
+                resolve({ state, type })
+              },
+            },
+          })
+
+          expect(app.modals.length).toEqual(0)
+
+          // When
+          backend.performKeyPress('C-s')
+          // Then - Save config dialog opens
+          expect(app.modals.length).toEqual(1)
+          expect(app.focusedComponent!.model).toEqual({ value: '' })
+
+          // When - Type config name
+          backend.typeString('Cheese Muffins')
+          await wait(100)
+          expect(app.focusedComponent!.model).toEqual({
+            value: 'Cheese Muffins',
+          })
+
+          // When - Tab to config type option
+          backend.performKeyPress('tab')
+          expect(app.focusedComponent!.model.label).toEqual('Private')
+
+          backend.performKeyPress('right')
+          expect(app.focusedComponent!.model.label).toEqual('Shared')
+
+          // When - Tab to Save-button
+          backend.performKeyPress('tab')
+          expect(app.focusedComponent!.model.text).toEqual('Save')
+
+          // When - Press button
+          backend.performKeyPress('enter')
+          // THen - Modal has been closed
+          expect(app.modals.length).toEqual(0)
+
+          // Then - focused item is the first project component
+          expect(app.focusedComponent!.model.id).toEqual('backend-service')
+        })
+
+        const { state, type } = await saved
+
+        expect(type).toEqual('local')
+        expect(Object.keys(state!.config.local.launchConfigs)).toEqual([
+          'Full Dev Environment',
+          'No Mocks',
+          'Cheese Muffins',
+        ])
+      })
     })
   })
 })

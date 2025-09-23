@@ -1,5 +1,5 @@
 import { Controller, CtrlCtorParams } from './controller'
-import { Event } from './event'
+import { Event, TextChangedEvent } from './event'
 import { Label, LabelItem } from './label'
 import { mergeLeft } from '@whimbrel/walk'
 import { Widget } from './widget'
@@ -53,6 +53,7 @@ export class TextField extends Controller<Widget, TextFieldModel> {
     )
 
     this.textInput.on('text-changed', (event: Event) => {
+      this.model.value = (event as TextChangedEvent).value
       this.emit(event)
     })
 
@@ -65,7 +66,6 @@ export class TextField extends Controller<Widget, TextFieldModel> {
 }
 
 export class TextInput extends Controller<Widget, { value: string }> {
-  private buffer = ''
   private prevRenderBuffer = ''
   private cursor = 0
 
@@ -91,7 +91,7 @@ export class TextInput extends Controller<Widget, { value: string }> {
     end: {
       handler: this.moveEnd.bind(this),
     },
-    '/[a-zA-Z0-9]/': {
+    '/[a-zA-Z0-9 ]/': {
       handler: this.insertChar.bind(this),
       group: 'edit',
       legend: 'Insert',
@@ -119,7 +119,7 @@ export class TextInput extends Controller<Widget, { value: string }> {
       model ?? { value: '' }
     )
     this.setParent(parent)
-    this.buffer = this.model.value || ''
+    this.model.value ??= ''
     this.inheritKeyMap(keyMap)
 
     this.widget.onBeforeRender(this.render.bind(this))
@@ -131,7 +131,7 @@ export class TextInput extends Controller<Widget, { value: string }> {
   }
 
   moveEnd() {
-    this.cursor = this.buffer.length
+    this.cursor = this.model.value.length
     this.emit('dirty')
   }
 
@@ -140,59 +140,63 @@ export class TextInput extends Controller<Widget, { value: string }> {
     this.emit('dirty')
   }
   moveRight() {
-    this.cursor = Math.min(this.buffer.length, this.cursor + 1)
+    this.cursor = Math.min(this.model.value.length, this.cursor + 1)
     this.emit('dirty')
   }
   submit() {
-    //    this.emit({ type: 'submit', value: this.buffer })
+    //    this.emit({ type: 'submit', value: this.model.value })
   }
   killBackwards() {
     if (this.cursor > 0) {
-      this.buffer =
-        this.buffer.slice(0, this.cursor - 1) + this.buffer.slice(this.cursor)
+      this.model.value =
+        this.model.value.slice(0, this.cursor - 1) +
+        this.model.value.slice(this.cursor)
       this.cursor--
     }
     this.emit('dirty')
   }
   killForwards() {
-    if (this.cursor < this.buffer.length) {
-      this.buffer =
-        this.buffer.slice(0, this.cursor) + this.buffer.slice(this.cursor + 1)
+    if (this.cursor < this.model.value.length) {
+      this.model.value =
+        this.model.value.slice(0, this.cursor) +
+        this.model.value.slice(this.cursor + 1)
     }
     this.emit('dirty')
   }
   insertChar(ch: string, _key: any) {
     if (ch && ch.length === 1) {
-      this.buffer =
-        this.buffer.slice(0, this.cursor) + ch + this.buffer.slice(this.cursor)
+      this.model.value =
+        this.model.value.slice(0, this.cursor) +
+        ch +
+        this.model.value.slice(this.cursor)
       this.cursor++
     }
     this.emit('dirty')
   }
 
   private render() {
-    if (!this.buffer) this.buffer = ''
+    if (!this.model.value) this.model.value = ''
     if (this.isFocused()) {
-      const before = this.buffer.slice(0, this.cursor)
-      const atCursor = this.buffer[this.cursor] || ' '
-      const after = this.buffer.slice(this.cursor + 1)
+      const before = this.model.value.slice(0, this.cursor)
+      const atCursor = this.model.value[this.cursor] || ' '
+      const after = this.model.value.slice(this.cursor + 1)
       this.widget.set(
         'text',
         before + '{inverse}' + atCursor + '{/inverse}' + after
       )
     } else {
-      this.widget.set('text', this.buffer)
+      this.widget.set('text', this.model.value)
     }
-    if (this.prevRenderBuffer !== this.buffer) {
+    if (this.prevRenderBuffer !== this.model.value) {
       this.emit({
         type: 'text-changed',
-        value: this.buffer,
+        value: this.model.value,
       })
     }
-    this.prevRenderBuffer = this.buffer
+    this.prevRenderBuffer = this.model.value
   }
 
   getText() {
-    return this.buffer
+    return this.model.value
   }
 }
