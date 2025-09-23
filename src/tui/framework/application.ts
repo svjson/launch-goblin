@@ -118,7 +118,12 @@ export class Application<Model, MainCtrl extends ApplicationController<Model>> {
     dialog.on('*', (event: Event) => {
       if (event.type === 'destroyed') {
         this.modals = this.modals.filter((m) => m !== dialog)
-        action.details.source.focus()
+        const { source } = action.details
+        if (source.isFocusable()) {
+          action.details.source.focus()
+        } else {
+          this.mainCtrl.focus()
+        }
         this.backend.render()
       }
       action.details.source.receive(event)

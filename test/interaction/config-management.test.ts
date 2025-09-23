@@ -1,5 +1,6 @@
 import { LegacyConfigType } from '@src/config'
 import { ApplicationState } from '@src/project'
+import { LaunchGoblinApp } from '@src/tui'
 import { runGoblinApp, wait } from 'test/fixtures'
 import { describe, expect, test, it } from 'vitest'
 
@@ -136,6 +137,52 @@ describe('Interaction', () => {
         ])
         expect(type).toEqual('local')
       })
+
+      it('should return focus to component section when the last launch config is deleted', async () => {
+        let goblinApp: LaunchGoblinApp
+        const saved = new Promise<{
+          state?: ApplicationState
+          type: LegacyConfigType
+        }>((resolve) => {
+          const { backend, app } = runGoblinApp({
+            projectId: 'dummy-project',
+            configs: {
+              private: ['Backend Dev Environment'],
+            },
+            facade: {
+              saveConfig: async (state, type) => {
+                resolve({ state, type })
+              },
+            },
+          })
+          goblinApp = app
+
+          // Tab into config section
+          backend.performKeyPress('tab')
+          backend.performKeyPress('tab')
+
+          // Then - The one and only config is selected
+          expect(app.focusedComponent!.model.label).toEqual(
+            'Backend Dev Environment'
+          )
+
+          // When
+          backend.performKeyPress('delete')
+          // Then
+          expect(app.modals.length === 1)
+          expect(app.focusedComponent!.model.text).toEqual('Delete')
+
+          // When
+          backend.performKeyPress('enter')
+          expect(app.focusedComponent!.model.label).toEqual('No Mocks')
+        })
+
+        const { state } = await saved
+        expect(Object.keys(state!.config.local.launchConfigs)).toEqual([])
+        expect(Object.keys(state!.config.global.launchConfigs)).toEqual([])
+
+        expect(goblinApp!.focusedComponent!.model.id).toEqual('backend-service')
+      })
     })
 
     describe('Creating launch configurations', () => {
@@ -176,6 +223,9 @@ describe('Interaction', () => {
         // Then - No config save has been triggered
         await wait(100)
         expect(saved).toBe(false)
+
+        expect(Object.keys(state!.config.local.launchConfigs)).toEqual([])
+        expect(Object.keys(state!.config.global.launchConfigs)).toEqual([])
       })
 
       it('Should save private config when a private launch configuration is created', async () => {
