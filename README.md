@@ -89,6 +89,11 @@ or inform the project setup, and this will be enabled as the project matures.
 
 ## Version History
 
+### 0.1.2 - Stability - 2025-09-23
+
+- Fixed crash when attempting to delete a launch configuration.
+- Fixed crash when deleting the last launch configuration kept focus on destroyed UI component
+
 ### 0.1.1 - Windows support & Color Theme adjustment - 2025-09-20
 
 - Proper/better resolution of executables
