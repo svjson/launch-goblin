@@ -1,13 +1,13 @@
 
 # Launch Goblin
 
+> A terminal-based launcher for multimodule projects.  
+> Granular control over what you start, how you start it, and when.
+
 [![npm version](https://img.shields.io/npm/v/launch-goblin.svg)](https://www.npmjs.com/package/launch-goblin)
 [![GitHub](https://img.shields.io/badge/GitHub-svjson%2Flaunch--goblin-blue?logo=github)](https://github.com/svjson/launch-goblin)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Node](https://img.shields.io/node/v/launch-goblin)](https://www.npmjs.com/package/launch-goblin)
-
-> A terminal-based launcher for multimodule projects.  
-> Granular control over what you start, how you start it, and when.
 
 Launch Goblin is a TUI (text-based user interface) tool for developers working in monorepos or other multi-service environments.  
 Instead of juggling `turbo run` and `pnpm dev` with endless `--filter` sequences, shell scripts, or custom launchers, you get a single interface where you can:
