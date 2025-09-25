@@ -1,9 +1,9 @@
 import { LaunchConfig } from '@src/config'
-import { ApplicationState, Project } from '@src/project'
+import { ApplicationState, ProjectComponent, ProjectParams } from '@src/project'
 import { LaunchGoblinApp } from '@src/tui'
 import { WhimbrelContext } from '@whimbrel/core'
 import { PackageJSON } from '@whimbrel/package-json'
-import { mergeLeft } from '@whimbrel/walk'
+import { makeProject } from '@src/project'
 import { applicationEnvironment } from './tui/framework/fixtures'
 import { ApplicationEnvironment, HeadlessBackend } from '@src/tui/framework'
 import { ActionFacade } from '@src/tui/goblin-app'
@@ -11,7 +11,7 @@ import { ActionFacade } from '@src/tui/goblin-app'
 export type TestProjectId = 'dummy-project'
 
 export interface TestProject {
-  project: Project
+  project: ProjectParams
   configs: {
     local: {
       launchConfigs: Record<string, LaunchConfig>
@@ -48,7 +48,13 @@ const TEST_PROJECTS: Record<TestProjectId, TestProject> = {
     project: {
       id: 'dummy-project',
       root: '/tmp/somewhere',
-      ctx: {} as WhimbrelContext,
+      ctx: {
+        getActor(_param: any) {
+          return {
+            root: '/tmp/somewhere',
+          }
+        },
+      } as WhimbrelContext,
       launchers: [
         {
           id: 'pnpm',
@@ -68,7 +74,7 @@ const TEST_PROJECTS: Record<TestProjectId, TestProject> = {
         {
           id: 'backend-service',
           name: 'backend-service',
-          package: 'backend-service',
+          package: '@acme-platform/backend-service',
           root: '/tmp/somewhere/packages/backend-service',
           pkgJson: new PackageJSON({ content: '{}' }),
           selected: true,
@@ -76,7 +82,7 @@ const TEST_PROJECTS: Record<TestProjectId, TestProject> = {
         {
           id: 'frontend-portal',
           name: 'frontend-portal',
-          package: 'frontend-portal',
+          package: '@acme-platform/frontend-portal',
           root: '/tmp/somewhere/packages/frontend-portal',
           pkgJson: new PackageJSON({ content: '{}' }),
           selected: true,
@@ -84,7 +90,7 @@ const TEST_PROJECTS: Record<TestProjectId, TestProject> = {
         {
           id: 'mock-provider-a',
           name: 'mock-provider-a',
-          package: 'mock-provider-a',
+          package: '@acme-platform/mock-provider-a',
           root: '/tmp/somewhere/packages/mock-provider-a',
           pkgJson: new PackageJSON({ content: '{}' }),
           selected: true,
@@ -92,13 +98,13 @@ const TEST_PROJECTS: Record<TestProjectId, TestProject> = {
         {
           id: 'mock-provider-b',
           name: 'mock-provider-b',
-          package: 'mock-provider-b',
+          package: '@acme-platform/mock-provider-b',
           root: '/tmp/somewhere/packages/mock-provider-b',
           pkgJson: new PackageJSON({ content: '{}' }),
           selected: true,
         },
-      ],
-    },
+      ] as ProjectComponent[],
+    } as ProjectParams,
     configs: {
       local: {
         launchConfigs: {},
@@ -133,7 +139,7 @@ export const makeAppState = (
 ): ApplicationState => {
   const testProject = TEST_PROJECTS[projectId]
   const state: ApplicationState = {
-    project: mergeLeft({}, testProject.project),
+    project: makeProject(testProject.project),
     config: {
       local: {
         launchConfigs: {},

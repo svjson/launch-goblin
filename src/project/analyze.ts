@@ -10,9 +10,9 @@ import NpmFacet from '@whimbrel/npm'
 import TurborepoFacet from '@whimbrel/turborepo'
 import PackageJsonFacet, { PackageJSON } from '@whimbrel/package-json'
 import { DefaultFacetRegistry } from '@whimbrel/facet'
-import { Project, ProjectComponent } from './types'
+import { ProjectComponent, ProjectParams } from './types'
 
-export const analyze = async (dir: string): Promise<Project> => {
+export const analyze = async (dir: string): Promise<ProjectParams> => {
   const ctx = await makeWhimbrelContext({
     facets: new DefaultFacetRegistry([
       ActorFacet,

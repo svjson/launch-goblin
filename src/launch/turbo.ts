@@ -2,7 +2,6 @@ import path from 'node:path'
 
 import { Project, ProjectComponent } from '@src/project'
 import { Launcher } from './types'
-import { actorFacetScope } from '@whimbrel/core'
 import { LGOptions } from '@src/tui/goblin-app'
 import { ApplicationEnvironment } from '@src/tui/framework'
 
@@ -11,17 +10,15 @@ export const turboLauncher = (
   launchAction: string,
   components: ProjectComponent[]
 ): Launcher => {
-  const cliRunner = actorFacetScope(
-    project.ctx.getActor({ root: project.root })!,
-    'pnpm'
-  )
-    ? 'npx'
-    : 'npx'
+  const cliRunner = project.hasRootFacet('pnpm') ? 'pnpx' : 'npx'
 
   return {
     id: 'turbo',
     components: components.map((c) => c.id),
-    launchCommand: (env: ApplicationEnvironment, components: ProjectComponent[]) => ({
+    launchCommand: (
+      _env: ApplicationEnvironment,
+      components: ProjectComponent[]
+    ) => ({
       bin: cliRunner,
       args: [
         'turbo',
@@ -39,12 +36,10 @@ export const identifyTurboLaunchOptions = async (
   options: LGOptions
 ): Promise<Launcher[]> => {
   if (options.verbose) console.log('Evaluating turborepo...')
-  const root = project.ctx.getActor({ root: project.root })
-  const turboScope = actorFacetScope(root!, 'turborepo')
 
-  if (turboScope) {
+  if (project.hasRootFacet('turborepo')) {
     if (options.verbose) console.log(' - turborepo is present')
-    const turboJsonPath = path.join(root!.root, 'turbo.json')
+    const turboJsonPath = path.join(project.projectRoot(), 'turbo.json')
     if (await project.ctx.disk.exists(turboJsonPath)) {
       if (options.verbose) console.log(' - turbo.json is present')
       const turboJson = await project.ctx.disk.readJson(turboJsonPath)

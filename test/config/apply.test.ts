@@ -52,7 +52,7 @@ describe('applyConfig', () => {
       ],
       root: '/tmp/somewhere',
       components: selectedComponents,
-    }
+    } as unknown as Project
   }
 
   it('should select all components if the launchConfig is empty (no previous launch)', () => {

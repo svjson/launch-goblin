@@ -6,12 +6,18 @@ import { PackageJSON } from '@whimbrel/package-json'
  * Describes the structure, shape and identified launch options of a target
  * project.
  */
-export interface Project {
+export interface ProjectParams {
   id: string
   root: string
   ctx: WhimbrelContext
   launchers: Launcher[]
   components: ProjectComponent[]
+}
+
+export interface Project extends ProjectParams {
+  hasRootFacet(facetId: string): boolean
+  packageManager(): string | undefined
+  projectRoot(): string
 }
 
 /**
