@@ -17,7 +17,7 @@ export const applyConfig = (
   session: LaunchSession
 ): LaunchSession => {
   session.components = project.components.map((cmp) => {
-    const { selected } = launchConfig.components[cmp.id] ?? {
+    const { selected, targets } = launchConfig.components[cmp.id] ?? {
       selected: false,
       targets: [],
     }
@@ -25,7 +25,10 @@ export const applyConfig = (
       component: cmp,
       state: {
         selected,
-        targets: cmp.targets.filter((t) => t === launchConfig.defaultTarget),
+        targets:
+          !targets || (Array.isArray(targets) && targets.length === 0)
+            ? cmp.targets.filter((t) => t === launchConfig.defaultTarget)
+            : targets,
       },
     }
   })
@@ -44,8 +47,7 @@ export const toLaunchConfigComponents = (
   return components.reduce(
     (launch, cmp) => {
       launch[cmp.component.id] = {
-        selected: cmp.state.selected,
-        targets: [],
+        ...cmp.state,
       }
       return launch
     },
