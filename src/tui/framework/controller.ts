@@ -531,6 +531,14 @@ export abstract class Controller<
     return !this.enabled
   }
 
+  hide(): void {
+    this.set('hidden', String(true))
+  }
+
+  show(): void {
+    this.set('hidden', String(false))
+  }
+
   focus() {
     let focusedChild: Controller | undefined = this.children[this.focusedIndex]
     if (focusedChild) {

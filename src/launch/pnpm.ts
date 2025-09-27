@@ -12,6 +12,10 @@ export const pnpmLauncher = (
   return {
     id: 'pnpm',
     components: components.map((c) => c.id),
+    features: {
+      componentTargets: 'multi',
+      launcherTargets: 'multi',
+    },
     launchCommand: (
       _env: ApplicationEnvironment,
       components: SessionComponent[]

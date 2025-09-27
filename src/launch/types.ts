@@ -8,10 +8,16 @@ export type MakeLaunchCommand = (
   components: SessionComponent[]
 ) => LaunchCommand
 
+export interface LauncherFeatures {
+  componentTargets: 'single' | 'multi'
+  launcherTargets: 'single' | 'multi'
+}
+
 export interface Launcher {
   id: LauncherId
   launchCommand: MakeLaunchCommand
   components: string[]
+  features: LauncherFeatures
 }
 
 export interface LaunchCommand {

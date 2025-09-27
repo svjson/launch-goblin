@@ -7,7 +7,7 @@ import {
 } from './framework'
 import { mergeLeft } from '@whimbrel/walk'
 import { juxt } from '@whimbrel/array'
-import { ApplicationState } from '@src/project'
+import { ApplicationState, Project } from '@src/project'
 import { CheckboxItem } from './framework/checkbox'
 import { Widget } from './framework/widget'
 import { resolveComponentStyle } from './framework/theme'
@@ -85,6 +85,9 @@ export class ComponentSection extends Controller<
         component: ComponentItem,
         model: {
           component: c as SessionComponent,
+          targetSelectable:
+            this.store.get<Project>('project').launchers[0].features
+              .componentTargets === 'multi',
           index: i,
         } as ComponentItemModel,
         style: {
@@ -124,6 +127,7 @@ export class ComponentSection extends Controller<
 
 export type ComponentItemModel = {
   component: SessionComponent
+  targetSelectable: boolean
   index: number
 }
 
@@ -145,18 +149,22 @@ class ComponentItem extends Controller<
       propagate: true,
       handler: () => (this.children[0] as Checkbox).toggle(),
     },
-    left: {
-      legend: 'Cycle target',
-      group: 'focused',
-      propagate: true,
-      handler: () => this.cycleTarget(-1),
-    },
-    right: {
-      legend: 'Cycle target',
-      group: 'focused',
-      propagate: true,
-      handler: this.cycleTarget,
-    },
+    ...(this.model.targetSelectable
+      ? {
+          left: {
+            legend: 'Cycle target',
+            group: 'focused',
+            propagate: true,
+            handler: () => this.cycleTarget(-1),
+          },
+          right: {
+            legend: 'Cycle target',
+            group: 'focused',
+            propagate: true,
+            handler: this.cycleTarget,
+          },
+        }
+      : {}),
   })
 
   components = this.defineComponents({
@@ -208,6 +216,10 @@ class ComponentItem extends Controller<
       model
     )
     this.inheritKeyMap(keyMap)
+
+    if (!this.model.targetSelectable) {
+      this.components.target.hide()
+    }
   }
 
   onChecked(event: CheckboxEvent) {
@@ -215,6 +227,8 @@ class ComponentItem extends Controller<
   }
 
   cycleTarget(amount: number = 1) {
+    if (!this.model.targetSelectable) return
+
     const currentIndex = this.model.component.component.targets.indexOf(
       this.model.component.state.targets[0]
     )

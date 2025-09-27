@@ -67,6 +67,10 @@ const accessors: Record<
     get: (lmnt) => lmnt.style?.focus?.fg,
     set: (lmnt, value: string | number) => (lmnt.style.focus.fg = value),
   },
+  hidden: {
+    get: (lmnt) => lmnt.hidden,
+    set: (lmnt, value) => (lmnt.hidden = Boolean(value)),
+  },
   width: {
     get: (lmnt) => lmnt.width,
     set: (lmnt, value) => (lmnt.width = value),

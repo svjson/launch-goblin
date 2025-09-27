@@ -12,6 +12,7 @@ export type LayoutProperty =
   | 'left'
   | 'right'
   | 'focusable'
+  | 'hidden'
   | 'bg'
   | 'fg'
   | 'focused:fg'

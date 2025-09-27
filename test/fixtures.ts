@@ -64,6 +64,10 @@ const TEST_PROJECTS: Record<TestProjectId, TestProject> = {
       launchers: [
         {
           id: 'pnpm',
+          features: {
+            componentTargets: 'multi',
+            launcherTargets: 'multi',
+          },
           components: [
             'backend-service',
             'frontend-portal',

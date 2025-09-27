@@ -16,6 +16,10 @@ export const turboLauncher = (
   return {
     id: 'turbo',
     components: components.map((c) => c.id),
+    features: {
+      componentTargets: 'single',
+      launcherTargets: 'single',
+    },
     launchCommand: (
       _env: ApplicationEnvironment,
       components: SessionComponent[]
