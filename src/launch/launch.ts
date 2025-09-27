@@ -2,7 +2,7 @@ import { spawn, ChildProcess } from 'child_process'
 
 import which from 'which'
 
-import { LaunchCommand } from './types'
+import { LaunchCommand, LaunchProcess } from './types'
 import { ApplicationEnvironment } from '@src/tui/framework'
 
 /**
@@ -12,6 +12,8 @@ import { ApplicationEnvironment } from '@src/tui/framework'
  * stdin.
  */
 let launched = false
+
+const children: ChildProcess[] = []
 
 /**
  * Resolve an executable across platforms.
@@ -61,13 +63,27 @@ export const launch = async (
   if (launched) return
   launched = true
 
-  const { bin, args } = cmd
-  const executable = await findExecutable(env, bin)
+  for (const group of cmd.groups) {
+    for (const proc of group.processes) {
+      const { bin, args } = proc
+      const executable = await findExecutable(env, bin)
 
-  if (process.platform === 'win32') {
-    await launchDetached(env, { bin: executable, args })
-  } else {
-    await launchProxied(env, { bin: executable, args })
+      if (process.platform === 'win32') {
+        await launchDetached(env, { bin: executable, args })
+      } else {
+        await launchProxied(env, { bin: executable, args })
+      }
+    }
+  }
+}
+
+const TERM_SIGNALS: NodeJS.Signals[] = ['SIGINT', 'SIGTERM']
+
+const killChildProcesses = (sig: NodeJS.Signals) => {
+  for (const child of children) {
+    try {
+      child.kill(sig)
+    } catch {}
   }
 }
 
@@ -75,17 +91,26 @@ export const launch = async (
  * Bind listeners to child process and dispose of Launch
  * Goblin after the launched child dies.
  */
-const bindSig = (child: ChildProcess) => {
-  process.on('SIGINT', () => {
-    child.kill('SIGINT')
-  })
-
-  process.on('SIGTERM', () => {
-    child.kill('SIGINT')
+const bindSig = (child: ChildProcess, cmd: LaunchProcess) => {
+  // always forward signals
+  TERM_SIGNALS.forEach((sig) => {
+    process.on(sig, () => {
+      killChildProcesses(sig)
+      process.exit(0)
+    })
   })
 
   child.on('exit', () => {
-    process.exit(0)
+    const idx = children.indexOf(child)
+    if (idx !== -1) children.splice(idx, 1)
+
+    if (cmd.critical) {
+      killChildProcesses('SIGTERM')
+    }
+
+    if (children.length) {
+      process.exit(0)
+    }
   })
 }
 
@@ -103,7 +128,7 @@ const bindSig = (child: ChildProcess) => {
  */
 const launchDetached = async (
   _env: ApplicationEnvironment,
-  cmd: LaunchCommand
+  cmd: LaunchProcess
 ) => {
   const { bin, args } = cmd
 
@@ -113,7 +138,7 @@ const launchDetached = async (
     windowsHide: false,
   })
 
-  bindSig(child)
+  bindSig(child, cmd)
 }
 
 /**
@@ -125,7 +150,7 @@ const launchDetached = async (
  */
 const launchProxied = async (
   _env: ApplicationEnvironment,
-  cmd: LaunchCommand
+  cmd: LaunchProcess
 ) => {
   const { bin, args } = cmd
 
@@ -133,5 +158,5 @@ const launchProxied = async (
     stdio: 'inherit',
   })
 
-  bindSig(child)
+  bindSig(child, cmd)
 }

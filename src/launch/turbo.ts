@@ -20,12 +20,22 @@ export const turboLauncher = (
       _env: ApplicationEnvironment,
       components: SessionComponent[]
     ) => ({
-      bin: cliRunner,
-      args: [
-        'turbo',
-        'run',
-        launchAction,
-        ...components.flatMap((c) => ['--filter', c.component.package]),
+      groups: [
+        {
+          mode: 'parallel',
+          processes: [
+            {
+              bin: cliRunner,
+              args: [
+                'turbo',
+                'run',
+                launchAction,
+                ...components.flatMap((c) => ['--filter', c.component.package]),
+              ],
+              critical: true,
+            },
+          ],
+        },
       ],
     }),
   }

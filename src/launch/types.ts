@@ -15,6 +15,16 @@ export interface Launcher {
 }
 
 export interface LaunchCommand {
+  groups: LaunchGroup[]
+}
+
+export interface LaunchGroup {
+  mode: 'parallel' | 'sequential'
+  processes: LaunchProcess[]
+}
+
+export interface LaunchProcess {
   bin: string
   args: string[]
+  critical?: boolean
 }

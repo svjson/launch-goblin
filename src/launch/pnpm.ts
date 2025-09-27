@@ -15,17 +15,34 @@ export const pnpmLauncher = (
     launchCommand: (
       _env: ApplicationEnvironment,
       components: SessionComponent[]
-    ) => ({
-      bin: 'pnpm',
-      args: [
-        '-r',
-        '--parallel',
-        '--stream',
-        ...components.flatMap((c) => ['--filter', c.component.package]),
-        'run',
-        launchAction,
-      ],
-    }),
+    ) => {
+      const groups: Record<string, SessionComponent[]> = {}
+      components.forEach((c) => {
+        c.state.targets.forEach((t) => {
+          ;(groups[t] ??= []).push(c)
+        })
+      })
+
+      return {
+        groups: [
+          {
+            mode: 'parallel',
+            processes: Object.entries(groups).map(([action, cmps]) => ({
+              bin: 'pnpm',
+              args: [
+                '-r',
+                '--parallel',
+                '--stream',
+                ...cmps.flatMap((c) => ['--filter', c.component.package]),
+                'run',
+                action,
+              ],
+              critical: false,
+            })),
+          },
+        ],
+      }
+    },
   }
 }
 

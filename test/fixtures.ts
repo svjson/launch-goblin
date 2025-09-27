@@ -71,8 +71,17 @@ const TEST_PROJECTS: Record<TestProjectId, TestProject> = {
             'mock-provider-b',
           ],
           launchCommand: (_env, _components) => ({
-            bin: 'pnpm',
-            args: [],
+            groups: [
+              {
+                mode: 'parallel',
+                processes: [
+                  {
+                    bin: 'pnpm',
+                    args: [],
+                  },
+                ],
+              },
+            ],
           }),
         },
       ],
@@ -84,7 +93,7 @@ const TEST_PROJECTS: Record<TestProjectId, TestProject> = {
           package: '@acme-platform/backend-service',
           root: '/tmp/somewhere/packages/backend-service',
           pkgJson: new PackageJSON({ content: '{}' }),
-          targets: ['dev'],
+          targets: ['dev', 'dev:local'],
         } satisfies NodePackage,
         {
           id: 'frontend-portal',

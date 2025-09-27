@@ -44,21 +44,87 @@ describe('pnpmLauncher', () => {
 
       // Then
       expect(command).toEqual({
-        bin: 'pnpm',
-        args: [
-          '-r',
-          '--parallel',
-          '--stream',
-          '--filter',
-          '@acme-platform/backend-service',
-          '--filter',
-          '@acme-platform/frontend-portal',
-          '--filter',
-          '@acme-platform/mock-provider-a',
-          '--filter',
-          '@acme-platform/mock-provider-b',
-          'run',
-          'dev',
+        groups: [
+          {
+            mode: 'parallel',
+            processes: [
+              {
+                bin: 'pnpm',
+                args: [
+                  '-r',
+                  '--parallel',
+                  '--stream',
+                  '--filter',
+                  '@acme-platform/backend-service',
+                  '--filter',
+                  '@acme-platform/frontend-portal',
+                  '--filter',
+                  '@acme-platform/mock-provider-a',
+                  '--filter',
+                  '@acme-platform/mock-provider-b',
+                  'run',
+                  'dev',
+                ],
+                critical: false,
+              },
+            ],
+          },
+        ],
+      })
+    })
+
+    it('should construct a pnpm command with two process when one component uses a different target', () => {
+      // Given
+      const env = applicationEnvironment()
+      const state = makeAppState('dummy-project')
+      const launcher = pnpmLauncher(
+        state.project,
+        'dev',
+        state.project.components
+      )
+      state.session.components[0].state.targets = ['dev:local']
+
+      // When
+      const command = launcher.launchCommand(env, state.session.components)
+
+      // Then
+      expect(command).toEqual({
+        groups: [
+          {
+            mode: 'parallel',
+            processes: [
+              {
+                bin: 'pnpm',
+                args: [
+                  '-r',
+                  '--parallel',
+                  '--stream',
+                  '--filter',
+                  '@acme-platform/backend-service',
+                  'run',
+                  'dev:local',
+                ],
+                critical: false,
+              },
+              {
+                bin: 'pnpm',
+                args: [
+                  '-r',
+                  '--parallel',
+                  '--stream',
+                  '--filter',
+                  '@acme-platform/frontend-portal',
+                  '--filter',
+                  '@acme-platform/mock-provider-a',
+                  '--filter',
+                  '@acme-platform/mock-provider-b',
+                  'run',
+                  'dev',
+                ],
+                critical: false,
+              },
+            ],
+          },
         ],
       })
     })
