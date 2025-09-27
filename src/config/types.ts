@@ -20,10 +20,12 @@ export type ConfigType = 'private' | 'shared'
 export type LegacyConfigType = 'global' | 'local'
 
 export interface ComponentLaunchConfig {
-  selected?: boolean
+  selected: boolean
+  targets: string[]
 }
 
 export interface LaunchConfig {
+  defaultTarget: string
   components: Record<string, ComponentLaunchConfig>
 }
 

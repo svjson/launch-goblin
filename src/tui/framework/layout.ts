@@ -11,6 +11,7 @@ export type LayoutProperty =
   | 'bottom'
   | 'left'
   | 'right'
+  | 'focusable'
   | 'bg'
   | 'fg'
   | 'focused:fg'

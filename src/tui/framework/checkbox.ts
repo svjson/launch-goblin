@@ -44,6 +44,7 @@ export class Checkbox<I extends CheckboxItem = CheckboxItem> extends Controller<
             padding: { left: 1 },
             mouse: true,
             keys: true,
+            focusable: true,
           },
           resolveComponentStyle(env.theme, 'CheckBox', env.tty.colorMode),
           options

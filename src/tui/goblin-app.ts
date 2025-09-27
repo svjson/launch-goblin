@@ -84,7 +84,7 @@ export class LaunchGoblinApp extends Application<
         createAction.details.name,
       ],
       {
-        components: toLaunchConfigComponents(this.model.project.components),
+        components: toLaunchConfigComponents(this.model.session.components),
       }
     )
 

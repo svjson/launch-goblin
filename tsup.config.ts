@@ -1,5 +1,4 @@
 import { defineConfig } from 'tsup'
-import { builtinModules } from 'module'
 import pkg from './package.json'
 
 export default defineConfig({

@@ -1,11 +1,11 @@
-import { ProjectComponent } from '@src/project'
+import { SessionComponent } from '@src/project/state'
 import { ApplicationEnvironment } from '@src/tui/framework'
 
 export type LauncherId = 'turbo' | 'pnpm'
 
 export type MakeLaunchCommand = (
   env: ApplicationEnvironment,
-  components: ProjectComponent[]
+  components: SessionComponent[]
 ) => LaunchCommand
 
 export interface Launcher {

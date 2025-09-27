@@ -1,5 +1,10 @@
-import { LaunchConfig } from '@src/config'
-import { ApplicationState, ProjectComponent, ProjectParams } from '@src/project'
+import { applyConfig, LaunchConfig } from '@src/config'
+import {
+  ApplicationState,
+  NodePackage,
+  ProjectComponent,
+  ProjectParams,
+} from '@src/project'
 import { LaunchGoblinApp } from '@src/tui'
 import { WhimbrelContext } from '@whimbrel/core'
 import { PackageJSON } from '@whimbrel/package-json'
@@ -7,6 +12,7 @@ import { makeProject } from '@src/project'
 import { applicationEnvironment } from './tui/framework/fixtures'
 import { ApplicationEnvironment, HeadlessBackend } from '@src/tui/framework'
 import { ActionFacade } from '@src/tui/goblin-app'
+import { goblinAppAdapter, GoblinAppAdapter } from './goblin-app-adapter'
 
 export type TestProjectId = 'dummy-project'
 
@@ -73,36 +79,40 @@ const TEST_PROJECTS: Record<TestProjectId, TestProject> = {
       components: [
         {
           id: 'backend-service',
+          type: 'pkgjson-script',
           name: 'backend-service',
           package: '@acme-platform/backend-service',
           root: '/tmp/somewhere/packages/backend-service',
           pkgJson: new PackageJSON({ content: '{}' }),
-          selected: true,
-        },
+          targets: ['dev'],
+        } satisfies NodePackage,
         {
           id: 'frontend-portal',
+          type: 'pkgjson-script',
           name: 'frontend-portal',
           package: '@acme-platform/frontend-portal',
           root: '/tmp/somewhere/packages/frontend-portal',
           pkgJson: new PackageJSON({ content: '{}' }),
-          selected: true,
-        },
+          targets: ['dev'],
+        } satisfies NodePackage,
         {
           id: 'mock-provider-a',
+          type: 'pkgjson-script',
           name: 'mock-provider-a',
           package: '@acme-platform/mock-provider-a',
           root: '/tmp/somewhere/packages/mock-provider-a',
           pkgJson: new PackageJSON({ content: '{}' }),
-          selected: true,
-        },
+          targets: ['dev'],
+        } satisfies NodePackage,
         {
           id: 'mock-provider-b',
+          type: 'pkgjson-script',
           name: 'mock-provider-b',
           package: '@acme-platform/mock-provider-b',
           root: '/tmp/somewhere/packages/mock-provider-b',
           pkgJson: new PackageJSON({ content: '{}' }),
-          selected: true,
-        },
+          targets: ['dev'],
+        } satisfies NodePackage,
       ] as ProjectComponent[],
     } as ProjectParams,
     configs: {
@@ -124,6 +134,7 @@ const constructLaunchConfig = (
     (cfg, cmp) => {
       cfg.components[cmp.id] = {
         selected: activeComponents.includes(cmp.id),
+        targets: [],
       }
       return cfg
     },
@@ -148,10 +159,12 @@ export const makeAppState = (
       global: {
         launchConfigs: {},
         lastConfig: {
+          defaultTarget: 'dev',
           components: {},
         },
       },
     },
+    session: { components: [], target: 'dev' },
   }
 
   for (const configId of configs.private ?? []) {
@@ -176,6 +189,12 @@ export const makeAppState = (
     )
   }
 
+  state.session = applyConfig(
+    { defaultTarget: 'dev', components: {} },
+    state.project,
+    state.session
+  )
+
   return state
 }
 
@@ -189,6 +208,7 @@ export const runGoblinApp = ({
   facade?: Partial<ActionFacade>
 }): {
   app: LaunchGoblinApp
+  adapter: GoblinAppAdapter
   env: ApplicationEnvironment
   backend: HeadlessBackend
   state: ApplicationState
@@ -205,5 +225,11 @@ export const runGoblinApp = ({
   const app = new LaunchGoblinApp(env, state, concreteFacade)
 
   env.backend.render()
-  return { env, app, state, backend: env.backend as HeadlessBackend }
+  return {
+    env,
+    app,
+    adapter: goblinAppAdapter(app, env.backend as HeadlessBackend),
+    state,
+    backend: env.backend as HeadlessBackend,
+  }
 }

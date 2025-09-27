@@ -62,6 +62,11 @@ export class HeadlessWidget<O extends WidgetOptions = WidgetOptions>
     })
     ;(this.parent as HeadlessWidget)?.removeChild(this)
   }
+  isFocusable(): boolean {
+    return typeof this.widgetOptions.focusable === 'boolean'
+      ? this.widgetOptions.focusable
+      : false
+  }
   isFocused(): boolean {
     return this.backend.focused === this
   }
@@ -75,7 +80,11 @@ export class HeadlessWidget<O extends WidgetOptions = WidgetOptions>
     throw new Error('HeadlessWidget::getAppearance() - Method not implemented.')
   }
 
-  set(prop: string, value: string | number | undefined): void {}
+  set(prop: string, value: string | number | undefined): void {
+    if (prop === 'focusable') {
+      this.widgetOptions.focusable = Boolean(value)
+    }
+  }
   get(prop: string): string | number | undefined {
     return (this.widgetOptions as any).text || (this.widgetOptions as any).label
   }

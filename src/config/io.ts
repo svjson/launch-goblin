@@ -3,7 +3,7 @@ import { existsSync } from 'node:fs'
 import { mkdir, readFile, writeFile } from 'node:fs/promises'
 import path from 'node:path'
 
-import { ContextConfig, GlobalConfig, LGConfig } from './types'
+import { ContextConfig, GlobalConfig, LaunchConfig, LGConfig } from './types'
 import { ApplicationState, Project } from '@src/project'
 import { toLaunchConfigComponents } from './apply'
 
@@ -17,6 +17,13 @@ const emptyConfig = (): LGConfig => ({
   launchConfigs: {},
 })
 
+const ensureLaunchConfigStructure = (lc: LaunchConfig) => {
+  if (!lc.defaultTarget) lc.defaultTarget = 'dev'
+  Object.values(lc.components).forEach((c) => {
+    if (!c.targets) c.targets = [lc.defaultTarget]
+  })
+}
+
 const ensurePath = async (filePath: string): Promise<string> => {
   if (existsSync(filePath)) return filePath
   if (existsSync(path.dirname(filePath))) return filePath
@@ -26,14 +33,19 @@ const ensurePath = async (filePath: string): Promise<string> => {
 
 const readConfigFile = async (cfgFile: string): Promise<LGConfig> => {
   if (existsSync(cfgFile)) {
-    return JSON.parse(await readFile(cfgFile, 'utf8'))
+    const cfg: LGConfig = JSON.parse(await readFile(cfgFile, 'utf8'))
+    Object.values(cfg.launchConfigs).forEach((lc) => {
+      ensureLaunchConfigStructure(lc)
+    })
+    return cfg
   }
   return emptyConfig()
 }
 
 const readGlobalConfigFile = async (cfgFile: string): Promise<GlobalConfig> => {
   const cfg = (await readConfigFile(cfgFile)) as GlobalConfig
-  if (!cfg.lastConfig) cfg.lastConfig = { components: {} }
+  if (!cfg.lastConfig) cfg.lastConfig = { defaultTarget: 'dev', components: {} }
+  ensureLaunchConfigStructure(cfg.lastConfig)
   return cfg
 }
 
@@ -46,7 +58,8 @@ export const readConfig = async (project: Project): Promise<ContextConfig> => {
 
 export const saveLatestLaunch = async (model: ApplicationState) => {
   model.config.global.lastConfig = {
-    components: toLaunchConfigComponents(model.project.components),
+    defaultTarget: 'dev',
+    components: toLaunchConfigComponents(model.session.components),
   }
   await saveGlobalConfig(model.project, model.config.global)
 }

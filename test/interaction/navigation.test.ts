@@ -5,16 +5,17 @@ describe('Interaction', () => {
   describe('Navigation', () => {
     it('should be possible to cycle through the user interface sections using tab', () => {
       // Given
-      const { backend, app } = runGoblinApp({
+      const { backend, app, adapter } = runGoblinApp({
         projectId: 'dummy-project',
         configs: {
           private: ['Backend Dev Environment'],
           shared: ['Full Dev Environment', 'No Mocks'],
         },
       })
+      const cmpSection = adapter.componentSection()
 
       // Then - Focused item is checkbox in Component Secction
-      expect(backend.getFocusedWidget()!.get('text')).toEqual('backend-service')
+      expect(cmpSection.getFocusedComponentName()).toEqual('backend-service')
 
       // When - press tab
       backend.performKeyPress('tab')
@@ -29,17 +30,18 @@ describe('Interaction', () => {
       // When - press tab
       backend.performKeyPress('tab')
       // Then - Focused item is, again, checkbox in Component Secction
-      expect(backend.getFocusedWidget()!.get('text')).toEqual('backend-service')
+      expect(cmpSection.getFocusedComponentName()).toEqual('backend-service')
     })
 
     it('should cycle past config section when there are no launch configs', () => {
       // Given
-      const { backend } = runGoblinApp({
+      const { backend, adapter } = runGoblinApp({
         projectId: 'dummy-project',
       })
+      const cmpSection = adapter.componentSection()
 
       // Then - Focused item is checkbox in Component Secction
-      expect(backend.getFocusedWidget()!.get('text')).toEqual('backend-service')
+      expect(cmpSection.getFocusedComponentName()).toEqual('backend-service')
 
       // When - press tab
       backend.performKeyPress('tab')
@@ -49,7 +51,7 @@ describe('Interaction', () => {
       // When - press tab
       backend.performKeyPress('tab')
       // Then - Focused item is, again, checkbox in Component Secction
-      expect(backend.getFocusedWidget()!.get('text')).toEqual('backend-service')
+      expect(cmpSection.getFocusedComponentName()).toEqual('backend-service')
     })
   })
 })

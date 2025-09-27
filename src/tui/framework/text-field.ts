@@ -98,6 +98,8 @@ export class TextInput extends Controller<Widget, { value: string }> {
     },
   })
 
+  focusable = true
+
   constructor({
     widget: { env, parent, keyMap, options = {} },
     state: { model, store },
@@ -111,6 +113,7 @@ export class TextInput extends Controller<Widget, { value: string }> {
             height: 1,
             keys: true,
             mouse: true,
+            focusable: true,
           },
           resolveComponentStyle(env.theme, 'TextInput', env.tty.colorMode),
           options

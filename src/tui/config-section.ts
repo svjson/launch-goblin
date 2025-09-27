@@ -1,6 +1,6 @@
 import { mergeLeft } from '@whimbrel/walk'
 
-import { CtrlCtorParams, KeyMap, Label, Store } from './framework'
+import { CtrlCtorParams, Label, Store } from './framework'
 import { ApplicationState } from '@src/project'
 import { launchConfigByName, launchConfigCount } from '@src/config/query'
 import { ListItem } from './framework/list-box'
@@ -137,7 +137,11 @@ export class ConfigSection extends CustomListBox<
   configSelected(event: ItemSelectedEvent<ListItem>) {
     const config = launchConfigByName(event.item.id, this.store.get('config'))
     if (config) {
-      applyConfig(config, this.store!.get('project'))
+      applyConfig(
+        config,
+        this.store!.get('project'),
+        this.store!.get('session')
+      )
       this.store.set('config.activeConfigName', event.item.id)
     }
   }
@@ -215,6 +219,7 @@ class ConfigItemBox extends CustomListBoxItem<ConfigListItem, ConfigListItem> {
           {
             height: 1,
             color: 'white',
+            focusable: true,
             background: 'default',
             ':focused': {
               color: 'white',

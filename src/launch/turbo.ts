@@ -4,6 +4,7 @@ import { Project, ProjectComponent } from '@src/project'
 import { Launcher } from './types'
 import { LGOptions } from '@src/tui/goblin-app'
 import { ApplicationEnvironment } from '@src/tui/framework'
+import { SessionComponent } from '@src/project/state'
 
 export const turboLauncher = (
   project: Project,
@@ -17,14 +18,14 @@ export const turboLauncher = (
     components: components.map((c) => c.id),
     launchCommand: (
       _env: ApplicationEnvironment,
-      components: ProjectComponent[]
+      components: SessionComponent[]
     ) => ({
       bin: cliRunner,
       args: [
         'turbo',
         'run',
         launchAction,
-        ...components.flatMap((c) => ['--filter', c.package]),
+        ...components.flatMap((c) => ['--filter', c.component.package]),
       ],
     }),
   }

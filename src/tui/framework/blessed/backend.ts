@@ -218,8 +218,9 @@ export const toBlessedBoxOptions = (
 export const toBlessedListOptions = (
   options: ListOptions,
   parent: blessed.Widgets.Node
-) => {
+): blessed.Widgets.ListOptions<blessed.Widgets.ListElementStyle> => {
   return {
+    focusable: true,
     ...toBlessedElementOptions(options, parent),
     items: options.items ?? [],
   }
@@ -230,6 +231,7 @@ export const toBlessedButtonOptions = (
   parent: blessed.Widgets.Node
 ) => {
   return {
+    focusable: true,
     ...toBlessedElementOptions(options, parent),
     content: options.label,
   }

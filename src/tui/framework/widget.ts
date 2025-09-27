@@ -48,6 +48,7 @@ export interface Widget<O extends WidgetOptions = WidgetOptions> {
   focus(): void
   destroy(): void
 
+  isFocusable(): boolean
   isFocused(): boolean
 
   children(): Widget[]
@@ -56,8 +57,8 @@ export interface Widget<O extends WidgetOptions = WidgetOptions> {
   getStyleOptions(): BaseWidgetOptions
   getAppearance(): Appearance
 
+  get(prop: string): string | number | boolean | undefined
   set(prop: string, value: string | number | undefined): void
-  get(prop: string): string | number | undefined
 
   setParent(parent: Widget): void
   setLayout(prop: LayoutProperty, value: string | number): void

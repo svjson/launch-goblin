@@ -5,39 +5,41 @@ import { Project, ProjectComponent } from '@src/project'
 import { PackageJSON } from '@whimbrel/package-json'
 import { WhimbrelContext } from '@whimbrel/core'
 import { LaunchCommand } from '@src/launch'
+import { LaunchSession } from '@src/project/state'
 
 describe('applyConfig', () => {
-  const components: Record<string, (sel: boolean) => ProjectComponent> = {
-    'great-cmp': (selected: boolean) => ({
+  const components: Record<string, ProjectComponent> = {
+    'great-cmp': {
       id: 'great-cmp',
+      type: 'pkgjson-script',
       root: '',
       name: 'Great Component',
       package: '@project/great-cmp',
       pkgJson: null as unknown as PackageJSON,
-      selected,
-    }),
-    'terrible-cmp': (selected: boolean) => ({
+      targets: ['dev', 'build'],
+    },
+    'terrible-cmp': {
       id: 'terrible-cmp',
+      type: 'pkgjson-script',
       root: '',
       name: 'Terrible Component',
       package: '@project/just-terrible',
       pkgJson: null as unknown as PackageJSON,
-      selected,
-    }),
-    'awesome-cmp': (selected: boolean) => ({
+      targets: ['dev', 'build'],
+    },
+    'awesome-cmp': {
       id: 'awesome-cmp',
+      type: 'pkgjson-script',
       root: '',
       name: 'Cowabunga!',
       package: '@project/awesome-cmp',
       pkgJson: null as unknown as PackageJSON,
-      selected,
-    }),
+      targets: ['dev', 'build'],
+    },
   }
 
-  const makeProject = (...cmps: [string, boolean][]): Project => {
-    const selectedComponents = cmps.map(([id, selected]) =>
-      components[id](selected)
-    )
+  const makeProject = (...cmps: string[]): Project => {
+    const selectedComponents = cmps.map((id) => components[id])
     return {
       id: 'my-project',
       ctx: null as unknown as WhimbrelContext,
@@ -58,53 +60,73 @@ describe('applyConfig', () => {
   it('should select all components if the launchConfig is empty (no previous launch)', () => {
     // Given
     const launchConfig: LaunchConfig = {
+      defaultTarget: 'dev',
       components: {},
     }
 
-    const project = makeProject(
-      ['great-cmp', false],
-      ['terrible-cmp', false],
-      ['awesome-cmp', false]
-    )
+    const project = makeProject('great-cmp', 'terrible-cmp', 'awesome-cmp')
+    const session: LaunchSession = { components: [], target: 'dev' }
 
     // When
-    applyConfig(launchConfig, project)
+    applyConfig(launchConfig, project, session)
 
     // Then
-    expect(project.components.map((c) => c.selected)).toEqual([
+    expect(session.components.map((c) => c.state.selected)).toEqual([
       true,
       true,
       true,
     ])
   })
 
+  it('should select default targets is empty (no previous launch)', () => {
+    // Given
+    const launchConfig: LaunchConfig = {
+      defaultTarget: 'dev',
+      components: {},
+    }
+
+    const project = makeProject('great-cmp', 'terrible-cmp', 'awesome-cmp')
+    const session: LaunchSession = { components: [], target: 'dev' }
+
+    // When
+    applyConfig(launchConfig, project, session)
+
+    // Then
+    expect(session.components.map((c) => c.state.targets)).toEqual([
+      ['dev'],
+      ['dev'],
+      ['dev'],
+    ])
+  })
+
   it('should select components marked as selected in launch config', () => {
     // Given
     const launchConfig: LaunchConfig = {
+      defaultTarget: 'dev',
       components: {
         'great-cmp': {
           selected: true,
+          targets: [],
         },
         'terrible-cmp': {
           selected: false,
+          targets: [],
         },
         'awesome-cmp': {
           selected: true,
+          targets: [],
         },
       },
     }
 
-    const project = makeProject(
-      ['great-cmp', false],
-      ['terrible-cmp', false],
-      ['awesome-cmp', false]
-    )
+    const project = makeProject('great-cmp', 'terrible-cmp', 'awesome-cmp')
+    const session: LaunchSession = { components: [], target: 'dev' }
 
     // When
-    applyConfig(launchConfig, project)
+    applyConfig(launchConfig, project, session)
 
     // Then
-    expect(project.components.map((c) => c.selected)).toEqual([
+    expect(session.components.map((c) => c.state.selected)).toEqual([
       true,
       false,
       true,
@@ -114,24 +136,23 @@ describe('applyConfig', () => {
   it('should mark components not present in config as selected=false', () => {
     // Given
     const launchConfig: LaunchConfig = {
+      defaultTarget: 'dev',
       components: {
         'great-cmp': {
           selected: true,
+          targets: [],
         },
       },
     }
 
-    const project = makeProject(
-      ['great-cmp', true],
-      ['terrible-cmp', true],
-      ['awesome-cmp', true]
-    )
+    const project = makeProject('great-cmp', 'terrible-cmp', 'awesome-cmp')
+    const session: LaunchSession = { components: [], target: 'dev' }
 
     // When
-    applyConfig(launchConfig, project)
+    applyConfig(launchConfig, project, session)
 
     // Then
-    expect(project.components.map((c) => c.selected)).toEqual([
+    expect(session.components.map((c) => c.state.selected)).toEqual([
       true,
       false,
       false,

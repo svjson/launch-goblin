@@ -55,6 +55,7 @@ describe('ConfigSection', () => {
       })
       configSection.populateModel()
 
+      expect(configSection.isFocusable()).toBe(false)
       expect(configSection.focusable).toBe(false)
     })
 
@@ -63,9 +64,11 @@ describe('ConfigSection', () => {
       const [env, container, store, state] = makeFixture()
 
       state.config.local.launchConfigs['Prutt'] = {
+        defaultTarget: 'dev',
         components: {
           skrutt: {
             selected: true,
+            targets: [],
           },
         },
       }
@@ -82,6 +85,7 @@ describe('ConfigSection', () => {
       })
       configSection.populateModel()
 
+      expect(configSection.isFocusable()).toBe(true)
       expect(configSection.focusable).toBe(true)
     })
   })

@@ -72,22 +72,61 @@ export const noBackend = (): Backend => {
       })
     },
     createBox(options: BoxOptions): Widget {
-      return new HeadlessWidget<BoxOptions>(this, {}, options)
+      return new HeadlessWidget<BoxOptions>(
+        this,
+        {},
+        { focusable: false, ...options }
+      )
     },
     createButton(options: ButtonOptions): Widget {
-      return new HeadlessWidget<ButtonOptions>(this, {}, options)
+      return new HeadlessWidget<ButtonOptions>(
+        this,
+        {},
+        {
+          focusable: true,
+          ...options,
+        }
+      )
     },
     createCheckbox(options: CheckboxOptions): CheckboxWidget {
-      return new HeadlessCheckboxWidget(this, {}, options)
+      return new HeadlessCheckboxWidget(
+        this,
+        {},
+        {
+          focusable: true,
+          ...options,
+        }
+      )
     },
     createLabel(options: LabelOptions): LabelWidget {
-      return new HeadlessLabelWidget(this, {}, options)
+      return new HeadlessLabelWidget(
+        this,
+        {},
+        {
+          focusable: false,
+          ...options,
+        }
+      )
     },
     createList(options: ListOptions): ListWidget {
-      return new HeadlessListWidget(this, {}, options)
+      return new HeadlessListWidget(
+        this,
+        {},
+        {
+          focusable: true,
+          ...options,
+        }
+      )
     },
     createTextField(options: TextFieldOptions): TextFieldWidget {
-      return new HeadlessTextFieldWidget(this, {}, options)
+      return new HeadlessTextFieldWidget(
+        this,
+        {},
+        {
+          focusable: true,
+          ...options,
+        }
+      )
     },
 
     async performKeyPress(keyName: string) {

@@ -2,6 +2,7 @@ import { Project, ProjectComponent } from '@src/project'
 import { Launcher } from './types'
 import { LGOptions } from '@src/tui/goblin-app'
 import { ApplicationEnvironment } from '@src/tui/framework'
+import { SessionComponent } from '@src/project/state'
 
 export const pnpmLauncher = (
   _project: Project,
@@ -13,14 +14,14 @@ export const pnpmLauncher = (
     components: components.map((c) => c.id),
     launchCommand: (
       _env: ApplicationEnvironment,
-      components: ProjectComponent[]
+      components: SessionComponent[]
     ) => ({
       bin: 'pnpm',
       args: [
         '-r',
         '--parallel',
         '--stream',
-        ...components.flatMap((c) => ['--filter', c.package]),
+        ...components.flatMap((c) => ['--filter', c.component.package]),
         'run',
         launchAction,
       ],
@@ -36,9 +37,14 @@ export const identifyPnpmLaunchOptions = async (
   if (options.verbose) console.log('Evaluating pnpm...')
   if (project.packageManager() === 'pnpm') {
     if (options.verbose) console.log(' - Is package manager for project')
-    const targetComponents = project.components.filter((c) =>
-      c.pkgJson.get(['scripts', launchAction])
-    )
+    const targetComponents = project.components
+      .map((c) => ({
+        ...c,
+        targets: c.targets.filter(
+          (t) => t === launchAction && t.startsWith(`${launchAction}:`)
+        ),
+      }))
+      .filter((c) => c.pkgJson.get(['scripts', launchAction]))
     if (targetComponents.length) {
       return [pnpmLauncher(project, launchAction, targetComponents)]
     }

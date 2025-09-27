@@ -100,6 +100,7 @@ export class Option<Model extends OptionItem> extends Controller<
           {
             label: ` ${model.label ?? ''} `,
             keys: true,
+            focusable: true,
           },
           resolveComponentStyle(env.theme, 'Option', env.tty.colorMode),
           options

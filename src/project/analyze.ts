@@ -34,13 +34,15 @@ export const analyze = async (dir: string): Promise<ProjectParams> => {
   const components: ProjectComponent[] = []
 
   for (const a of cmpActors) {
+    const pkgJSON = await PackageJSON.read(ctx.disk, a.root)
     components.push({
       id: a.id,
+      type: 'pkgjson-script',
       name: a.name,
       root: a.root,
       package: a.name,
-      pkgJson: await PackageJSON.read(ctx.disk, a.root),
-      selected: true,
+      pkgJson: pkgJSON,
+      targets: Object.keys(pkgJSON.get('scripts', {})),
     })
   }
 

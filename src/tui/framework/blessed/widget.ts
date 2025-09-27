@@ -19,7 +19,7 @@ export type BlessedLmnt = blessed.Widgets.BlessedElement
 const accessors: Record<
   LayoutProperty,
   {
-    get: (lmnt: BlessedLmnt) => string | number | undefined
+    get: (lmnt: BlessedLmnt) => string | number | boolean | undefined
     set: (lmnt: BlessedLmnt, value: string | number) => void
   }
 > = {
@@ -46,6 +46,10 @@ const accessors: Record<
   fg: {
     get: (lmnt) => lmnt.style?.fg,
     set: (lmnt, value: string | number) => (lmnt.style.fg = value),
+  },
+  focusable: {
+    get: (lmnt) => lmnt.focusable,
+    set: (lmnt, value: string | number) => (lmnt.focusable = Boolean(value)),
   },
   'focused:bg': {
     get: (lmnt) => lmnt.style?.focus?.bg,
@@ -123,6 +127,9 @@ export class BlessedWidget<
       typeof style.underline === 'boolean'
         ? { underline: style.underline }
         : {}),
+      ...(typeof style.focusable === 'boolean'
+        ? { focusable: style.focusable }
+        : {}),
     }
     this.calculatedStyle = style
   }
@@ -139,6 +146,18 @@ export class BlessedWidget<
     this.inner.onScreenEvent('prerender', handler)
   }
 
+  isFocusable(): boolean {
+    if (!this.inner.screen) return false
+    if (this.inner.hidden) return false
+    if (this.inner.detached) return false
+    if ((this.inner as any).keyable) return true
+    if ((this.inner as any).clickable) return true
+    if (this.calculatedStyle.focusable) return true
+    if (this.inner.focusable) return true
+    if (this.inner.style?.focusable) return true
+    if (this.inner.options.focusable) return true
+    return false
+  }
   isFocused(): boolean {
     return this.inner.screen.focused === this.inner
   }
@@ -147,7 +166,7 @@ export class BlessedWidget<
     accessors[prop]?.set(this.inner, value)
   }
 
-  get(prop: LayoutProperty): string | number | undefined {
+  get(prop: LayoutProperty): string | number | boolean | undefined {
     return accessors[prop]?.get(this.inner)
   }
 

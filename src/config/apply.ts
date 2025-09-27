@@ -1,35 +1,51 @@
+import { LaunchSession, SessionComponent } from '@src/project/state'
 import { ComponentLaunchConfig, LaunchConfig } from './types'
-import { Project, ProjectComponent } from '@src/project'
+import { Project } from '@src/project'
 
 export const setSelected = (
-  components: ProjectComponent[],
+  components: SessionComponent[],
   selected: boolean = true
 ) => {
   components.forEach((c) => {
-    c.selected = selected
+    c.state.selected = selected
   })
 }
 
-export const applyConfig = (launchConfig: LaunchConfig, project: Project) => {
+export const applyConfig = (
+  launchConfig: LaunchConfig,
+  project: Project,
+  session: LaunchSession
+): LaunchSession => {
+  session.components = project.components.map((cmp) => {
+    const { selected } = launchConfig.components[cmp.id] ?? {
+      selected: false,
+      targets: [],
+    }
+    return {
+      component: cmp,
+      state: {
+        selected,
+        targets: cmp.targets.filter((t) => t === launchConfig.defaultTarget),
+      },
+    }
+  })
+
   if (Object.keys(launchConfig.components).length === 0) {
-    setSelected(project.components, true)
-    return
+    setSelected(session.components, true)
+    return session
   }
 
-  setSelected(project.components, false)
-
-  for (const cmp of project.components) {
-    cmp.selected = launchConfig.components[cmp.id]?.selected ?? false
-  }
+  return session
 }
 
 export const toLaunchConfigComponents = (
-  components: ProjectComponent[]
+  components: SessionComponent[]
 ): Record<string, ComponentLaunchConfig> => {
   return components.reduce(
     (launch, cmp) => {
-      launch[cmp.id] = {
-        selected: cmp.selected,
+      launch[cmp.component.id] = {
+        selected: cmp.state.selected,
+        targets: [],
       }
       return launch
     },

@@ -14,19 +14,13 @@ export interface ProjectParams {
   components: ProjectComponent[]
 }
 
-export interface Project extends ProjectParams {
-  hasRootFacet(facetId: string): boolean
-  packageManager(): string | undefined
-  projectRoot(): string
-}
-
 /**
  * The common root of launchable project components
  */
 export interface BaseComponent {
   id: string
   name: string
-  selected?: boolean
+  targets: string[]
 }
 
 export interface Package {
@@ -39,6 +33,7 @@ export interface Package {
  */
 export type NodePackage = BaseComponent &
   Package & {
+    type: 'pkgjson-script'
     pkgJson: PackageJSON
   }
 

@@ -1,5 +1,6 @@
-import { Project } from './types'
-import { ContextConfig } from '@src/config'
+import { Project } from './project'
+import { ProjectComponent } from './types'
+import { ComponentLaunchConfig, ContextConfig } from '@src/config'
 
 export interface ApplicationState {
   /**
@@ -13,4 +14,15 @@ export interface ApplicationState {
   originalWindowTitleString?: string | null | undefined
   project: Project
   config: ContextConfig
+  session: LaunchSession
+}
+
+export interface SessionComponent {
+  component: ProjectComponent
+  state: ComponentLaunchConfig
+}
+
+export interface LaunchSession {
+  target: string
+  components: SessionComponent[]
 }

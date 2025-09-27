@@ -129,7 +129,7 @@ export class CustomListBox<
       })
     }
 
-    this.focusable = this.model.length > 0
+    this.setFocusable(this.model.length > 0)
     if (this.focusedIndex >= this.children.length) {
       this.nextChild(-1)
     }

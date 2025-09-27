@@ -1,15 +1,23 @@
-import { applyConfig, ContextConfig, readConfig } from '@src/config'
 import { analyze } from './analyze'
 import { identifyLaunchers } from '@src/launch'
 import { LGOptions } from '@src/tui/goblin-app'
-import { Project, ProjectParams } from './types'
-import { ApplicationState } from './state'
+import { ProjectComponent, ProjectParams } from './types'
 import { actorFacetScope } from '@whimbrel/core'
+
+export interface Project extends ProjectParams {
+  component(componentId: string): ProjectComponent | undefined
+  hasRootFacet(facetId: string): boolean
+  packageManager(): string | undefined
+  projectRoot(): string
+}
 
 export const makeProject = (params: ProjectParams): Project => {
   const root = params.ctx.getActor({ root: params.root })!
   return {
     ...params,
+    component(componentId: string) {
+      return this.components.find((c) => c.id === componentId)
+    },
     hasRootFacet(facetId: string) {
       return Boolean(actorFacetScope(root, facetId))
     },
@@ -26,10 +34,8 @@ export const makeProject = (params: ProjectParams): Project => {
 export const readProject = async (
   launchAction: string,
   options: LGOptions
-): Promise<ApplicationState> => {
+): Promise<Project> => {
   const project = makeProject(await analyze(process.cwd()))
   project.launchers = await identifyLaunchers(project, launchAction, options)
-  const config: ContextConfig = await readConfig(project)
-  applyConfig(config.global.lastConfig, project)
-  return { project, config }
+  return project
 }

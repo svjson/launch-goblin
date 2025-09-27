@@ -351,7 +351,7 @@ export abstract class Controller<
   }
 
   isFocusable(): boolean {
-    if (this.focusable && this.enabled) return true
+    if (this.focusable && this.enabled && this.widget.isFocusable()) return true
 
     for (const child of this.children) {
       if (child.isFocusable()) return true
@@ -468,42 +468,42 @@ export abstract class Controller<
     if (value !== undefined) {
       this.widget.set('top', value)
     }
-    return this.widget.get('top')!
+    return this.widget.get('top')! as string | number
   }
 
   right(value?: string | number): string | number {
     if (value !== undefined) {
       this.widget.set('right', value)
     }
-    return this.widget.get('right')!
+    return this.widget.get('right')! as string | number
   }
 
   bottom(value?: string | number): string | number {
     if (value !== undefined) {
       this.widget.set('bottom', value)
     }
-    return this.widget.get('bottom')!
+    return this.widget.get('bottom')! as string | number
   }
 
   left(value?: string | number): string | number {
     if (value !== undefined) {
       this.widget.set('left', value)
     }
-    return this.widget.get('left')!
+    return this.widget.get('left')! as string | number
   }
 
   width(value?: string | number): string | number {
     if (value !== undefined) {
       this.widget.set('width', value)
     }
-    return this.widget.get('width')!
+    return this.widget.get('width')! as string | number
   }
 
   height(value?: string | number): string | number {
     if (value !== undefined) {
       this.widget.set('height', value)
     }
-    return this.widget.get('height')!
+    return this.widget.get('height')! as string | number
   }
 
   getComponentState(): ComponentState {
@@ -516,6 +516,11 @@ export abstract class Controller<
 
   isFocused(): boolean {
     return this.widget.isFocused()
+  }
+
+  setFocusable(focusable: boolean) {
+    this.focusable = focusable
+    this.widget.set('focusable', String(focusable))
   }
 
   isSelected(): boolean {

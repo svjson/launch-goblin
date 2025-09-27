@@ -1,4 +1,6 @@
-import { ApplicationState, readProject } from '@src/project'
+import { applyConfig, ContextConfig, readConfig } from '@src/config'
+import { ApplicationState, Project, readProject } from '@src/project'
+import { LaunchSession } from '@src/project/state'
 import {
   ApplicationEnvironment,
   DefaultTheme,
@@ -16,7 +18,23 @@ export const bootstrap = async (
   env: ApplicationEnvironment
   model: ApplicationState
 }> => {
-  const model: ApplicationState = await readProject(targetAction, options)
+  const project: Project = await readProject(targetAction, options)
+
+  const config: ContextConfig = await readConfig(project)
+  const session: LaunchSession = applyConfig(
+    config.global.lastConfig,
+    project,
+    {
+      target: 'dev',
+      components: [],
+    }
+  )
+
+  const model: ApplicationState = {
+    project,
+    config,
+    session,
+  }
 
   if (model.project.launchers.length === 0) {
     console.error(

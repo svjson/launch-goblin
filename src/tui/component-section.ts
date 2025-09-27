@@ -3,11 +3,15 @@ import {
   CheckboxEvent,
   Controller,
   CtrlCtorParams,
+  Label,
 } from './framework'
+import { mergeLeft } from '@whimbrel/walk'
 import { juxt } from '@whimbrel/array'
-import { ApplicationState, ProjectComponent } from '@src/project'
+import { ApplicationState } from '@src/project'
 import { CheckboxItem } from './framework/checkbox'
 import { Widget } from './framework/widget'
+import { resolveComponentStyle } from './framework/theme'
+import { SessionComponent } from '@src/project/state'
 
 /**
  * TUI Component containing checkboxes and options for launchable
@@ -15,7 +19,7 @@ import { Widget } from './framework/widget'
  */
 export class ComponentSection extends Controller<
   Widget,
-  ProjectComponent[],
+  SessionComponent[],
   ApplicationState
 > {
   keyMap = this.defineKeys({
@@ -33,24 +37,27 @@ export class ComponentSection extends Controller<
     },
   })
 
-  events = this.defineEvents({
-    checkbox: this.onChecked,
-  })
-
   focusedIndex = 0
 
-  components: ProjectComponent[]
+  components: SessionComponent[]
 
   constructor({
     widget: { env, parent, keyMap },
     state: { model = [], store },
-  }: CtrlCtorParams<ProjectComponent[], ApplicationState>) {
+  }: CtrlCtorParams<SessionComponent[], ApplicationState>) {
     super(
       env,
       env.backend.createBox({
         width: Math.max(
           4 + ' Select Components to Launch '.length,
-          10 + Math.max(...model.map((cmp) => cmp.name.length))
+          10 +
+            Math.max(
+              ...model.map(
+                (cmp) =>
+                  cmp.component.name.length +
+                  Math.max(0, ...cmp.component.targets.map((t) => t.length))
+              )
+            )
         ),
         height: Math.max(10, model.length + 4),
         top: '25%',
@@ -75,31 +82,26 @@ export class ComponentSection extends Controller<
 
     model.forEach((c, i) => {
       this.addChild({
-        component: Checkbox,
+        component: ComponentItem,
         model: {
-          id: c.id,
-          label: c.name,
+          component: c as SessionComponent,
           index: i,
-          checked: c.selected,
-        } as CheckboxItem,
+        } as ComponentItemModel,
         style: {
           top: i + 1,
+          width: '100%-3',
         },
       })
     })
 
     this.store!.subscribe('config.activeConfigName', () => {
       juxt(this.children, this.components).forEach(([checkbox, cmp]) => {
-        ;(checkbox as Checkbox).setSelected(cmp.selected ?? false)
+        ;(checkbox as Checkbox).setSelected(cmp.state.selected ?? false)
       })
       return true
     })
 
     this.children[this.focusedIndex]?.focus()
-  }
-
-  onChecked(event: CheckboxEvent) {
-    this.components[event.item.index].selected = event.checked
   }
 
   moveUp() {
@@ -116,5 +118,124 @@ export class ComponentSection extends Controller<
   applySelection() {
     this.children[this.focusedIndex]?.focus()
     this.emit('dirty')
+  }
+}
+
+export type ComponentItemModel = {
+  component: SessionComponent
+  index: number
+}
+
+class ComponentItem extends Controller<
+  Widget,
+  ComponentItemModel,
+  ApplicationState
+> {
+  focusable = true
+
+  events = this.defineEvents({
+    checkbox: this.onChecked,
+  })
+
+  keyMap = this.defineKeys({
+    enter: {
+      legend: 'Toggle Selection',
+      group: 'focused',
+      propagate: true,
+      handler: () => (this.children[0] as Checkbox).toggle(),
+    },
+    left: {
+      legend: 'Cycle target',
+      group: 'focused',
+      propagate: true,
+      handler: () => this.cycleTarget(-1),
+    },
+    right: {
+      legend: 'Cycle target',
+      group: 'focused',
+      propagate: true,
+      handler: this.cycleTarget,
+    },
+  })
+
+  components = this.defineComponents({
+    checkbox: {
+      component: Checkbox,
+      model: {
+        id: this.model.component.component.id,
+        label: this.model.component.component.name,
+        index: this.model.index,
+        checked: this.model.component.state.selected,
+      } as CheckboxItem,
+      style: {
+        left: 1,
+        focusable: false,
+      },
+    },
+    target: {
+      component: Label,
+      model: {
+        text: this.model.component.state.targets.join(' '),
+      },
+      style: {
+        right: 0,
+        color: 'white',
+        ':focused': {
+          background: 'blue',
+        },
+      },
+    },
+  })
+
+  constructor({
+    widget: { env, keyMap, options },
+    state: { model },
+  }: CtrlCtorParams<ComponentItemModel>) {
+    super(
+      env,
+      env.backend.createBox(
+        mergeLeft(
+          {
+            height: 1,
+            top: model.index + 1,
+            focusable: true,
+          },
+          resolveComponentStyle(env.theme, 'CheckBox', env.tty.colorMode),
+          options
+        )
+      ),
+      model
+    )
+    this.inheritKeyMap(keyMap)
+  }
+
+  onChecked(event: CheckboxEvent) {
+    this.model.component.state.selected = event.checked
+  }
+
+  cycleTarget(amount: number = 1) {
+    const currentIndex = this.model.component.component.targets.indexOf(
+      this.model.component.state.targets[0]
+    )
+
+    const newIndex =
+      (currentIndex + amount + this.model.component.component.targets.length) %
+      this.model.component.component.targets.length
+
+    this.model.component.state.targets[0] =
+      this.model.component.component.targets[newIndex]
+
+    // FIXME: Setting the model should be enough here!
+    // this.components.target.model.text =
+    //   this.model.component.state.targets.join(' ')
+    this.components.target.set(
+      'text',
+      this.model.component.state.targets.join(' ')
+    )
+    this.emit('dirty')
+  }
+
+  setSelected(sel: boolean) {
+    ;(this.children[0] as Checkbox).setSelected(sel)
   }
 }

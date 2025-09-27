@@ -40,7 +40,7 @@ describe('pnpmLauncher', () => {
       )
 
       // When
-      const command = launcher.launchCommand(env, state.project.components)
+      const command = launcher.launchCommand(env, state.session.components)
 
       // Then
       expect(command).toEqual({

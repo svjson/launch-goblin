@@ -13,6 +13,7 @@ import { FooterController } from './footer'
 import { HeaderController } from './header'
 import { SaveConfigDialog } from './save-config-dialog'
 import { ConfigSection } from './config-section'
+import { LaunchSession } from '@src/project/state'
 
 /**
  * The main TUI component of the Launch Goblin user interface
@@ -46,9 +47,9 @@ export class MainController extends ApplicationController<ApplicationState> {
     componentSection: {
       component: ComponentSection,
       model: this.store
-        .get<Project>('project')
+        .get<LaunchSession>('session')
         .components.filter((cmp) =>
-          this.model.project.launchers[0].components.includes(cmp.id)
+          this.model.project.launchers[0].components.includes(cmp.component.id)
         ),
       store: this.store,
     },

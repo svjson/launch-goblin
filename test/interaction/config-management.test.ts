@@ -2,6 +2,7 @@ import { LegacyConfigType } from '@src/config'
 import { ApplicationState } from '@src/project'
 import { LaunchGoblinApp } from '@src/tui'
 import { runGoblinApp, wait } from 'test/fixtures'
+import { GoblinAppAdapter } from 'test/goblin-app-adapter'
 import { describe, expect, test, it } from 'vitest'
 
 describe('Interaction', () => {
@@ -139,12 +140,12 @@ describe('Interaction', () => {
       })
 
       it('should return focus to component section when the last launch config is deleted', async () => {
-        let goblinApp: LaunchGoblinApp
+        let appAdapter: GoblinAppAdapter
         const saved = new Promise<{
           state?: ApplicationState
           type: LegacyConfigType
         }>((resolve) => {
-          const { backend, app } = runGoblinApp({
+          const { backend, app, adapter } = runGoblinApp({
             projectId: 'dummy-project',
             configs: {
               private: ['Backend Dev Environment'],
@@ -155,7 +156,7 @@ describe('Interaction', () => {
               },
             },
           })
-          goblinApp = app
+          appAdapter = adapter
 
           // Tab into config section
           backend.performKeyPress('tab')
@@ -181,14 +182,16 @@ describe('Interaction', () => {
         expect(Object.keys(state!.config.local.launchConfigs)).toEqual([])
         expect(Object.keys(state!.config.global.launchConfigs)).toEqual([])
 
-        expect(goblinApp!.focusedComponent!.model.id).toEqual('backend-service')
+        expect(
+          appAdapter!.componentSection().getFocusedComponentName()
+        ).toEqual('backend-service')
       })
     })
 
     describe('Creating launch configurations', () => {
       test('C-s should open a cancellable save dialog', async () => {
         let saved = false
-        const { backend, app, state } = runGoblinApp({
+        const { backend, app, state, adapter } = runGoblinApp({
           projectId: 'dummy-project',
           facade: {
             saveConfig: async (_s, _t) => {
@@ -218,7 +221,9 @@ describe('Interaction', () => {
         expect(app.modals.length).toEqual(0)
 
         // Then - focused item is the first project component
-        expect(app.focusedComponent!.model.id).toEqual('backend-service')
+        expect(adapter.componentSection().getFocusedComponentName()).toEqual(
+          'backend-service'
+        )
 
         // Then - No config save has been triggered
         await wait(100)
@@ -233,7 +238,7 @@ describe('Interaction', () => {
           state?: ApplicationState
           type: LegacyConfigType
         }>(async (resolve) => {
-          const { backend, app } = runGoblinApp({
+          const { backend, app, adapter } = runGoblinApp({
             projectId: 'dummy-project',
             configs: {
               private: ['Backend Dev Environment'],
@@ -272,7 +277,9 @@ describe('Interaction', () => {
           expect(app.modals.length).toEqual(0)
 
           // Then - focused item is the first project component
-          expect(app.focusedComponent!.model.id).toEqual('backend-service')
+          expect(adapter.componentSection().getFocusedComponentName()).toEqual(
+            'backend-service'
+          )
         })
 
         const { state, type } = await saved
@@ -289,7 +296,7 @@ describe('Interaction', () => {
           state?: ApplicationState
           type: LegacyConfigType
         }>(async (resolve) => {
-          const { backend, app } = runGoblinApp({
+          const { backend, app, adapter } = runGoblinApp({
             projectId: 'dummy-project',
             configs: {
               private: ['Backend Dev Environment'],
@@ -334,7 +341,9 @@ describe('Interaction', () => {
           expect(app.modals.length).toEqual(0)
 
           // Then - focused item is the first project component
-          expect(app.focusedComponent!.model.id).toEqual('backend-service')
+          expect(adapter.componentSection().getFocusedComponentName()).toEqual(
+            'backend-service'
+          )
         })
 
         const { state, type } = await saved

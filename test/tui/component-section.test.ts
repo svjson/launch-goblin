@@ -4,10 +4,11 @@ import { makeAppState, TestProjectId } from 'test/fixtures'
 import { ComponentSection } from '@src/tui/component-section'
 import {
   ApplicationEnvironment,
-  Checkbox,
   createStore,
+  HeadlessBackend,
 } from '@src/tui/framework'
 import { ApplicationState } from '@src/project'
+import { componentSectionAdapter } from './component-section-adapter'
 
 describe('ComponentSection', () => {
   const createEnv = (
@@ -28,12 +29,12 @@ describe('ComponentSection', () => {
     const store = createStore(state.project)
     const section = new ComponentSection({
       widget: { env, parent, keyMap: { replace: false, keys: {} } },
-      state: { model: state.project.components, store },
+      state: { model: state.session.components, store },
     })
 
     env.backend.render()
 
-    return section
+    return componentSectionAdapter(section, env.backend as HeadlessBackend)
   }
 
   const createCmpAndEnv = (projectId: TestProjectId) => {
@@ -48,18 +49,12 @@ describe('ComponentSection', () => {
       const { section } = createCmpAndEnv('dummy-project')
 
       // Then
-      const expectedComponents = [
+      expect(section.getComponentNames()).toEqual([
         'backend-service',
         'frontend-portal',
         'mock-provider-a',
         'mock-provider-b',
-      ]
-      const checkboxes = section.getWidget().children()
-      expect(checkboxes.length).toBe(expectedComponents.length)
-
-      expectedComponents.forEach((cmpName, i) => {
-        expect(checkboxes[i].get('text')).toEqual(cmpName)
-      })
+      ])
     })
 
     test('all checkboxes should be checked by default', () => {
@@ -67,11 +62,12 @@ describe('ComponentSection', () => {
       const { section } = createCmpAndEnv('dummy-project')
 
       // Then
-      const checkboxes = section.children
-
-      checkboxes.forEach((cb) => {
-        expect((cb as Checkbox).isSelected()).toBe(true)
-      })
+      expect(section.getComponentStates().map((s) => s.checked)).toEqual([
+        true,
+        true,
+        true,
+        true,
+      ])
     })
   })
 
@@ -80,9 +76,9 @@ describe('ComponentSection', () => {
       // Given
       const { section } = createCmpAndEnv('dummy-project')
       // When
-      section.keyMap.down.handler()
+      section.section.keyMap.down.handler()
       // Then
-      expect(section.focusedIndex).toEqual(1)
+      expect(section.section.focusedIndex).toEqual(1)
     })
   })
 })
