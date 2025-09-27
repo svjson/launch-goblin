@@ -16,6 +16,7 @@ import {
   TextFieldWidget,
   Widget,
   CheckboxWidget,
+  OptionBarWidget,
 } from '../widget'
 import { genKeyPress } from './keygen'
 import {
@@ -110,6 +111,16 @@ export const noBackend = (): Backend => {
     },
     createList(options: ListOptions): ListWidget {
       return new HeadlessListWidget(
+        this,
+        {},
+        {
+          focusable: true,
+          ...options,
+        }
+      )
+    },
+    createOptionBar(options: ListOptions): OptionBarWidget {
+      return new HeadlessWidget(
         this,
         {},
         {

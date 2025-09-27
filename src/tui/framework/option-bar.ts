@@ -1,7 +1,7 @@
 import { mergeLeft } from '@whimbrel/walk'
 
 import { Controller, CtrlCtorParams } from './controller'
-import { Widget } from './widget'
+import { OptionBarWidget, Widget } from './widget'
 import { resolveComponentStyle } from './theme'
 
 export interface OptionItem {
@@ -12,19 +12,25 @@ export interface OptionItem {
 
 export class OptionBar<
   ItemModel extends OptionItem = OptionItem,
-> extends Controller<Widget, ItemModel[], undefined> {
+> extends Controller<OptionBarWidget, ItemModel[], undefined> {
   keyMap = this.defineKeys({
     right: {
       propagate: true,
-      legend: 'Select Next',
+      legend: 'Next',
       group: 'nav',
       handler: this.nextChild,
     },
     left: {
       propagate: true,
-      legend: 'Select Previous',
+      legend: 'Previous',
       group: 'nav',
       handler: () => this.nextChild(-1),
+    },
+    enter: {
+      propagate: true,
+      legend: 'Toggle',
+      group: 'focused',
+      handler: this.toggle,
     },
   })
 
@@ -35,12 +41,12 @@ export class OptionBar<
   focusable = true
 
   constructor({
-    widget: { env, parent, keyMap, options = {} },
+    widget: { env, parent, keyMap, options = { selectionMode: 'single' } },
     state: { model = [] },
-  }: CtrlCtorParams<ItemModel[]>) {
+  }: CtrlCtorParams<ItemModel[], undefined, OptionBarWidget>) {
     super(
       env,
-      env.backend.createBox(
+      env.backend.createOptionBar(
         mergeLeft(
           {
             width: '100%-2',
@@ -55,6 +61,14 @@ export class OptionBar<
     )
     this.setParent(parent)
     this.inheritKeyMap(keyMap)
+
+    if (
+      options.selectionMode === 'single' &&
+      this.model.length &&
+      !this.model.some((o) => o.selected)
+    ) {
+      this.model[0].selected = true
+    }
 
     let left = 2
     for (let i = 0; i < this.model.length; i++) {
@@ -76,10 +90,19 @@ export class OptionBar<
     return this.model[this.focusedIndex].id
   }
 
+  toggle() {
+    if (this.widget.widgetOptions.selectionMode === 'multi') {
+      this.model[this.focusedIndex].selected =
+        !this.model[this.focusedIndex].selected
+    }
+  }
+
   itemFocused() {
-    this.model.forEach((item, i) => {
-      item.selected = this.focusedIndex === i
-    })
+    if (this.widget.widgetOptions.selectionMode === 'single') {
+      this.model.forEach((item, i) => {
+        item.selected = this.focusedIndex === i
+      })
+    }
   }
 }
 

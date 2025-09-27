@@ -3,6 +3,7 @@ import {
   CheckboxWidget,
   LabelWidget,
   ListWidget,
+  OptionBarWidget,
   TextFieldWidget,
   Widget,
 } from './widget'
@@ -43,6 +44,7 @@ export interface Backend {
   createCheckbox(options: CheckboxOptions): CheckboxWidget
   createLabel(options: LabelOptions): LabelWidget
   createList(options: ListOptions): ListWidget
+  createOptionBar(options: ListOptions): OptionBarWidget
   createTextField(options: TextFieldOptions): TextFieldWidget
 
   dispose(): void

@@ -31,12 +31,16 @@ export interface ApplicationCtrlCtorParams<M> {
   store: Store<M>
 }
 
-export interface WidgetParams {
+export interface WidgetParams<T extends Widget<any> = Widget<any>> {
   env: ComponentEnvironment
   parent: Widget
   keyMap?: KeyMapArg
-  options?: WidgetOptions
+  options?: InferWidgetOptions<T>
 }
+
+type InferWidget<C> = C extends Controller<infer W, any, any> ? W : Widget
+
+type InferWidgetOptions<W> = W extends Widget<infer O> ? O : WidgetOptions
 
 export interface StateParams<Model, StoreModel> {
   model: Model
@@ -46,8 +50,12 @@ export interface StateParams<Model, StoreModel> {
 /**
  * Parameters for constructing a Controller.
  */
-export interface CtrlCtorParams<Model = any, StoreModel = Model> {
-  widget: WidgetParams
+export interface CtrlCtorParams<
+  Model = any,
+  StoreModel = Model,
+  W extends Widget<any> = Widget<WidgetOptions>,
+> {
+  widget: WidgetParams<W>
   state: StateParams<Model, StoreModel>
 }
 
@@ -55,7 +63,11 @@ export interface CtrlCtorParams<Model = any, StoreModel = Model> {
  * Type for a Controller class/constructor.
  */
 export type CtrlConstructor<T extends Controller, M, SM> = new (
-  ctorParams: CtrlCtorParams<M, SM>,
+  ctorParams: CtrlCtorParams<
+    M,
+    SM,
+    T extends Controller<infer W> ? W : Widget<WidgetOptions>
+  >,
   ...args: any[]
 ) => T
 
@@ -246,7 +258,7 @@ export abstract class Controller<
           env: this.env,
           parent: this.widget,
           keyMap: { replace: false, keys: inheritKeys },
-          options: style as WidgetOptions,
+          options: style,
         },
         state: {
           store: store!,
@@ -259,10 +271,15 @@ export abstract class Controller<
     return child
   }
 
-  #resolveChildParams<T extends Controller, M, SM>(
+  #resolveChildParams<T extends Controller, M, SM, W = InferWidget<T>>(
     childDesc: ChildParam<T, M, SM>,
     options: WidgetOptions | StateParams<M, SM> = {}
-  ) {
+  ): {
+    ctrlClass: CtrlConstructor<T, M, SM>
+    model: M
+    store: Store<SM>
+    style: InferWidgetOptions<W>
+  } {
     const ctrlClass =
       typeof childDesc === 'function' ? childDesc : childDesc.component
 
@@ -273,7 +290,9 @@ export abstract class Controller<
       return {
         ctrlClass,
         ...(options as StateParams<M, SM>),
-        style: typeof childDesc !== 'function' ? (childDesc.style ?? {}) : {},
+        style: (typeof childDesc !== 'function'
+          ? (childDesc.style ?? {})
+          : {}) as InferWidgetOptions<W>,
       }
     }
 
@@ -284,9 +303,13 @@ export abstract class Controller<
 
     return {
       ctrlClass,
-      model: typeof childDesc === 'function' ? undefined : childDesc.model,
-      store: typeof childDesc === 'function' ? this.store : childDesc.store,
-      style: opts,
+      model: (typeof childDesc === 'function'
+        ? undefined
+        : childDesc.model) as M,
+      store: (typeof childDesc === 'function'
+        ? this.store
+        : childDesc.store) as Store<SM>,
+      style: opts as InferWidgetOptions<W>,
     }
   }
 

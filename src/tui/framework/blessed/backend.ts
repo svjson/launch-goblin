@@ -16,6 +16,7 @@ import {
   Widget,
   WidgetOptions,
   CheckboxOptions,
+  OptionBarWidget,
 } from '../widget'
 import {
   BlessedCheckboxWidget,
@@ -98,6 +99,13 @@ export class BlessedBackend implements Backend {
   createList(options: ListOptions): ListWidget {
     return new BlessedListWidget(
       blessed.list(toBlessedListOptions(options, this.screen)),
+      options
+    )
+  }
+
+  createOptionBar(options: ListOptions): OptionBarWidget {
+    return new BlessedWidget(
+      blessed.box(toBlessedListOptions(options, this.screen)),
       options
     )
   }

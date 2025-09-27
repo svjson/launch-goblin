@@ -5,6 +5,7 @@ import { Interaction } from './interaction'
 import { Behavior } from './behavior'
 
 export type UIState = ':focused' | ':selected' | ':disabled'
+export type SelectionMode = 'none' | 'single' | 'multi'
 
 export type WidgetOptions = BaseWidgetOptions & StateVariants
 
@@ -22,6 +23,7 @@ export type CheckboxOptions = BaseWidgetOptions & {}
 
 export type ListOptions = BaseWidgetOptions & {
   items?: string[]
+  selectionMode: SelectionMode
 }
 
 export type LabelOptions = BaseWidgetOptions & {
@@ -74,6 +76,8 @@ export interface ListWidget extends Widget {
   setItems(items: string[]): void
   onItemSelected(callback: (item: any, index: number) => void): void
 }
+
+export interface OptionBarWidget extends Widget<ListOptions> {}
 
 export interface TextFieldWidget extends Widget {
   onSubmit(callback: () => void): void
