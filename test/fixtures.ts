@@ -93,7 +93,7 @@ const TEST_PROJECTS: Record<TestProjectId, TestProject> = {
           package: '@acme-platform/backend-service',
           root: '/tmp/somewhere/packages/backend-service',
           pkgJson: new PackageJSON({ content: '{}' }),
-          targets: ['dev', 'dev:local'],
+          targets: ['dev', 'dev:local', 'test', 'typecheck'],
         } satisfies NodePackage,
         {
           id: 'frontend-portal',

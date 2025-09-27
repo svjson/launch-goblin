@@ -64,21 +64,102 @@ describe('Interaction', () => {
 
     it('should be possible to toggle selection with enter', () => {
       // Given
-      const { backend, adapter } = runGoblinApp({ projectId: 'dummy-project' })
+      const { state, backend, adapter } = runGoblinApp({
+        projectId: 'dummy-project',
+      })
       const cmpSection = adapter.componentSection()
 
       // Then
       expect(cmpSection.isFocusedComponentChecked()).toBe(true)
+      expect(state.session.components.map((c) => c.state.selected)).toEqual([
+        true,
+        true,
+        true,
+        true,
+      ])
 
       // When - press enter
       backend.performKeyPress('enter')
       // Then - Box has been unchecked
       expect(cmpSection.isFocusedComponentChecked()).toBe(false)
+      expect(state.session.components.map((c) => c.state.selected)).toEqual([
+        false,
+        true,
+        true,
+        true,
+      ])
 
       // When - press enter
       backend.performKeyPress('enter')
       // Then - Box has been checked
       expect(cmpSection.isFocusedComponentChecked()).toBe(true)
+      expect(state.session.components.map((c) => c.state.selected)).toEqual([
+        true,
+        true,
+        true,
+        true,
+      ])
+    })
+
+    it('should be possible to cycle through script targets with arrow right', () => {
+      // Given
+      const { state, backend, adapter } = runGoblinApp({
+        projectId: 'dummy-project',
+      })
+      const cmpSection = adapter.componentSection()
+
+      // Then
+      expect(cmpSection.isFocusedComponentChecked()).toBe(true)
+      expect(state.session.components.map((c) => c.state.targets)).toEqual([
+        ['dev'],
+        ['dev'],
+        ['dev'],
+        ['dev'],
+      ])
+
+      // When - press arrow right
+      backend.performKeyPress('right')
+      // Then - The next script has been selected
+      expect(cmpSection.isFocusedComponentChecked()).toBe(true)
+      expect(state.session.components.map((c) => c.state.targets)).toEqual([
+        ['dev:local'],
+        ['dev'],
+        ['dev'],
+        ['dev'],
+      ])
+
+      // When - press arrow right
+      backend.performKeyPress('right')
+      // Then - The next script has been selected
+      expect(cmpSection.isFocusedComponentChecked()).toBe(true)
+      expect(state.session.components.map((c) => c.state.targets)).toEqual([
+        ['test'],
+        ['dev'],
+        ['dev'],
+        ['dev'],
+      ])
+
+      // When - press arrow right
+      backend.performKeyPress('right')
+      // Then - The next script has been selected
+      expect(cmpSection.isFocusedComponentChecked()).toBe(true)
+      expect(state.session.components.map((c) => c.state.targets)).toEqual([
+        ['typecheck'],
+        ['dev'],
+        ['dev'],
+        ['dev'],
+      ])
+
+      // When - press arrow right
+      backend.performKeyPress('right')
+      // Then - The selected script has cycled back to 'dev'
+      expect(cmpSection.isFocusedComponentChecked()).toBe(true)
+      expect(state.session.components.map((c) => c.state.targets)).toEqual([
+        ['dev'],
+        ['dev'],
+        ['dev'],
+        ['dev'],
+      ])
     })
   })
 })

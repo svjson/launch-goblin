@@ -16,20 +16,29 @@ export const applyConfig = (
   project: Project,
   session: LaunchSession
 ): LaunchSession => {
-  session.components = project.components.map((cmp) => {
-    const { selected, targets } = launchConfig.components[cmp.id] ?? {
+  project.components.forEach((cmp) => {
+    let { selected, targets } = launchConfig.components[cmp.id] ?? {
       selected: false,
       targets: [],
     }
-    return {
-      component: cmp,
-      state: {
-        selected,
-        targets:
-          !targets || (Array.isArray(targets) && targets.length === 0)
-            ? cmp.targets.filter((t) => t === launchConfig.defaultTarget)
-            : targets,
-      },
+
+    targets =
+      !targets || (Array.isArray(targets) && targets.length === 0)
+        ? cmp.targets.filter((t) => t === launchConfig.defaultTarget)
+        : targets
+
+    const sessionCmp = session.components.find((c) => c.component.id === cmp.id)
+    if (sessionCmp) {
+      sessionCmp.state.selected = selected
+      sessionCmp.state.targets = [...targets]
+    } else {
+      session.components.push({
+        component: cmp,
+        state: {
+          selected,
+          targets: [...targets],
+        },
+      })
     }
   })
 

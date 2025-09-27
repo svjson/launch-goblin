@@ -96,7 +96,8 @@ export class ComponentSection extends Controller<
 
     this.store!.subscribe('config.activeConfigName', () => {
       juxt(this.children, this.components).forEach(([checkbox, cmp]) => {
-        ;(checkbox as Checkbox).setSelected(cmp.state.selected ?? false)
+        ;(checkbox as ComponentItem).setSelected(cmp.state.selected ?? false)
+        ;(checkbox as ComponentItem).setTargets(cmp.state.targets ?? ['dev'])
       })
       return true
     })
@@ -222,8 +223,11 @@ class ComponentItem extends Controller<
       (currentIndex + amount + this.model.component.component.targets.length) %
       this.model.component.component.targets.length
 
-    this.model.component.state.targets[0] =
-      this.model.component.component.targets[newIndex]
+    this.setTargets([this.model.component.component.targets[newIndex]])
+  }
+
+  setTargets(targets: string[]) {
+    this.model.component.state.targets[0] = targets[0]
 
     // FIXME: Setting the model should be enough here!
     // this.components.target.model.text =
