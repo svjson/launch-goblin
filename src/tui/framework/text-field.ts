@@ -15,7 +15,22 @@ export interface TextInputModel {
 }
 
 export class TextField extends Controller<Widget, TextFieldModel> {
-  textInput: TextInput
+  components = this.defineComponents({
+    label: {
+      component: Label,
+      model:
+        typeof this.model.label === 'string'
+          ? { text: this.model.label }
+          : this.model.label,
+      style: { top: 0 },
+    },
+
+    textInput: {
+      component: TextInput,
+      style: { top: 1 },
+      model: { value: this.model.value },
+    },
+  })
 
   constructor({ widget: { env, options }, state: { model } }: CtrlCtorParams) {
     super(
@@ -32,21 +47,7 @@ export class TextField extends Controller<Widget, TextFieldModel> {
       model
     )
 
-    this.addChild(
-      {
-        component: Label,
-        model:
-          typeof model.label === 'string' ? { text: model.label } : model.label,
-      },
-      { top: 0 }
-    )
-    this.textInput = this.addChild(
-      TextInput,
-      { top: 1 },
-      { value: model.value }
-    )
-
-    this.textInput.on('text-changed', (event: TUIEvent) => {
+    this.components.textInput.on('text-changed', (event: TUIEvent) => {
       this.model.value = (event as TextChangedEvent).value
       this.emit(event)
     })
@@ -55,7 +56,7 @@ export class TextField extends Controller<Widget, TextFieldModel> {
   }
 
   getText() {
-    return this.textInput.getText()
+    return this.components.textInput.getText()
   }
 }
 
