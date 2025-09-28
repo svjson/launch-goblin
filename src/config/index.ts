@@ -1,5 +1,4 @@
 export { applyConfig, toLaunchConfigComponents } from './apply'
-export { readConfig, saveLatestLaunch, saveLocalConfig } from './io'
 export { makeConfigurationFacade } from './facade'
 
 export type { ConfigurationModule } from './facade'

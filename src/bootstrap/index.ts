@@ -1,9 +1,10 @@
+import { DiskFileSystem } from '@whimbrel/filesystem'
+
 import {
   applyConfig,
   ContextConfig,
   LegacyConfigType,
   makeConfigurationFacade,
-  readConfig,
 } from '@src/config'
 import { LaunchModule, makeLaunchFacade } from '@src/launch'
 import { ApplicationState, Project, readProject } from '@src/project'
@@ -28,9 +29,11 @@ export const bootstrap = async (
   model: ApplicationState
   facade: ActionFacade
 }> => {
+  const configModule = makeConfigurationFacade(DiskFileSystem)
+
   const project: Project = await readProject(targetAction, options)
 
-  const config: ContextConfig = await readConfig(project)
+  const config: ContextConfig = await configModule.readConfig(project)
   const session: LaunchSession = applyConfig(
     config.global.lastConfig,
     project,
@@ -61,7 +64,6 @@ export const bootstrap = async (
 
   const env = { backend, tty, theme: DefaultTheme, log: [] }
 
-  const configModule = makeConfigurationFacade()
   const launchModule = makeLaunchFacade()
   const facade = makeApplicationFacade(env, model, configModule, launchModule)
 
