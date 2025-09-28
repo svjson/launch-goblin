@@ -34,6 +34,12 @@ export type LabelOptions = BaseWidgetOptions & {
 
 export type TextFieldOptions = BaseWidgetOptions
 
+/**
+ * Type used for inferring the WidgetOptions type associated with a Widget
+ */
+export type InferWidgetOptions<W> =
+  W extends Widget<infer O> ? O : WidgetOptions
+
 export interface Widget<O extends WidgetOptions = WidgetOptions> {
   calculatedStyle: BaseWidgetOptions
   widgetOptions: O

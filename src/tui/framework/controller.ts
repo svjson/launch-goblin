@@ -3,7 +3,12 @@ import { keyHandler, KeyMap } from './keymap'
 import { createStore, Store } from './store'
 import { ControllerLayout, LayoutProperty } from './layout'
 import { Backend } from './backend'
-import { BaseWidgetOptions, Widget, WidgetOptions } from './widget'
+import {
+  BaseWidgetOptions,
+  InferWidgetOptions,
+  Widget,
+  WidgetOptions,
+} from './widget'
 import { calculateWidgetStyle } from './style'
 import { Theme } from './theme'
 import { TTYEnv } from './environment'
@@ -16,29 +21,21 @@ export interface ComponentEnvironment {
 }
 
 /**
+ * Type used for inferring the Widget type used by Controller type.
+ */
+type InferWidget<C> = C extends Controller<infer W, any, any> ? W : Widget
+
+/**
  * Mixin-interface for anything that may listen to events.
  */
 export interface Listener {
   receive: (event: TUIEvent) => void
 }
 
-/**
- * Parameters for constructor an ApplicationController
- */
-export interface ApplicationCtrlCtorParams<M> {
-  env: ComponentEnvironment
-  model: M
-  store: Store<M>
-}
-
 export interface WidgetParams<T extends Widget<any> = Widget<any>> {
   env: ComponentEnvironment
   options?: InferWidgetOptions<T>
 }
-
-type InferWidget<C> = C extends Controller<infer W, any, any> ? W : Widget
-
-type InferWidgetOptions<W> = W extends Widget<infer O> ? O : WidgetOptions
 
 export interface StateParams<Model, StoreModel> {
   model: Model
@@ -75,6 +72,15 @@ export type CtrlConstructor<T extends Controller, M, SM> = new (
 export type CtrlType<
   C extends Controller<any, any, any> = Controller<any, any, any>,
 > = new (...args: any[]) => C
+
+/**
+ * Parameters for constructor an ApplicationController
+ */
+export interface ApplicationCtrlCtorParams<M> {
+  env: ComponentEnvironment
+  model: M
+  store: Store<M>
+}
 
 /**
  * Type for an ApplicationController class/constructor.
