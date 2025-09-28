@@ -1,5 +1,5 @@
 import { Controller, CtrlCtorParams } from './controller'
-import { TUIEvent, TextChangedEvent } from './event'
+import { KeyEvent, TUIEvent, TextChangedEvent } from './event'
 import { Label, LabelItem } from './label'
 import { mergeLeft } from '@whimbrel/walk'
 import { Widget } from './widget'
@@ -71,28 +71,28 @@ export class TextInput extends Controller<Widget, { value: string }> {
 
   keyMap = this.defineKeys({
     left: {
-      handler: this.moveLeft.bind(this),
+      handler: this.moveLeft,
     },
     right: {
-      handler: this.moveRight.bind(this),
+      handler: this.moveRight,
     },
     return: {
-      handler: this.submit.bind(this),
+      handler: this.submit,
     },
     backspace: {
-      handler: this.killBackwards.bind(this),
+      handler: this.killBackwards,
     },
     delete: {
-      handler: this.killForwards.bind(this),
+      handler: this.killForwards,
     },
     home: {
-      handler: this.moveStart.bind(this),
+      handler: this.moveStart,
     },
     end: {
-      handler: this.moveEnd.bind(this),
+      handler: this.moveEnd,
     },
     '/[a-zA-Z0-9 ]/': {
-      handler: this.insertChar.bind(this),
+      handler: this.insertChar,
       group: 'edit',
       legend: 'Insert',
     },
@@ -166,7 +166,7 @@ export class TextInput extends Controller<Widget, { value: string }> {
     }
     this.emit('dirty')
   }
-  insertChar(ch: string, _key: any) {
+  insertChar({ ch }: KeyEvent) {
     if (ch && ch.length === 1) {
       this.model.value =
         this.model.value.slice(0, this.cursor) +

@@ -29,7 +29,7 @@ export class ComponentSection extends Controller<
       propagate: true,
       legend: 'Navigate',
       group: 'nav',
-      handler: () => this.nextChild(-1),
+      handler: this.prevChild,
     },
     down: {
       propagate: true,
@@ -245,7 +245,7 @@ class ComponentItem extends Controller<
             legend: 'Cycle target',
             group: 'focused',
             propagate: true,
-            handler: this.cycleTarget,
+            handler: () => this.cycleTarget(),
           },
         }
       : {}),
@@ -377,7 +377,7 @@ class MultiTargetItem extends Controller<
             legend: 'Previous Target',
             group: 'nav',
             propagate: true,
-            handler: () => this.components.targets.nextChild(-1),
+            handler: () => this.components.targets.prevChild(),
           },
           right: {
             legend: 'Next target',

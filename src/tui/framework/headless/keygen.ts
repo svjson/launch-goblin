@@ -1,17 +1,4 @@
-export interface KeyMeta {
-  sequence?: string
-  name: string
-  ctrl: boolean
-  meta: boolean
-  shift: boolean
-  code?: string
-  full: string
-}
-
-export interface KeyPress {
-  ch?: string
-  key: KeyMeta
-}
+import { KeyPress, KeyMeta } from '../input'
 
 const CHAR_0 = 48
 const CHAR_UCASE_A = 65

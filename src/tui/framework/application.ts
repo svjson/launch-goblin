@@ -6,7 +6,6 @@ import {
 } from './controller'
 import { Store, createStore } from './store'
 import { action, Action, ActionMap, ActionsMeta } from './action'
-import { keyHandler, KeyMap } from './keymap'
 import { ActionEvent, FocusEvent } from './event'
 import { Backend } from './backend'
 
@@ -31,7 +30,6 @@ export class Application<Model, MainCtrl extends ApplicationController<Model>> {
   mainCtrl: MainCtrl
   modals: Controller[] = []
 
-  activeKeyMap: KeyMap = {}
   /**
    * The currently focused component.
    *
@@ -68,10 +66,7 @@ export class Application<Model, MainCtrl extends ApplicationController<Model>> {
 
   #bindApplicationEvents() {
     this.backend.onKey((ch, key) => {
-      const handlerFn = keyHandler(this.activeKeyMap, ch, key)
-      if (typeof handlerFn === 'function') {
-        handlerFn(ch, key)
-      }
+      this.focusedComponent?.receive({ type: 'key', ch, key })
     })
 
     this.backend.onBeforeRender(() => {
@@ -84,7 +79,6 @@ export class Application<Model, MainCtrl extends ApplicationController<Model>> {
     })
 
     this.mainCtrl.on('focus', (event: FocusEvent) => {
-      this.activeKeyMap = event.component.keyMap
       this.focusedComponent = event.component
     })
 

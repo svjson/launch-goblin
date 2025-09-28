@@ -33,7 +33,7 @@ export class MainController extends ApplicationController<ApplicationState> {
     'S-tab': {
       propagate: true,
       legend: 'Prev Section',
-      handler: () => this.nextChild(-1),
+      handler: this.prevChild,
     },
   })
 

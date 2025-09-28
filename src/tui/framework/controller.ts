@@ -1,5 +1,5 @@
 import { DestroyEvent, TUIEvent, EventMap, StringEvent } from './event'
-import { KeyMap, KeyMapArg } from './keymap'
+import { keyHandler, KeyMap, KeyMapArg } from './keymap'
 import { createStore, Store } from './store'
 import { ControllerLayout, LayoutProperty } from './layout'
 import { Backend } from './backend'
@@ -343,16 +343,24 @@ export abstract class Controller<
 
   receive(event: TUIEvent) {
     const handler = this.events[event.type]
-
     if (handler) {
       handler(event)
+    }
+    if (event.type === 'key') {
+      const kHandler = keyHandler(this.keyMap, event.ch, event.key)
+      if (kHandler) {
+        kHandler(event)
+        return
+      }
     }
 
     if (event.type === 'destroy') {
       this.#destroyChild((event as DestroyEvent).component)
     }
 
-    if (['dirty', 'launch', 'focus', 'log', 'action'].includes(event.type)) {
+    if (
+      ['dirty', 'launch', 'focus', 'log', 'action', 'key'].includes(event.type)
+    ) {
       this.emit(event)
     }
   }
@@ -387,7 +395,7 @@ export abstract class Controller<
     return this.widget
   }
 
-  nextChild(dir: number = 1): Controller | undefined {
+  #nextChild(dir: number): Controller | undefined {
     dir = typeof dir !== 'number' ? 1 : dir
     this.focusedIndex =
       (this.focusedIndex + dir + this.children.length) % this.children.length
@@ -395,7 +403,7 @@ export abstract class Controller<
     const child = this.children[this.focusedIndex]
     if (!child || !child.isFocusable()) {
       if (this.children.some((c) => c.isFocusable())) {
-        return this.nextChild(dir)
+        return this.#nextChild(dir)
       }
       return
     }
@@ -403,6 +411,14 @@ export abstract class Controller<
     child.focus()
     this.emit('dirty')
     return child
+  }
+
+  nextChild(): Controller | undefined {
+    return this.#nextChild(1)
+  }
+
+  prevChild(): Controller | undefined {
+    return this.#nextChild(-1)
   }
 
   destroy() {

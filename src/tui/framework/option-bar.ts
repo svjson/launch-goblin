@@ -24,7 +24,7 @@ export class OptionBar<
       propagate: true,
       legend: 'Previous',
       group: 'nav',
-      handler: () => this.nextChild(-1),
+      handler: this.prevChild,
     },
     enter: {
       propagate: true,

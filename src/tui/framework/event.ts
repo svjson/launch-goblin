@@ -1,5 +1,6 @@
 import { Action } from './action'
 import { Controller } from './controller'
+import { KeyPress } from './input'
 
 export type StringEvent = 'dirty' | 'pressed' | 'launch'
 
@@ -48,8 +49,13 @@ export interface ActionEvent {
   action: Action
 }
 
+export type KeyEvent = {
+  type: 'key'
+} & KeyPress
+
 export type TUIEvent =
   | ActionEvent
+  | KeyEvent
   | NoArgEvent
   | CheckboxEvent
   | DestroyEvent

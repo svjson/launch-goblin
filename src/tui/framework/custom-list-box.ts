@@ -38,7 +38,7 @@ export class CustomListBox<
       propagate: true,
       legend: 'Navigate',
       group: 'nav',
-      handler: () => this.nextChild(-1),
+      handler: this.prevChild,
     },
     down: {
       propagate: true,
@@ -131,7 +131,7 @@ export class CustomListBox<
 
     this.setFocusable(this.model.length > 0)
     if (this.focusedIndex >= this.children.length) {
-      this.nextChild(-1)
+      this.prevChild
     }
     this.flushSelection()
   }
