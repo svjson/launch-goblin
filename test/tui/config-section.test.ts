@@ -6,14 +6,12 @@ import {
   DefaultTheme,
   noBackend,
   Store,
-  Widget,
 } from '@src/tui/framework'
 import { ApplicationState } from '@src/project'
 import { ttyEnv } from './framework/fixtures'
 
 const makeFixture = (): [
   ComponentEnvironment,
-  Widget,
   Store<ApplicationState>,
   ApplicationState,
 ] => {
@@ -24,7 +22,6 @@ const makeFixture = (): [
     theme,
     tty: ttyEnv(),
   }
-  const container = backend.createBox({})
   const state: ApplicationState = {
     config: {
       local: { launchConfigs: {} },
@@ -34,19 +31,18 @@ const makeFixture = (): [
 
   const store = createStore(state)
 
-  return [env, container, store, state]
+  return [env, store, state]
 }
 
 describe('ConfigSection', () => {
   describe('focusable', () => {
     test('on construction - no configs set focusable to false', () => {
       // Given
-      const [env, container, store, _state] = makeFixture()
+      const [env, store, _state] = makeFixture()
 
       const configSection = new ConfigSection({
         widget: {
           env,
-          parent: container,
         },
         state: {
           model: [],
@@ -61,7 +57,7 @@ describe('ConfigSection', () => {
 
     test('on construction - one present config sets focusable to true', () => {
       // Given
-      const [env, container, store, state] = makeFixture()
+      const [env, store, state] = makeFixture()
 
       state.config.local.launchConfigs['Prutt'] = {
         defaultTarget: 'dev',
@@ -76,7 +72,6 @@ describe('ConfigSection', () => {
       const configSection = new ConfigSection({
         widget: {
           env,
-          parent: container,
         },
         state: {
           store,

@@ -14,7 +14,6 @@ describe('OptionBar', () => {
       optionBar: new OptionBar({
         widget: {
           env,
-          parent: env.backend.createBox({}),
           options: {
             selectionMode,
           },

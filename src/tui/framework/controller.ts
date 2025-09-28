@@ -33,7 +33,6 @@ export interface ApplicationCtrlCtorParams<M> {
 
 export interface WidgetParams<T extends Widget<any> = Widget<any>> {
   env: ComponentEnvironment
-  parent: Widget
   keyMap?: KeyMapArg
   options?: InferWidgetOptions<T>
 }
@@ -170,6 +169,14 @@ export abstract class Controller<
   layout: ControllerLayout
 
   /**
+   * The parent component of this component.
+   *
+   * If this component has not been mounted or is detached, this field will
+   * be undefined.
+   */
+  parent?: Controller
+
+  /**
    * The child controllers/components of this component
    */
   children: Controller[] = []
@@ -229,11 +236,15 @@ export abstract class Controller<
       args
     )
 
-    child.setParent(this.widget)
-    child.addListener(this)
-    this.children.push(child)
+    this.#mount(child)
 
     return child
+  }
+
+  #mount(child: Controller) {
+    child.setParent(this)
+    child.addListener(this)
+    this.children.push(child)
   }
 
   #resolveChildInstance<T extends Controller, M, SM>(
@@ -256,7 +267,6 @@ export abstract class Controller<
       {
         widget: {
           env: this.env,
-          parent: this.widget,
           keyMap: { replace: false, keys: inheritKeys },
           options: style,
         },
@@ -313,8 +323,9 @@ export abstract class Controller<
     }
   }
 
-  setParent(widget: Widget) {
-    this.widget.setParent(widget)
+  setParent(controller: Controller) {
+    this.parent = controller
+    this.widget.setParent(controller.widget)
   }
 
   addListener(listener: Listener) {

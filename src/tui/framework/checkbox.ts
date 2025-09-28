@@ -30,7 +30,7 @@ export class Checkbox<I extends CheckboxItem = CheckboxItem> extends Controller<
   focusable = true
 
   constructor({
-    widget: { env, parent, keyMap, options },
+    widget: { env, keyMap, options },
     state: { model },
   }: CtrlCtorParams) {
     super(
@@ -53,7 +53,6 @@ export class Checkbox<I extends CheckboxItem = CheckboxItem> extends Controller<
       model
     )
     this.inheritKeyMap(keyMap)
-    this.setParent(parent)
 
     this.box = this.addChild({
       component: Label,

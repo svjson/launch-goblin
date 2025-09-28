@@ -48,7 +48,7 @@ export class ComponentSection extends Controller<
   components: SessionComponent[]
 
   constructor({
-    widget: { env, parent, keyMap },
+    widget: { env, keyMap },
     state: { model = [], store },
   }: CtrlCtorParams<SessionComponent[], ApplicationState>) {
     super(
@@ -92,7 +92,6 @@ export class ComponentSection extends Controller<
       model,
       store
     )
-    this.setParent(parent)
     this.inheritKeyMap(keyMap)
 
     this.components = model

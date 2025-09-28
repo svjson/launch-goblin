@@ -18,7 +18,7 @@ export class TextField extends Controller<Widget, TextFieldModel> {
   textInput: TextInput
 
   constructor({
-    widget: { env, parent, keyMap, options },
+    widget: { env, keyMap, options },
     state: { model },
   }: CtrlCtorParams) {
     super(
@@ -34,7 +34,6 @@ export class TextField extends Controller<Widget, TextFieldModel> {
       ),
       model
     )
-    this.setParent(parent)
 
     this.inheritKeyMap(keyMap)
 
@@ -101,7 +100,7 @@ export class TextInput extends Controller<Widget, { value: string }> {
   focusable = true
 
   constructor({
-    widget: { env, parent, keyMap, options = {} },
+    widget: { env, keyMap, options = {} },
     state: { model },
   }: CtrlCtorParams) {
     super(
@@ -121,7 +120,6 @@ export class TextInput extends Controller<Widget, { value: string }> {
       ),
       model ?? { value: '' }
     )
-    this.setParent(parent)
     this.model.value ??= ''
     this.inheritKeyMap(keyMap)
 

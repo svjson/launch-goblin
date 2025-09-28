@@ -18,7 +18,7 @@ export class ListBox<ItemModel extends ListItem = ListItem> extends Controller<
   focusable = true
 
   constructor({
-    widget: { env, parent, keyMap, options = {} },
+    widget: { env, keyMap, options = {} },
     state: { model = [] },
   }: CtrlCtorParams<ItemModel[]>) {
     super(
@@ -35,8 +35,6 @@ export class ListBox<ItemModel extends ListItem = ListItem> extends Controller<
       ),
       model
     )
-
-    this.setParent(parent)
 
     if (this.model.length === 0) {
       this.disable()

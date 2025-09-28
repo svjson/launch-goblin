@@ -62,10 +62,11 @@ export interface Widget<O extends WidgetOptions = WidgetOptions> {
   getStyleOptions(): BaseWidgetOptions
   getAppearance(): Appearance
 
+  setParent(parent: Widget): void
+
   get(prop: string): string | number | boolean | undefined
   set(prop: string, value: string | number | undefined): void
 
-  setParent(parent: Widget): void
   setLayout(prop: LayoutProperty, value: string | number): void
 }
 
