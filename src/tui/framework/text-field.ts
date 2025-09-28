@@ -1,5 +1,5 @@
 import { Controller, CtrlCtorParams } from './controller'
-import { Event, TextChangedEvent } from './event'
+import { TUIEvent, TextChangedEvent } from './event'
 import { Label, LabelItem } from './label'
 import { mergeLeft } from '@whimbrel/walk'
 import { Widget } from './widget'
@@ -52,7 +52,7 @@ export class TextField extends Controller<Widget, TextFieldModel> {
       { value: model.value }
     )
 
-    this.textInput.on('text-changed', (event: Event) => {
+    this.textInput.on('text-changed', (event: TUIEvent) => {
       this.model.value = (event as TextChangedEvent).value
       this.emit(event)
     })
@@ -102,7 +102,7 @@ export class TextInput extends Controller<Widget, { value: string }> {
 
   constructor({
     widget: { env, parent, keyMap, options = {} },
-    state: { model, store },
+    state: { model },
   }: CtrlCtorParams) {
     super(
       env,

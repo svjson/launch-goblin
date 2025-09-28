@@ -1,5 +1,3 @@
-#!/usr/bin/env node
-
 import { LaunchGoblinApp } from './tui'
 import { LogEvent } from './tui/framework'
 import { setTTYTitleString } from './tui/framework/tty'

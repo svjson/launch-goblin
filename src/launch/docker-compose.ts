@@ -11,7 +11,7 @@ export const findExecutable = async (
   try {
     const binPath = await which(bin)
     return binPath
-  } catch (err) {
+  } catch {
     return undefined
   }
 }

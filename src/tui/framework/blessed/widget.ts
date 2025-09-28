@@ -185,20 +185,20 @@ export abstract class BlessedWidget<
     blessedParent.inner.append(this.inner)
   }
 
-  setLayout(prop: LayoutProperty, value: string | number): void {
+  setLayout(_prop: LayoutProperty, _value: string | number): void {
     throw new Error('Method not implemented.')
   }
 }
 
 export class BlessedBoxWidget
-  extends BlessedWidget<blessed.Widgets.BoxElement>
+  extends BlessedWidget<blessed.Widgets.BoxElement, BoxOptions>
   implements Widget
 {
   type: 'box' = 'box'
 }
 
 export class BlessedButtonWidget
-  extends BlessedWidget<blessed.Widgets.ButtonElement>
+  extends BlessedWidget<blessed.Widgets.ButtonElement, ButtonOptions>
   implements Widget
 {
   type: 'button' = 'button'

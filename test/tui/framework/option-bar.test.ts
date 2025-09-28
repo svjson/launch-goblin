@@ -1,6 +1,6 @@
 import { createStore, HeadlessBackend, OptionBar } from '@src/tui/framework'
-import { describe, expect, it, test } from 'vitest'
-import { applicationEnvironment, ttyEnv } from './fixtures'
+import { describe, expect, it } from 'vitest'
+import { applicationEnvironment } from './fixtures'
 import { OptionItem } from '@src/tui/framework/option-bar'
 import { SelectionMode } from '@src/tui/framework/widget'
 

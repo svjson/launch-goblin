@@ -46,7 +46,7 @@ export const ST = '\x1b\\'
  * CSI = “Control Sequence Introducer” = ESC [ (0x1B 0x5B)
  * BEL = 0x07, ST = ESC \ (0x1B 0x5C)
  */
-const QUERY = `${ESC_CSI}21t`
+//const QUERY = `${ESC_CSI}21t`
 
 /**
  * Builder for OSC sequence

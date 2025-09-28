@@ -172,13 +172,13 @@ export class HeadlessListWidget
   clearItems(): void {
     throw new Error('HeadlessLabelWidget::clearItems - Method not implemented.')
   }
-  select(index: number): void {
+  select(_index: number): void {
     throw new Error('HeadlessLabelWidget::select - Method not implemented.')
   }
-  setItems(items: string[]): void {
+  setItems(_items: string[]): void {
     throw new Error('HeadlessLabelWidget::setItems - Method not implemented.')
   }
-  onItemSelected(callback: (item: any, index: number) => void): void {
+  onItemSelected(_callback: (item: any, index: number) => void): void {
     throw new Error(
       'HeadlessLabelWidget::onItemSelected - Method not implemented.'
     )
@@ -198,12 +198,12 @@ export class HeadlessTextFieldWidget
 {
   type: 'text-field' = 'text-field'
 
-  onSubmit(callback: () => void): void {
+  onSubmit(_callback: () => void): void {
     throw new Error(
       'HeadlessTextFieldWidget::onSubmit() - Method not implemented.'
     )
   }
-  onCancel(callback: () => void): void {
+  onCancel(_callback: () => void): void {
     throw new Error(
       'HeadlessTextFieldWidget::onCancel() - Method not implemented.'
     )

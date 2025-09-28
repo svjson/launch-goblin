@@ -65,15 +65,6 @@ const makeTestSubscriber = <T>() => {
 }
 
 describe('matchesPath', () => {
-  const matchesTest = (
-    [testPath, againstPath]: [PropertyPath, PropertyPath],
-    expected: boolean
-  ) => {
-    it(`should test ${expected} for ${testPath} against ${againstPath}`, () => {
-      expect(matchesPath(testPath, againstPath)).toBe(expected)
-    })
-  }
-
   it.each([
     ['somewhere.over.the.rainbow', 'somewhere'],
     ['somewhere.over.the', 'somewhere'],

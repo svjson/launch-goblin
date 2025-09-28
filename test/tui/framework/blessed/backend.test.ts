@@ -1,6 +1,6 @@
 import { Behavior } from '@src/tui/framework/behavior'
 import { toBlessedBehavior } from '@src/tui/framework/blessed/backend'
-import { describe, expect, it, test } from 'vitest'
+import { describe, expect, test } from 'vitest'
 
 describe('toBlessedBehavior', () => {
   test.each([

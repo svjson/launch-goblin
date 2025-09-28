@@ -4,7 +4,7 @@ import { runGoblinApp } from 'test/fixtures'
 
 describe('LaunchGoblinApp', () => {
   it('should start with component section focused', async () => {
-    const { app, env } = runGoblinApp({ projectId: 'dummy-project' })
+    const { env } = runGoblinApp({ projectId: 'dummy-project' })
 
     const backend = env.backend as HeadlessBackend
 

@@ -36,7 +36,7 @@ const publish = (
   }
 }
 
-export interface Store<Model> {
+export interface Store<_Model> {
   get<T>(propertyPath: PropertyPath): T
   set<T>(propertyPath: PropertyPath, value: T): void
   delete(propertyPath: PropertyPath): void

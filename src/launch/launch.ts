@@ -38,7 +38,7 @@ export const findExecutable = async (
     }
 
     return binPath
-  } catch (err) {
+  } catch {
     throw new Error(`Could not find executable: ${bin}`)
   }
 }
@@ -83,7 +83,9 @@ const killChildProcesses = (sig: NodeJS.Signals) => {
   for (const child of children) {
     try {
       child.kill(sig)
-    } catch {}
+    } catch {
+      return
+    }
   }
 }
 

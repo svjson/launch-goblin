@@ -2,7 +2,7 @@ import { mergeLeft } from '@whimbrel/walk'
 
 import { Controller, CtrlCtorParams } from './controller'
 import { Label } from './label'
-import { CheckboxWidget, Widget } from './widget'
+import { CheckboxWidget } from './widget'
 import { resolveComponentStyle } from './theme'
 
 export interface CheckboxItem {

@@ -28,7 +28,7 @@ export type { ColorMode, TTYEnv } from './environment'
 export type {
   ActionEvent,
   CheckboxEvent,
-  Event,
+  TUIEvent,
   FocusEvent,
   DestroyedEvent,
   LogEvent,

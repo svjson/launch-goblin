@@ -1,4 +1,4 @@
-import { DestroyEvent, Event, EventMap, StringEvent } from './event'
+import { DestroyEvent, TUIEvent, EventMap, StringEvent } from './event'
 import { KeyMap, KeyMapArg } from './keymap'
 import { createStore, Store } from './store'
 import { ControllerLayout, LayoutProperty } from './layout'
@@ -19,7 +19,7 @@ export interface ComponentEnvironment {
  * Mixin-interface for anything that may listen to events.
  */
 export interface Listener {
-  receive: (event: Event) => void
+  receive: (event: TUIEvent) => void
 }
 
 /**
@@ -341,7 +341,7 @@ export abstract class Controller<
     }
   }
 
-  receive(event: Event) {
+  receive(event: TUIEvent) {
     const handler = this.events[event.type]
 
     if (handler) {
@@ -422,7 +422,7 @@ export abstract class Controller<
     this.emit({ type: 'action', action })
   }
 
-  emit(event: Event | StringEvent) {
+  emit(event: TUIEvent | StringEvent) {
     event = typeof event === 'string' ? { type: event } : event
     this.listeners.forEach((l) => {
       l.receive(event)

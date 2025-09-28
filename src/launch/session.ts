@@ -1,4 +1,4 @@
-import { ApplicationState, Project } from '@src/project'
+import { ApplicationState } from '@src/project'
 import { SessionComponent } from '@src/project/state'
 import { ApplicationEnvironment } from '@src/tui/framework'
 import { LaunchCommand, LaunchMode } from './types'

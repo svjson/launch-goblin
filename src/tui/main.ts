@@ -1,10 +1,10 @@
-import { ApplicationState, Project } from '@src/project'
+import { ApplicationState } from '@src/project'
 import {
   ApplicationController,
   ApplicationCtrlCtorParams,
   Backend,
   Button,
-  Event,
+  TUIEvent,
   FocusEvent,
   Store,
 } from './framework'
@@ -87,7 +87,7 @@ export class MainController extends ApplicationController<ApplicationState> {
     this.components.footer.applyContext(event.component)
   }
 
-  emit(event: Event) {
+  emit(event: TUIEvent) {
     super.emit(event)
   }
 
@@ -96,7 +96,7 @@ export class MainController extends ApplicationController<ApplicationState> {
       type: 'open-modal',
       details: {
         source: this,
-        create: <M, SM>({}: { backend: Backend; model: M; store: Store<SM> }) =>
+        create: <M, SM>(_: { backend: Backend; model: M; store: Store<SM> }) =>
           new SaveConfigDialog({
             env: this.env,
             store: this.store,

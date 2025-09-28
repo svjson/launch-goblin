@@ -241,49 +241,51 @@ describe('Interaction', () => {
         const saved = new Promise<{
           state?: ApplicationState
           type: LegacyConfigType
-        }>(async (resolve) => {
-          const { backend, app, adapter } = runGoblinApp({
-            projectId: 'dummy-project',
-            configs: {
-              private: ['Backend Dev Environment'],
-              shared: ['Full Dev Environment', 'No Mocks'],
-            },
-            facade: {
-              saveConfig: async (state, type) => {
-                resolve({ state, type })
+        }>((resolve) => {
+          ;(async () => {
+            const { backend, app, adapter } = runGoblinApp({
+              projectId: 'dummy-project',
+              configs: {
+                private: ['Backend Dev Environment'],
+                shared: ['Full Dev Environment', 'No Mocks'],
               },
-            },
-          })
+              facade: {
+                saveConfig: async (state, type) => {
+                  resolve({ state, type })
+                },
+              },
+            })
 
-          expect(app.modals.length).toEqual(0)
+            expect(app.modals.length).toEqual(0)
 
-          // When
-          backend.performKeyPress('C-s')
-          // Then - Save config dialog opens
-          expect(app.modals.length).toEqual(1)
-          expect(app.focusedComponent!.model).toEqual({ value: '' })
+            // When
+            backend.performKeyPress('C-s')
+            // Then - Save config dialog opens
+            expect(app.modals.length).toEqual(1)
+            expect(app.focusedComponent!.model).toEqual({ value: '' })
 
-          // When - Type config name
-          backend.typeString('New Config')
-          await wait(100)
-          expect(app.focusedComponent!.model).toEqual({ value: 'New Config' })
+            // When - Type config name
+            backend.typeString('New Config')
+            await wait(100)
+            expect(app.focusedComponent!.model).toEqual({ value: 'New Config' })
 
-          // When - Tab to Save-button
-          backend.performKeyPress('tab')
-          expect(app.focusedComponent!.model.label).toEqual('Private')
+            // When - Tab to Save-button
+            backend.performKeyPress('tab')
+            expect(app.focusedComponent!.model.label).toEqual('Private')
 
-          backend.performKeyPress('tab')
-          expect(app.focusedComponent!.model.text).toEqual('Save')
+            backend.performKeyPress('tab')
+            expect(app.focusedComponent!.model.text).toEqual('Save')
 
-          // When - Press button
-          backend.performKeyPress('enter')
-          // THen - Modal has been closed
-          expect(app.modals.length).toEqual(0)
+            // When - Press button
+            backend.performKeyPress('enter')
+            // THen - Modal has been closed
+            expect(app.modals.length).toEqual(0)
 
-          // Then - focused item is the first project component
-          expect(adapter.componentSection().getFocusedComponentName()).toEqual(
-            'backend-service'
-          )
+            // Then - focused item is the first project component
+            expect(
+              adapter.componentSection().getFocusedComponentName()
+            ).toEqual('backend-service')
+          })()
         })
 
         const { state, type } = await saved
@@ -299,55 +301,57 @@ describe('Interaction', () => {
         const saved = new Promise<{
           state?: ApplicationState
           type: LegacyConfigType
-        }>(async (resolve) => {
-          const { backend, app, adapter } = runGoblinApp({
-            projectId: 'dummy-project',
-            configs: {
-              private: ['Backend Dev Environment'],
-              shared: ['Full Dev Environment', 'No Mocks'],
-            },
-            facade: {
-              saveConfig: async (state, type) => {
-                resolve({ state, type })
+        }>((resolve) => {
+          ;(async () => {
+            const { backend, app, adapter } = runGoblinApp({
+              projectId: 'dummy-project',
+              configs: {
+                private: ['Backend Dev Environment'],
+                shared: ['Full Dev Environment', 'No Mocks'],
               },
-            },
-          })
+              facade: {
+                saveConfig: async (state, type) => {
+                  resolve({ state, type })
+                },
+              },
+            })
 
-          expect(app.modals.length).toEqual(0)
+            expect(app.modals.length).toEqual(0)
 
-          // When
-          backend.performKeyPress('C-s')
-          // Then - Save config dialog opens
-          expect(app.modals.length).toEqual(1)
-          expect(app.focusedComponent!.model).toEqual({ value: '' })
+            // When
+            backend.performKeyPress('C-s')
+            // Then - Save config dialog opens
+            expect(app.modals.length).toEqual(1)
+            expect(app.focusedComponent!.model).toEqual({ value: '' })
 
-          // When - Type config name
-          backend.typeString('Cheese Muffins')
-          await wait(100)
-          expect(app.focusedComponent!.model).toEqual({
-            value: 'Cheese Muffins',
-          })
+            // When - Type config name
+            backend.typeString('Cheese Muffins')
+            await wait(100)
+            expect(app.focusedComponent!.model).toEqual({
+              value: 'Cheese Muffins',
+            })
 
-          // When - Tab to config type option
-          backend.performKeyPress('tab')
-          expect(app.focusedComponent!.model.label).toEqual('Private')
+            // When - Tab to config type option
+            backend.performKeyPress('tab')
+            expect(app.focusedComponent!.model.label).toEqual('Private')
 
-          backend.performKeyPress('right')
-          expect(app.focusedComponent!.model.label).toEqual('Shared')
+            backend.performKeyPress('right')
+            expect(app.focusedComponent!.model.label).toEqual('Shared')
 
-          // When - Tab to Save-button
-          backend.performKeyPress('tab')
-          expect(app.focusedComponent!.model.text).toEqual('Save')
+            // When - Tab to Save-button
+            backend.performKeyPress('tab')
+            expect(app.focusedComponent!.model.text).toEqual('Save')
 
-          // When - Press button
-          backend.performKeyPress('enter')
-          // THen - Modal has been closed
-          expect(app.modals.length).toEqual(0)
+            // When - Press button
+            backend.performKeyPress('enter')
+            // THen - Modal has been closed
+            expect(app.modals.length).toEqual(0)
 
-          // Then - focused item is the first project component
-          expect(adapter.componentSection().getFocusedComponentName()).toEqual(
-            'backend-service'
-          )
+            // Then - focused item is the first project component
+            expect(
+              adapter.componentSection().getFocusedComponentName()
+            ).toEqual('backend-service')
+          })()
         })
 
         const { state, type } = await saved

@@ -153,7 +153,7 @@ const applyModifiers = (
   keySym: string,
   modifiers: string
 ): KeyPress => {
-  const { ch, key } = KeyGen[keySym]
+  const { key } = KeyGen[keySym]
   return {
     ch: undefined,
     key: {

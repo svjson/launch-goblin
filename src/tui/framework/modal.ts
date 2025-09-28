@@ -1,7 +1,7 @@
 import { mergeLeft } from '@whimbrel/walk'
 
 import { ComponentEnvironment, Controller } from './controller'
-import { Event } from './event'
+import { TUIEvent } from './event'
 import { Store } from './store'
 import { Label } from './label'
 import { Button } from './button'
@@ -93,9 +93,9 @@ export interface ConfirmDialogModel {
   message?: string
   options?: ConfirmOption[]
   buttonSpacing?: number
-  onConfirm?: Event | (() => void)
-  onCancel?: Event | (() => void)
-  onDecline?: Event | (() => void)
+  onConfirm?: TUIEvent | (() => void)
+  onCancel?: TUIEvent | (() => void)
+  onDecline?: TUIEvent | (() => void)
 }
 
 const DEFAULT_BUTTON_TEXT = {
@@ -211,7 +211,7 @@ export class ConfirmDialog<
     )
   }
 
-  #fireHandler(handler: Event | (() => void) | undefined) {
+  #fireHandler(handler: TUIEvent | (() => void) | undefined) {
     if (handler === undefined) return
     if (typeof handler === 'function') {
       handler()

@@ -28,7 +28,7 @@ export const resolveComponentStyle = (
   theme: Theme,
   component: string,
   colorMode: ColorMode,
-  cmpDefaults?: ComponentThemeStyle
+  _cmpDefaults?: ComponentThemeStyle
 ): BaseComponentThemeStyle & StateVariants => {
   const componentThemeStyle = theme.components[component] ?? {}
 

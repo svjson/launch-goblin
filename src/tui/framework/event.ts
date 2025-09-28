@@ -48,7 +48,7 @@ export interface ActionEvent {
   action: Action
 }
 
-export type Event =
+export type TUIEvent =
   | ActionEvent
   | NoArgEvent
   | CheckboxEvent

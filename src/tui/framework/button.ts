@@ -19,7 +19,7 @@ export class Button extends Controller<Widget, ButtonModel> {
   })
 
   constructor({
-    widget: { env, parent, keyMap, options = {} },
+    widget: { env, keyMap, options = {} },
     state: { model },
   }: CtrlCtorParams) {
     super(

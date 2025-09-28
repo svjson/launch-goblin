@@ -1,5 +1,5 @@
 import { runGoblinApp } from 'test/fixtures'
-import { describe, expect, test, it } from 'vitest'
+import { describe, expect, it } from 'vitest'
 
 describe('Interaction', () => {
   describe('Launch Config Selection', () => {
@@ -86,7 +86,7 @@ describe('Interaction', () => {
 
     describe('Node Packages and Docker Compose File', () => {
       it('should apply configurations when selected/focused', () => {
-        const { state, backend, adapter } = runGoblinApp({
+        const { backend, adapter } = runGoblinApp({
           projectId: 'dummy-with-docker-compose',
           configs: {
             shared: [

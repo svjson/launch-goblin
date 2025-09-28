@@ -5,7 +5,7 @@ import {
   makeConfigurationFacade,
   readConfig,
 } from '@src/config'
-import { LaunchModule, launchSession, makeLaunchFacade } from '@src/launch'
+import { LaunchModule, makeLaunchFacade } from '@src/launch'
 import { ApplicationState, Project, readProject } from '@src/project'
 import { LaunchSession } from '@src/project/state'
 import {

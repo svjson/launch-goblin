@@ -1,4 +1,4 @@
-import { NodePackage, Project, ProjectComponent } from '@src/project'
+import { NodePackage, Project } from '@src/project'
 import { Launcher } from './types'
 import { LGOptions } from '@src/tui/goblin-app'
 import { ApplicationEnvironment } from '@src/tui/framework'

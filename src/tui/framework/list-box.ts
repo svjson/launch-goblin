@@ -1,7 +1,7 @@
 import { mergeLeft } from '@whimbrel/walk'
 
 import { Controller, CtrlConstructor, CtrlCtorParams } from './controller'
-import { ListWidget, Widget } from './widget'
+import { ListWidget } from './widget'
 import { resolveComponentStyle } from './theme'
 
 export interface ListItem {
