@@ -6,6 +6,7 @@ import { PackageJSON } from '@whimbrel/package-json'
 import { WhimbrelContext } from '@whimbrel/core'
 import { LaunchCommand } from '@src/launch'
 import { LaunchSession } from '@src/project/state'
+import { makeAppState } from 'test/fixtures'
 
 describe('applyConfig', () => {
   const components: Record<string, ProjectComponent> = {
@@ -170,6 +171,39 @@ describe('applyConfig', () => {
       true,
       false,
       false,
+    ])
+  })
+
+  it('should apply all configured targets to multi-target components', () => {
+    // Given
+    const { project, config, session } = makeAppState(
+      'dummy-with-docker-compose',
+      {
+        shared: ['Frontend with Kibana/ElasticSearch'],
+      }
+    )
+
+    // When
+    applyConfig(
+      config.local.launchConfigs['Frontend with Kibana/ElasticSearch'],
+      project,
+      session
+    )
+
+    // Then
+    expect(session.components.map((c) => c.state)).toEqual([
+      {
+        selected: false,
+        targets: ['dev'],
+      },
+      {
+        selected: true,
+        targets: ['dev'],
+      },
+      {
+        selected: true,
+        targets: ['kibana', 'elasticsearch'],
+      },
     ])
   })
 })

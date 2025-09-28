@@ -33,7 +33,17 @@ export const wait = (ms: number) => {
   return new Promise<void>((resolve) => setTimeout(resolve, ms))
 }
 
-const TEST_SAVED_CONFIGS: Record<TestProjectId, Record<string, string[]>> = {
+export type TestComponentConfig =
+  | string
+  | {
+      name: string
+      targets: string[]
+    }
+
+const TEST_SAVED_CONFIGS: Record<
+  TestProjectId,
+  Record<string, TestComponentConfig[]>
+> = {
   'dummy-project': {
     'Full Dev Environment': [
       'backend-service',
@@ -48,7 +58,31 @@ const TEST_SAVED_CONFIGS: Record<TestProjectId, Record<string, string[]>> = {
     ],
     'No Mocks': ['backend-service', 'frontend-portal'],
   },
-  'dummy-with-docker-compose': {},
+  'dummy-with-docker-compose': {
+    'Full Dev Environment': [
+      'frontdesk-service',
+      'frontdesk-app',
+      {
+        name: 'docker-compose.yaml',
+        targets: ['sql', 'kibana', 'elasticsearch'],
+      },
+    ],
+    'Backend with SQL': [
+      'frontdesk-service',
+      {
+        name: 'docker-compose.yaml',
+        targets: ['sql'],
+      },
+    ],
+    'Frontend with Kibana/ElasticSearch': [
+      'frontdesk-app',
+      {
+        name: 'docker-compose.yaml',
+        targets: ['kibana', 'elasticsearch'],
+      },
+    ],
+    'No Docker': ['frontdesk-service', 'frontdesk-app'],
+  },
 }
 
 const TEST_PROJECTS: Record<TestProjectId, TestProject> = {
@@ -246,13 +280,17 @@ const TEST_PROJECTS: Record<TestProjectId, TestProject> = {
 
 const constructLaunchConfig = (
   state: ApplicationState,
-  activeComponents: string[]
+  activeComponents: TestComponentConfig[]
 ): LaunchConfig => {
   return state.project.components.reduce(
     (cfg, cmp) => {
+      const cfgEntry = activeComponents.find((cf) =>
+        typeof cf === 'string' ? cf === cmp.id : cf.name === cmp.id
+      )
       cfg.components[cmp.id] = {
-        selected: activeComponents.includes(cmp.id),
-        targets: [],
+        selected: Boolean(cfgEntry),
+        targets:
+          !cfgEntry || typeof cfgEntry === 'string' ? [] : cfgEntry.targets,
       }
       return cfg
     },

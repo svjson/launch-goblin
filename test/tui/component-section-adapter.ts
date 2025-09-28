@@ -48,7 +48,10 @@ export const componentSectionAdapter = (
         .filter((sc) => {
           return sc.state.selected
         })
-        .map((sc) => sc.component.name)
+        .flatMap((sc) => [
+          sc.component.name,
+          ...(sc.component.type === 'docker-compose' ? sc.state.targets : []),
+        ])
     },
   }
 

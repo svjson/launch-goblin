@@ -142,8 +142,24 @@ export class ComponentSection extends Controller<
 
     this.store!.subscribe('config.activeConfigName', () => {
       juxt(this.children, this.components).forEach(([checkbox, cmp]) => {
-        ;(checkbox as ComponentItem).setSelected(cmp.state.selected ?? false)
-        ;(checkbox as ComponentItem).setTargets(cmp.state.targets ?? ['dev'])
+        if (checkbox && cmp) {
+          const item = checkbox as ComponentItem
+          item.setSelected(cmp.state.selected ?? false, true)
+          item.setTargets(cmp.state.targets ?? ['dev'])
+
+          const launcher = this.store
+            .get<Project>('project')
+            .launcherOf(cmp.component.id)
+
+          if (launcher?.features.launcherTargets === 'multi') {
+            this.getChildItemComponents(cmp.component.id).forEach((child) => {
+              child.setSelected(
+                (cmp.state.targets ?? []).includes(child.model.target),
+                true
+              )
+            })
+          }
+        }
       })
       return true
     })
@@ -151,24 +167,28 @@ export class ComponentSection extends Controller<
     this.children[this.focusedIndex]?.focus()
   }
 
+  getItemComponent(itemId: string) {
+    return this.children.find(
+      (c) => c.model.component.component.id === itemId
+    ) as ComponentItem
+  }
+
+  getChildItemComponents(itemId: string): ComponentTargetItem[] {
+    return this.children.filter(
+      (c) => c.model.target && c.model.component.component.id === itemId
+    ) as ComponentTargetItem[]
+  }
+
   onCheck(event: CheckboxEvent) {
     if (event.item.parentId) {
-      const parent = this.children.find(
-        (c) => c.model.component.component.id === event.item.parentId
-      ) as ComponentItem
+      const parent = this.getItemComponent(event.item.parentId)
       parent.silent = true
-      parent.setSelected(parent.model.component.state.targets.length > 0)
+      parent.setSelected(parent.model.component.state.targets.length > 0, true)
       parent.silent = false
     } else {
-      const children = this.children.filter(
-        (c) =>
-          c.model.target && c.model.component.component.id === event.item.id
-      )
+      const children = this.getChildItemComponents(event.item.id)
       children.forEach((c) => {
-        const child = c as ComponentTargetItem
-        child.silent = true
-        child.setSelected(event.checked)
-        child.silent = false
+        c.setSelected(event.checked, true)
       })
     }
   }
@@ -318,8 +338,11 @@ class ComponentItem extends Controller<
     this.emit('dirty')
   }
 
-  setSelected(sel: boolean) {
+  setSelected(sel: boolean, silent?: boolean) {
+    const currentSilentFlag = this.silent
+    if (silent === true) this.silent = true
     ;(this.children[0] as Checkbox).setSelected(sel)
+    this.silent = currentSilentFlag
   }
 }
 
@@ -329,6 +352,7 @@ class MultiTargetItem extends Controller<
   ApplicationState
 > {
   focusable = true
+  silent: boolean = false
 
   events = this.defineEvents({
     checkbox: this.onChecked,
@@ -455,8 +479,11 @@ class MultiTargetItem extends Controller<
     this.emit('dirty')
   }
 
-  setSelected(sel: boolean) {
+  setSelected(sel: boolean, silent?: boolean) {
+    const currentSilentFlag = this.silent
+    if (silent === true) this.silent = true
     ;(this.children[0] as Checkbox).setSelected(sel)
+    this.silent = currentSilentFlag
   }
 }
 
@@ -541,20 +568,10 @@ class ComponentTargetItem extends Controller<
     if (!this.silent) this.emit(event)
   }
 
-  setTargets(targets: string[]) {
-    this.model.component.state.targets[0] = targets[0]
-
-    // FIXME: Setting the model should be enough here!
-    // this.components.target.model.text =
-    //   this.model.component.state.targets.join(' ')
-    // this.components.target.set(
-    //   'text',
-    //   this.model.component.state.targets.join(' ')
-    // )
-    // this.emit('dirty')
-  }
-
-  setSelected(sel: boolean) {
+  setSelected(sel: boolean, silent?: boolean) {
+    const currentSilentFlag = this.silent
+    if (silent === true) this.silent = true
     ;(this.children[1] as Checkbox).setSelected(sel)
+    this.silent = currentSilentFlag
   }
 }
