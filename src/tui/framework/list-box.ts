@@ -18,7 +18,7 @@ export class ListBox<ItemModel extends ListItem = ListItem> extends Controller<
   focusable = true
 
   constructor({
-    widget: { env, keyMap, options = {} },
+    widget: { env, options = {} },
     state: { model = [] },
   }: CtrlCtorParams<ItemModel[]>) {
     super(
@@ -47,8 +47,6 @@ export class ListBox<ItemModel extends ListItem = ListItem> extends Controller<
         item: this.model[index],
       })
     })
-
-    this.inheritKeyMap(keyMap)
   }
 
   getSelectedItem() {

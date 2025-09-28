@@ -19,7 +19,7 @@ export class Button extends Controller<Widget, ButtonModel> {
   })
 
   constructor({
-    widget: { env, keyMap, options = {} },
+    widget: { env, options = {} },
     state: { model },
   }: CtrlCtorParams) {
     super(
@@ -41,8 +41,6 @@ export class Button extends Controller<Widget, ButtonModel> {
     )
 
     this.enable()
-
-    this.inheritKeyMap(keyMap)
   }
 
   pressed() {

@@ -41,7 +41,7 @@ export class OptionBar<
   focusable = true
 
   constructor({
-    widget: { env, keyMap, options = { selectionMode: 'single' } },
+    widget: { env, options = { selectionMode: 'single' } },
     state: { model = [] },
   }: CtrlCtorParams<ItemModel[], undefined, OptionBarWidget>) {
     super(
@@ -58,7 +58,6 @@ export class OptionBar<
       ),
       model
     )
-    this.inheritKeyMap(keyMap)
 
     if (
       options.selectionMode === 'single' &&
@@ -110,7 +109,7 @@ export class Option<Model extends OptionItem> extends Controller<
   focusable = true
 
   constructor({
-    widget: { env, keyMap, options },
+    widget: { env, options },
     state: { model = { text: '' } },
   }: CtrlCtorParams) {
     super(
@@ -128,8 +127,6 @@ export class Option<Model extends OptionItem> extends Controller<
       ),
       model
     )
-
-    this.inheritKeyMap(keyMap)
   }
 
   isSelected() {

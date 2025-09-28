@@ -58,7 +58,7 @@ export class CustomListBox<
   emptyLabel?: ChildDescription<EmptyT, EmptyM, EmptyM>
 
   constructor({
-    widget: { env, keyMap, options = {} },
+    widget: { env, options = {} },
     state: { model, store },
     itemCls,
     emptyLabel,
@@ -84,8 +84,6 @@ export class CustomListBox<
     )
     this.itemCls = itemCls
     this.emptyLabel = emptyLabel
-
-    this.inheritKeyMap(keyMap)
   }
 
   itemFocused() {

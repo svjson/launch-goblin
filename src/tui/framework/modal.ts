@@ -42,7 +42,6 @@ export class ModalDialog<
     env,
     model,
     store,
-    keyMap,
     options = {},
   }: ModalCtorParams<Model, StoreModel>) {
     super(
@@ -68,10 +67,6 @@ export class ModalDialog<
     )
 
     this.env.backend.addRoot(this.widget)
-
-    if (keyMap) {
-      this.inheritKeyMap({ replace: false, keys: keyMap })
-    }
   }
 
   destroy() {

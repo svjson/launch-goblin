@@ -1,7 +1,4 @@
-export interface KeyMapArg {
-  replace: boolean
-  keys: KeyMap
-}
+import { Controller } from './controller'
 
 export type KeyMap = Record<string, KeyHandler>
 
@@ -44,4 +41,24 @@ export const keyHandler = (
   }
 
   return keyMap[key.full]?.handler
+}
+
+/**
+ * Get the effective KeyMap of a component, including entries that
+ * would be caught by event bubbling.
+ *
+ * @param controller The controller to get the effective keymap for
+ * @returns The effective keymap
+ */
+export const getEffectiveKeyMap = (controller: Controller) => {
+  let keyMap: KeyMap = {}
+
+  let next: Controller | undefined = controller
+
+  while (next) {
+    keyMap = { ...next.keyMap, ...keyMap }
+    next = next.parent
+  }
+
+  return keyMap
 }

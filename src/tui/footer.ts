@@ -1,4 +1,5 @@
 import { Controller, CtrlCtorParams, Label, LegendEntry } from './framework'
+import { getEffectiveKeyMap } from './framework/keymap'
 
 /**
  * Replacement dictionary for the keyboard command legend.
@@ -20,12 +21,16 @@ const KEY_SYMBOLS: Record<string, string> = {
 export class FooterController extends Controller {
   focusable = false
 
-  label: Label
+  components = this.defineComponents({
+    label: {
+      component: Label,
+      style: {
+        width: '100%',
+      },
+    },
+  })
 
-  constructor({
-    widget: { env, keyMap },
-    state: { model, store },
-  }: CtrlCtorParams) {
+  constructor({ widget: { env }, state: { model, store } }: CtrlCtorParams) {
     super(
       env,
       env.backend.createBox({
@@ -39,15 +44,6 @@ export class FooterController extends Controller {
       model,
       store
     )
-    this.inheritKeyMap(keyMap)
-    this.label = this.addChild(
-      {
-        component: Label,
-      },
-      {
-        width: '100%',
-      }
-    )
   }
 
   buildKeyLegend(controller: Controller) {
@@ -55,7 +51,9 @@ export class FooterController extends Controller {
 
     const groups: Record<string, LegendEntry> = {}
 
-    for (const [key, spec] of Object.entries(controller.keyMap)) {
+    const keyMap = getEffectiveKeyMap(controller)
+
+    for (const [key, spec] of Object.entries(keyMap)) {
       const keySym = KEY_SYMBOLS[key] ?? key
       let groupName = spec.group
 
@@ -85,6 +83,6 @@ export class FooterController extends Controller {
 
   applyContext(controller: Controller) {
     const legend = this.buildKeyLegend(controller)
-    this.label.setText(legend)
+    this.components.label.setText(legend)
   }
 }

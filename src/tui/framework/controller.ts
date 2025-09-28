@@ -1,5 +1,5 @@
 import { DestroyEvent, TUIEvent, EventMap, StringEvent } from './event'
-import { keyHandler, KeyMap, KeyMapArg } from './keymap'
+import { keyHandler, KeyMap } from './keymap'
 import { createStore, Store } from './store'
 import { ControllerLayout, LayoutProperty } from './layout'
 import { Backend } from './backend'
@@ -33,7 +33,6 @@ export interface ApplicationCtrlCtorParams<M> {
 
 export interface WidgetParams<T extends Widget<any> = Widget<any>> {
   env: ComponentEnvironment
-  keyMap?: KeyMapArg
   options?: InferWidgetOptions<T>
 }
 
@@ -219,22 +218,7 @@ export abstract class Controller<
     options?: WidgetOptions | StateParams<M, SM>,
     ...args: any[]
   ): T {
-    const inheritKeys: KeyMap = Object.entries(this.keyMap).reduce(
-      (km, [key, entry]) => {
-        if (entry.propagate) {
-          km[key] = entry
-        }
-        return km
-      },
-      {} as KeyMap
-    )
-
-    const child = this.#resolveChildInstance(
-      childDesc,
-      options,
-      inheritKeys,
-      args
-    )
+    const child = this.#resolveChildInstance(childDesc, options, ...args)
 
     this.#mount(child)
 
@@ -250,11 +234,9 @@ export abstract class Controller<
   #resolveChildInstance<T extends Controller, M, SM>(
     childDesc: ChildParam<T, M, SM> | T,
     options: WidgetOptions | StateParams<M, SM> = {},
-    inheritKeys: KeyMap,
     ...args: any[]
   ): T {
     if (childDesc instanceof Controller) {
-      childDesc.inheritKeyMap({ replace: false, keys: inheritKeys })
       return childDesc
     }
 
@@ -267,7 +249,6 @@ export abstract class Controller<
       {
         widget: {
           env: this.env,
-          keyMap: { replace: false, keys: inheritKeys },
           options: style,
         },
         state: {
@@ -324,6 +305,10 @@ export abstract class Controller<
   }
 
   setParent(controller: Controller) {
+    if (controller === this) {
+      throw new Error('Component cannot be its own parent')
+    }
+
     this.parent = controller
     this.widget.setParent(controller.widget)
   }
@@ -340,16 +325,6 @@ export abstract class Controller<
         }
       },
     })
-  }
-
-  protected inheritKeyMap(inherited?: KeyMapArg) {
-    if (inherited) {
-      if (inherited.replace) {
-        this.keyMap = inherited.keys
-      } else {
-        Object.assign(this.keyMap, inherited.keys)
-      }
-    }
   }
 
   receive(event: TUIEvent) {
@@ -506,7 +481,8 @@ export abstract class Controller<
       return map
     }, {} as KeyMap)
 
-    this.inheritKeyMap({ replace: false, keys })
+    Object.assign(this.keyMap, keys)
+
     return this.keyMap
   }
 

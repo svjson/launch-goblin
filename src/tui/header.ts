@@ -19,10 +19,7 @@ export class HeaderController extends Controller<Widget, ApplicationState> {
     },
   })
 
-  constructor({
-    widget: { env, keyMap },
-    state: { model, store },
-  }: CtrlCtorParams) {
+  constructor({ widget: { env }, state: { model, store } }: CtrlCtorParams) {
     super(
       env,
       env.backend.createBox({
@@ -37,7 +34,5 @@ export class HeaderController extends Controller<Widget, ApplicationState> {
       model,
       store
     )
-
-    this.inheritKeyMap(keyMap)
   }
 }

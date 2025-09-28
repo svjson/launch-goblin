@@ -26,7 +26,7 @@ describe('ComponentSection', () => {
   ) => {
     const store = createStore(state)
     const section = new ComponentSection({
-      widget: { env, keyMap: { replace: false, keys: {} } },
+      widget: { env },
       state: { model: state.session.components, store },
     })
 

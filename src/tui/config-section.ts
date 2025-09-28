@@ -62,13 +62,12 @@ export class ConfigSection extends CustomListBox<
   })
 
   constructor({
-    widget: { env, keyMap, options = {} },
+    widget: { env, options = {} },
     state: { store, model },
   }: CtrlCtorParams<ConfigListItem[], ApplicationState>) {
     super({
       widget: {
         env,
-        keyMap,
         options: mergeLeft(
           {
             width: 40,
@@ -104,8 +103,6 @@ export class ConfigSection extends CustomListBox<
     })
 
     this.populateModel()
-
-    this.inheritKeyMap(keyMap)
 
     this.populateList()
 
@@ -208,7 +205,7 @@ class ConfigItemBox extends CustomListBoxItem<ConfigListItem, ConfigListItem> {
   })
 
   constructor({
-    widget: { env, options, keyMap },
+    widget: { env, options },
     state: { model },
   }: CtrlCtorParams<ConfigListItem>) {
     super(
@@ -234,6 +231,5 @@ class ConfigItemBox extends CustomListBoxItem<ConfigListItem, ConfigListItem> {
       ),
       model
     )
-    this.inheritKeyMap(keyMap)
   }
 }

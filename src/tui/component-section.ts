@@ -48,7 +48,7 @@ export class ComponentSection extends Controller<
   components: SessionComponent[]
 
   constructor({
-    widget: { env, keyMap },
+    widget: { env },
     state: { model = [], store },
   }: CtrlCtorParams<SessionComponent[], ApplicationState>) {
     super(
@@ -92,7 +92,6 @@ export class ComponentSection extends Controller<
       model,
       store
     )
-    this.inheritKeyMap(keyMap)
 
     this.components = model
 
@@ -280,7 +279,7 @@ class ComponentItem extends Controller<
   })
 
   constructor({
-    widget: { env, keyMap, options },
+    widget: { env, options },
     state: { model },
   }: CtrlCtorParams<ComponentItemModel>) {
     super(
@@ -298,7 +297,6 @@ class ComponentItem extends Controller<
       ),
       model
     )
-    this.inheritKeyMap(keyMap)
 
     if (!this.model.targetSelectable || this.model.targetChildren) {
       this.components.target.hide()
@@ -422,7 +420,7 @@ class MultiTargetItem extends Controller<
   })
 
   constructor({
-    widget: { env, keyMap, options },
+    widget: { env, options },
     state: { model },
   }: CtrlCtorParams<ComponentItemModel>) {
     super(
@@ -440,7 +438,6 @@ class MultiTargetItem extends Controller<
       ),
       model
     )
-    this.inheritKeyMap(keyMap)
 
     if (!this.model.targetSelectable || this.model.targetChildren) {
       this.components.targets.hide()
@@ -534,7 +531,7 @@ class ComponentTargetItem extends Controller<
   })
 
   constructor({
-    widget: { env, keyMap, options },
+    widget: { env, options },
     state: { model },
   }: CtrlCtorParams<ComponentTargetModel>) {
     super(
@@ -552,7 +549,6 @@ class ComponentTargetItem extends Controller<
       ),
       model
     )
-    this.inheritKeyMap(keyMap)
   }
 
   onChecked(event: CheckboxEvent) {
