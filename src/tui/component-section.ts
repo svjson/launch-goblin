@@ -197,26 +197,26 @@ export class ComponentSection extends Controller<
   }
 }
 
-export type ComponentItemModel = {
+type AbstractItemModel = {
   component: SessionComponent
+}
+
+export type ComponentItemModel = AbstractItemModel & {
   targetSelectable: boolean
   targetChildren: boolean
   index: number
 }
 
-export type ComponentTargetModel = {
-  component: SessionComponent
+export type ComponentTargetModel = AbstractItemModel & {
   cmpIndex: number
   targetIndex: number
   target: string
   lastChild: boolean
 }
 
-class ComponentItem extends Controller<
-  Widget,
-  ComponentItemModel,
-  ApplicationState
-> {
+class AbstractComponentItem<
+  M extends AbstractItemModel = ComponentItemModel,
+> extends Controller<Widget, M, ApplicationState> {
   focusable = true
   silent = false
 
@@ -229,9 +229,50 @@ class ComponentItem extends Controller<
       legend: 'Toggle Selection',
       group: 'focused',
       propagate: true,
-      handler: () => (this.children[0] as Checkbox).toggle(),
+      handler: () => this.getCheckbox().toggle(),
     },
-    ...(this.model.targetSelectable
+  })
+
+  constructor({
+    widget: { env, options },
+    state: { model },
+  }: CtrlCtorParams<M>) {
+    super(
+      env,
+      env.backend.createBox(
+        mergeLeft(
+          {
+            height: 1,
+            focusable: true,
+          },
+          resolveComponentStyle(env.theme, 'CheckBox', env.tty.colorMode),
+          options
+        )
+      ),
+      model
+    )
+  }
+
+  getCheckbox() {
+    return this.children[0] as Checkbox
+  }
+
+  onChecked(event: CheckboxEvent) {
+    this.model.component.state.selected = event.checked
+    if (!this.silent) this.emit(event)
+  }
+
+  setSelected(sel: boolean, silent?: boolean) {
+    const currentSilentFlag = this.silent
+    if (silent === true) this.silent = true
+    this.getCheckbox().setSelected(sel)
+    this.silent = currentSilentFlag
+  }
+}
+
+class ComponentItem extends AbstractComponentItem {
+  keyMap = this.defineKeys(
+    this.model.targetSelectable
       ? {
           left: {
             legend: 'Cycle target',
@@ -246,8 +287,8 @@ class ComponentItem extends Controller<
             handler: () => this.cycleTarget(),
           },
         }
-      : {}),
-  })
+      : {}
+  )
 
   components = this.defineComponents({
     checkbox: {
@@ -278,34 +319,12 @@ class ComponentItem extends Controller<
     },
   })
 
-  constructor({
-    widget: { env, options },
-    state: { model },
-  }: CtrlCtorParams<ComponentItemModel>) {
-    super(
-      env,
-      env.backend.createBox(
-        mergeLeft(
-          {
-            height: 1,
-            top: model.index + 1,
-            focusable: true,
-          },
-          resolveComponentStyle(env.theme, 'CheckBox', env.tty.colorMode),
-          options
-        )
-      ),
-      model
-    )
+  constructor(params: CtrlCtorParams) {
+    super(params)
 
     if (!this.model.targetSelectable || this.model.targetChildren) {
       this.components.target.hide()
     }
-  }
-
-  onChecked(event: CheckboxEvent) {
-    this.model.component.state.selected = event.checked
-    if (!this.silent) this.emit(event)
   }
 
   cycleTarget(amount: number = 1) {
@@ -334,34 +353,10 @@ class ComponentItem extends Controller<
     )
     this.emit('dirty')
   }
-
-  setSelected(sel: boolean, silent?: boolean) {
-    const currentSilentFlag = this.silent
-    if (silent === true) this.silent = true
-    ;(this.children[0] as Checkbox).setSelected(sel)
-    this.silent = currentSilentFlag
-  }
 }
 
-class MultiTargetItem extends Controller<
-  Widget,
-  ComponentItemModel,
-  ApplicationState
-> {
-  focusable = true
-  silent: boolean = false
-
-  events = this.defineEvents({
-    checkbox: this.onChecked,
-  })
-
+class MultiTargetItem extends AbstractComponentItem {
   keyMap = this.defineKeys({
-    enter: {
-      legend: 'Toggle Selection',
-      group: 'focused',
-      propagate: true,
-      handler: () => (this.children[0] as Checkbox).toggle(),
-    },
     space: {
       legend: 'Toggle Target',
       group: 'focused',
@@ -419,33 +414,11 @@ class MultiTargetItem extends Controller<
     },
   })
 
-  constructor({
-    widget: { env, options },
-    state: { model },
-  }: CtrlCtorParams<ComponentItemModel>) {
-    super(
-      env,
-      env.backend.createBox(
-        mergeLeft(
-          {
-            height: 1,
-            top: model.index + 1,
-            focusable: true,
-          },
-          resolveComponentStyle(env.theme, 'CheckBox', env.tty.colorMode),
-          options
-        )
-      ),
-      model
-    )
-
+  constructor(params: CtrlCtorParams) {
+    super(params)
     if (!this.model.targetSelectable || this.model.targetChildren) {
       this.components.targets.hide()
     }
-  }
-
-  onChecked(event: CheckboxEvent) {
-    this.model.component.state.selected = event.checked
   }
 
   cycleTarget(amount: number = 1) {
@@ -474,36 +447,9 @@ class MultiTargetItem extends Controller<
     )
     this.emit('dirty')
   }
-
-  setSelected(sel: boolean, silent?: boolean) {
-    const currentSilentFlag = this.silent
-    if (silent === true) this.silent = true
-    ;(this.children[0] as Checkbox).setSelected(sel)
-    this.silent = currentSilentFlag
-  }
 }
 
-class ComponentTargetItem extends Controller<
-  Widget,
-  ComponentTargetModel,
-  ApplicationState
-> {
-  focusable = true
-  silent = false
-
-  events = this.defineEvents({
-    checkbox: this.onChecked,
-  })
-
-  keyMap = this.defineKeys({
-    enter: {
-      legend: 'Toggle Selection',
-      group: 'focused',
-      propagate: true,
-      handler: () => (this.children[1] as Checkbox).toggle(),
-    },
-  })
-
+class ComponentTargetItem extends AbstractComponentItem<ComponentTargetModel> {
   components = this.defineComponents({
     connector: {
       component: Label,
@@ -530,27 +476,6 @@ class ComponentTargetItem extends Controller<
     },
   })
 
-  constructor({
-    widget: { env, options },
-    state: { model },
-  }: CtrlCtorParams<ComponentTargetModel>) {
-    super(
-      env,
-      env.backend.createBox(
-        mergeLeft(
-          {
-            height: 1,
-            top: model.cmpIndex + model.targetIndex + 1,
-            focusable: true,
-          },
-          resolveComponentStyle(env.theme, 'CheckBox', env.tty.colorMode),
-          options
-        )
-      ),
-      model
-    )
-  }
-
   onChecked(event: CheckboxEvent) {
     if (event.checked) {
       pushUnique(this.model.component.state.targets, this.model.target)
@@ -563,10 +488,7 @@ class ComponentTargetItem extends Controller<
     if (!this.silent) this.emit(event)
   }
 
-  setSelected(sel: boolean, silent?: boolean) {
-    const currentSilentFlag = this.silent
-    if (silent === true) this.silent = true
-    ;(this.children[1] as Checkbox).setSelected(sel)
-    this.silent = currentSilentFlag
+  getCheckbox() {
+    return this.children[1] as Checkbox
   }
 }
