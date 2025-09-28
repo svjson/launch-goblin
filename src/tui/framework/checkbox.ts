@@ -24,8 +24,26 @@ export class Checkbox<I extends CheckboxItem = CheckboxItem> extends Controller<
     },
   })
 
-  box: Label
-  label: Label
+  components = this.defineComponents({
+    box: {
+      component: Label,
+      model: {
+        text: this.makeBoxContent(),
+      },
+      style: {
+        color: 'white',
+      },
+    },
+    label: {
+      component: Label,
+      model: {
+        text: this.model.label,
+      },
+      style: {
+        left: 4,
+      },
+    },
+  })
 
   focusable = true
 
@@ -50,26 +68,6 @@ export class Checkbox<I extends CheckboxItem = CheckboxItem> extends Controller<
       model
     )
 
-    this.box = this.addChild({
-      component: Label,
-      model: {
-        text: this.makeBoxContent(),
-      },
-      style: {
-        color: 'white',
-      },
-    })
-
-    this.label = this.addChild({
-      component: Label,
-      model: {
-        text: this.model.label,
-      },
-      style: {
-        left: 4,
-      },
-    })
-
     this.setSelected(this.model.checked)
   }
 
@@ -90,7 +88,7 @@ export class Checkbox<I extends CheckboxItem = CheckboxItem> extends Controller<
       return
     this.widget.setChecked(selected)
     this.model.checked = selected
-    this.box.setText(this.makeBoxContent())
+    this.components.box.setText(this.makeBoxContent())
     this.emit('dirty')
     this.emit({
       type: 'checkbox',
