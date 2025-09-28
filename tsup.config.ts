@@ -9,6 +9,9 @@ export default defineConfig({
   clean: true,
   target: 'node20',
   shims: false,
+  banner: {
+    js: '#!/usr/bin/env node',
+  },
   define: {
     __LG_VERSION__: JSON.stringify(pkg.version),
   },
