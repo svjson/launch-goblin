@@ -43,6 +43,13 @@ export const componentSectionAdapter = (
     isFocusedComponentChecked() {
       return adapter.getFocusedCheckboxWidget()?.isChecked()
     },
+    getSelectedComponentNames() {
+      return section.components
+        .filter((sc) => {
+          return sc.state.selected
+        })
+        .map((sc) => sc.component.name)
+    },
   }
 
   return adapter

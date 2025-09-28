@@ -1,5 +1,5 @@
 import { runGoblinApp } from 'test/fixtures'
-import { describe, expect, it, test } from 'vitest'
+import { describe, expect, it } from 'vitest'
 
 describe('Interaction', () => {
   describe('Node Packages Only', () => {

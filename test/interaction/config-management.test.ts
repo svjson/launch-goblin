@@ -1,6 +1,5 @@
 import { LegacyConfigType } from '@src/config'
 import { ApplicationState } from '@src/project'
-import { LaunchGoblinApp } from '@src/tui'
 import { runGoblinApp, wait } from 'test/fixtures'
 import { GoblinAppAdapter } from 'test/goblin-app-adapter'
 import { describe, expect, test, it } from 'vitest'
@@ -43,7 +42,7 @@ describe('Interaction', () => {
           state?: ApplicationState
           type: LegacyConfigType
         }>((resolve) => {
-          const { backend, app } = runGoblinApp({
+          const { backend, app, adapter } = runGoblinApp({
             projectId: 'dummy-project',
             configs: {
               private: ['Backend Dev Environment'],
@@ -55,24 +54,27 @@ describe('Interaction', () => {
               },
             },
           })
+          const configSection = adapter.configSection()
 
           // Tab into config section
           backend.performKeyPress('tab')
           backend.performKeyPress('tab')
 
           // Then - First shared config is selected
-          expect(app.focusedComponent!.model.label).toEqual(
-            'Full Dev Environment'
-          )
+          expect(configSection.getFocusedConfig()).toEqual({
+            name: 'Full Dev Environment',
+            type: 'shared',
+          })
           // Move to next config
           backend.performKeyPress('down')
           expect(app.focusedComponent!.model.label).toEqual('No Mocks')
 
           // Move to next config
           backend.performKeyPress('down')
-          expect(app.focusedComponent!.model.label).toEqual(
-            'Backend Dev Environment'
-          )
+          expect(configSection.getFocusedConfig()).toEqual({
+            name: 'Backend Dev Environment',
+            type: 'private',
+          })
 
           // When
           backend.performKeyPress('delete')
@@ -82,9 +84,11 @@ describe('Interaction', () => {
 
           // When
           backend.performKeyPress('enter')
-          expect(app.focusedComponent!.model.label).toEqual(
-            'Full Dev Environment'
-          )
+          // Then - First shared config is selected
+          expect(configSection.getFocusedConfig()).toEqual({
+            name: 'Full Dev Environment',
+            type: 'shared',
+          })
         })
 
         const { state, type } = await saved
