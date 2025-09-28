@@ -1,4 +1,13 @@
-import { applyConfig, ContextConfig, readConfig } from '@src/config'
+import {
+  applyConfig,
+  ContextConfig,
+  LegacyConfigType,
+  readConfig,
+  saveLatestLaunch,
+  saveLocalConfig,
+} from '@src/config'
+import { saveGlobalConfig } from '@src/config/io'
+import { launchSession } from '@src/launch'
 import { ApplicationState, Project, readProject } from '@src/project'
 import { LaunchSession } from '@src/project/state'
 import {
@@ -8,6 +17,7 @@ import {
   noBackend,
 } from '@src/tui/framework'
 import { BlessedBackend } from '@src/tui/framework/blessed'
+import { ActionFacade } from '@src/tui'
 import { LGOptions } from '@src/tui/goblin-app'
 export { inspectEnvironment } from '@src/tui/framework'
 
@@ -17,6 +27,7 @@ export const bootstrap = async (
 ): Promise<{
   env: ApplicationEnvironment
   model: ApplicationState
+  facade: ActionFacade
 }> => {
   const project: Project = await readProject(targetAction, options)
 
@@ -50,5 +61,27 @@ export const bootstrap = async (
 
   const env = { backend, tty, theme: DefaultTheme, log: [] }
 
-  return { env, model }
+  const facade = makeApplicationFacade(env, model)
+
+  return { env, model, facade }
+}
+
+const makeApplicationFacade = (
+  env: ApplicationEnvironment,
+  state: ApplicationState
+): ActionFacade => {
+  return {
+    launch: async () => {
+      env.backend.dispose()
+      await saveLatestLaunch(state)
+      await launchSession(env, state)
+    },
+    saveConfig: async (state: ApplicationState, type: LegacyConfigType) => {
+      if (type === 'local') {
+        await saveLocalConfig(state.project, state.config.local)
+      } else {
+        await saveGlobalConfig(state.project, state.config.global)
+      }
+    },
+  }
 }
