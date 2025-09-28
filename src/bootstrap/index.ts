@@ -2,12 +2,10 @@ import {
   applyConfig,
   ContextConfig,
   LegacyConfigType,
+  makeConfigurationFacade,
   readConfig,
-  saveLatestLaunch,
-  saveLocalConfig,
 } from '@src/config'
-import { saveGlobalConfig } from '@src/config/io'
-import { launchSession } from '@src/launch'
+import { LaunchModule, launchSession, makeLaunchFacade } from '@src/launch'
 import { ApplicationState, Project, readProject } from '@src/project'
 import { LaunchSession } from '@src/project/state'
 import {
@@ -19,6 +17,7 @@ import {
 import { BlessedBackend } from '@src/tui/framework/blessed'
 import { ActionFacade } from '@src/tui'
 import { LGOptions } from '@src/tui/goblin-app'
+import { ConfigurationModule } from '@src/config/facade'
 export { inspectEnvironment } from '@src/tui/framework'
 
 export const bootstrap = async (
@@ -45,6 +44,7 @@ export const bootstrap = async (
     project,
     config,
     session,
+    options,
   }
 
   if (model.project.launchers.length === 0) {
@@ -61,26 +61,30 @@ export const bootstrap = async (
 
   const env = { backend, tty, theme: DefaultTheme, log: [] }
 
-  const facade = makeApplicationFacade(env, model)
+  const configModule = makeConfigurationFacade()
+  const launchModule = makeLaunchFacade()
+  const facade = makeApplicationFacade(env, model, configModule, launchModule)
 
   return { env, model, facade }
 }
 
 const makeApplicationFacade = (
   env: ApplicationEnvironment,
-  state: ApplicationState
+  state: ApplicationState,
+  configModule: ConfigurationModule,
+  launchModule: LaunchModule
 ): ActionFacade => {
   return {
     launch: async () => {
       env.backend.dispose()
-      await saveLatestLaunch(state)
-      await launchSession(env, state)
+      await configModule.saveLatestLaunch(state)
+      await launchModule.launchSession(env, state)
     },
     saveConfig: async (state: ApplicationState, type: LegacyConfigType) => {
       if (type === 'local') {
-        await saveLocalConfig(state.project, state.config.local)
+        await configModule.saveLocalConfig(state.project, state.config.local)
       } else {
-        await saveGlobalConfig(state.project, state.config.global)
+        await configModule.saveGlobalConfig(state.project, state.config.global)
       }
     },
   }

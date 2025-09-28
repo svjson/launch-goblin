@@ -12,7 +12,7 @@ import { PackageJSON } from '@whimbrel/package-json'
 import { makeProject } from '@src/project'
 import { applicationEnvironment } from './tui/framework/fixtures'
 import { ApplicationEnvironment, HeadlessBackend } from '@src/tui/framework'
-import { ActionFacade } from '@src/tui/goblin-app'
+import { ActionFacade, LGOptions, makeLGOptions } from '@src/tui/goblin-app'
 import { goblinAppAdapter, GoblinAppAdapter } from './goblin-app-adapter'
 
 export type TestProjectId = 'dummy-project' | 'dummy-with-docker-compose'
@@ -69,7 +69,7 @@ const TEST_PROJECTS: Record<TestProjectId, TestProject> = {
           defaultTargets: ['dev'],
           features: {
             componentTargets: 'multi',
-            launcherTargets: 'multi',
+            launcherTargets: 'single',
           },
           components: [
             'backend-service',
@@ -218,7 +218,8 @@ const constructLaunchConfig = (
 
 export const makeAppState = (
   projectId: TestProjectId,
-  configs: { private?: string[]; shared?: string[] } = {}
+  configs: { private?: string[]; shared?: string[] } = {},
+  options: Partial<LGOptions> = {}
 ): ApplicationState => {
   const testProject = TEST_PROJECTS[projectId]
   const state: ApplicationState = {
@@ -237,6 +238,7 @@ export const makeAppState = (
       },
     },
     session: { components: [], target: 'dev' },
+    options: makeLGOptions(options),
   }
 
   for (const configId of configs.private ?? []) {

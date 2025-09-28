@@ -1,11 +1,10 @@
 #!/usr/bin/env node
 
-import { launchSession } from './launch'
 import { LaunchGoblinApp } from './tui'
 import { LogEvent } from './tui/framework'
 import { setTTYTitleString } from './tui/framework/tty'
 import { Command } from 'commander'
-import { ActionFacade, LGOptions } from './tui/goblin-app'
+import { LGOptions, makeLGOptions } from './tui/goblin-app'
 import { bootstrap, inspectEnvironment } from './bootstrap'
 
 /**
@@ -78,10 +77,12 @@ program
     'Launch with the most recent launch configuration, bypassing the tui.'
   )
   .action(async () => {
-    await main({
-      verbose: false,
-      autoLaunch: true,
-    })
+    await main(
+      makeLGOptions({
+        verbose: false,
+        autoLaunch: true,
+      })
+    )
   })
 
 program.parse()

@@ -1,3 +1,5 @@
+import { mergeLeft } from '@whimbrel/walk'
+
 import { ApplicationState } from '@src/project'
 import { MainController } from './main'
 import {
@@ -7,6 +9,8 @@ import {
   ColorMode,
 } from './framework'
 import { LegacyConfigType, toLaunchConfigComponents } from '@src/config'
+
+export type TuiTargetOptionType = 'checkbox' | 'option-bar'
 
 /**
  * Contains user options for running Launch Goblin.
@@ -33,6 +37,35 @@ export interface LGOptions {
    * string - launch a named configuration immediately
    */
   autoLaunch: boolean | string
+
+  /**
+   * TUI Options
+   */
+  tui: {
+    /**
+     * Determines whether selection of targets for components with multiple
+     * choice-targets should be shown as child checkboxes or a horizontal
+     * OptionBar.
+     */
+    targetOption: TuiTargetOptionType
+  }
+}
+
+/**
+ * Create a full LGOptions instance with default values, optionally
+ * overridden the values of `params`.
+ */
+export const makeLGOptions = (params: Partial<LGOptions> = {}) => {
+  return mergeLeft(
+    {
+      verbose: false,
+      autoLaunch: false,
+      tui: {
+        targetOption: 'option-bar',
+      },
+    } satisfies LGOptions,
+    params
+  )
 }
 
 /**

@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import { applyConfig, LaunchConfig } from '@src/config'
-import { Project, ProjectComponent } from '@src/project'
+import { makeProject, Project, ProjectComponent } from '@src/project'
 import { PackageJSON } from '@whimbrel/package-json'
 import { WhimbrelContext } from '@whimbrel/core'
 import { LaunchCommand } from '@src/launch'
@@ -38,11 +38,20 @@ describe('applyConfig', () => {
     },
   }
 
-  const makeProject = (...cmps: string[]): Project => {
+  const constructProject = (...cmps: string[]): Project => {
     const selectedComponents = cmps.map((id) => components[id])
-    return {
+    return makeProject({
       id: 'my-project',
-      ctx: null as unknown as WhimbrelContext,
+      ctx: {
+        getActor(params: any) {
+          if (params.root === '/tmp/somewhere') {
+            return {
+              root: '/tmp/somewhere',
+            }
+          }
+          return undefined
+        },
+      } as unknown as WhimbrelContext,
       launchers: [
         {
           id: 'turbo',
@@ -50,11 +59,16 @@ describe('applyConfig', () => {
             return null as unknown as LaunchCommand
           },
           components: selectedComponents.map((c) => c.id),
+          defaultTargets: ['dev'],
+          features: {
+            componentTargets: 'single',
+            launcherTargets: 'single',
+          },
         },
       ],
       root: '/tmp/somewhere',
       components: selectedComponents,
-    } as unknown as Project
+    })
   }
 
   it('should select all components if the launchConfig is empty (no previous launch)', () => {
@@ -64,7 +78,7 @@ describe('applyConfig', () => {
       components: {},
     }
 
-    const project = makeProject('great-cmp', 'terrible-cmp', 'awesome-cmp')
+    const project = constructProject('great-cmp', 'terrible-cmp', 'awesome-cmp')
     const session: LaunchSession = { components: [], target: 'dev' }
 
     // When
@@ -85,7 +99,7 @@ describe('applyConfig', () => {
       components: {},
     }
 
-    const project = makeProject('great-cmp', 'terrible-cmp', 'awesome-cmp')
+    const project = constructProject('great-cmp', 'terrible-cmp', 'awesome-cmp')
     const session: LaunchSession = { components: [], target: 'dev' }
 
     // When
@@ -119,7 +133,7 @@ describe('applyConfig', () => {
       },
     }
 
-    const project = makeProject('great-cmp', 'terrible-cmp', 'awesome-cmp')
+    const project = constructProject('great-cmp', 'terrible-cmp', 'awesome-cmp')
     const session: LaunchSession = { components: [], target: 'dev' }
 
     // When
@@ -145,7 +159,7 @@ describe('applyConfig', () => {
       },
     }
 
-    const project = makeProject('great-cmp', 'terrible-cmp', 'awesome-cmp')
+    const project = constructProject('great-cmp', 'terrible-cmp', 'awesome-cmp')
     const session: LaunchSession = { components: [], target: 'dev' }
 
     // When

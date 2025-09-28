@@ -15,7 +15,7 @@ export const pnpmLauncher = (
     components: components.map((c) => c.id),
     features: {
       componentTargets: 'multi',
-      launcherTargets: 'multi',
+      launcherTargets: 'single',
     },
     launchCommand: (
       _env: ApplicationEnvironment,

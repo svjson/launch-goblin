@@ -1,3 +1,4 @@
+import { LGOptions } from '@src/tui/goblin-app'
 import { Project } from './project'
 import { ProjectComponent } from './types'
 import { ComponentLaunchConfig, ContextConfig } from '@src/config'
@@ -15,6 +16,7 @@ export interface ApplicationState {
   project: Project
   config: ContextConfig
   session: LaunchSession
+  options: LGOptions
 }
 
 export interface SessionComponent<

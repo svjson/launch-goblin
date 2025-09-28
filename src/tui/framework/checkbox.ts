@@ -92,7 +92,8 @@ export class Checkbox<I extends CheckboxItem = CheckboxItem> extends Controller<
   }
 
   setSelected(selected: boolean) {
-    if (selected === this.model.checked) return
+    if (selected === this.model.checked && selected === this.widget.isChecked())
+      return
     this.widget.setChecked(selected)
     this.model.checked = selected
     this.box.setText(this.makeBoxContent())

@@ -1,6 +1,7 @@
 import { Launcher } from '@src/launch'
 import { identifyPnpmLaunchOptions, pnpmLauncher } from '@src/launch/pnpm'
 import { NodePackage, ProjectComponent } from '@src/project'
+import { makeLGOptions } from '@src/tui'
 import { makeAppState } from 'test/fixtures'
 import { applicationEnvironment } from 'test/tui/framework/fixtures'
 import { describe, expect, it } from 'vitest'
@@ -29,7 +30,7 @@ describe('pnpmLauncher', () => {
       ],
       features: {
         componentTargets: 'multi',
-        launcherTargets: 'multi',
+        launcherTargets: 'single',
       },
       launchCommand: expect.any(Function),
     } satisfies Launcher<NodePackage>)
@@ -144,10 +145,14 @@ describe('identifyPnpmLaunchOptions', () => {
     const state = makeAppState('dummy-with-docker-compose')
 
     // When
-    const [launcher] = await identifyPnpmLaunchOptions(state.project, 'dev', {
-      verbose: false,
-      autoLaunch: false,
-    })
+    const [launcher] = await identifyPnpmLaunchOptions(
+      state.project,
+      'dev',
+      makeLGOptions({
+        verbose: false,
+        autoLaunch: false,
+      })
+    )
 
     // Then
     expect(launcher).toEqual({
@@ -156,7 +161,7 @@ describe('identifyPnpmLaunchOptions', () => {
       components: ['frontdesk-service', 'frontdesk-app'],
       features: {
         componentTargets: 'multi',
-        launcherTargets: 'multi',
+        launcherTargets: 'single',
       },
       launchCommand: expect.any(Function),
     } satisfies Launcher<NodePackage>)
