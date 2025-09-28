@@ -1,12 +1,13 @@
 import { applyConfig, LaunchConfig } from '@src/config'
 import {
   ApplicationState,
+  DockerComposeFile,
   NodePackage,
   ProjectComponent,
   ProjectParams,
 } from '@src/project'
 import { LaunchGoblinApp } from '@src/tui'
-import { WhimbrelContext } from '@whimbrel/core'
+import { Actor, FacetScope, WhimbrelContext } from '@whimbrel/core'
 import { PackageJSON } from '@whimbrel/package-json'
 import { makeProject } from '@src/project'
 import { applicationEnvironment } from './tui/framework/fixtures'
@@ -14,7 +15,7 @@ import { ApplicationEnvironment, HeadlessBackend } from '@src/tui/framework'
 import { ActionFacade } from '@src/tui/goblin-app'
 import { goblinAppAdapter, GoblinAppAdapter } from './goblin-app-adapter'
 
-export type TestProjectId = 'dummy-project'
+export type TestProjectId = 'dummy-project' | 'dummy-with-docker-compose'
 
 export interface TestProject {
   project: ProjectParams
@@ -47,6 +48,7 @@ const TEST_SAVED_CONFIGS: Record<TestProjectId, Record<string, string[]>> = {
     ],
     'No Mocks': ['backend-service', 'frontend-portal'],
   },
+  'dummy-with-docker-compose': {},
 }
 
 const TEST_PROJECTS: Record<TestProjectId, TestProject> = {
@@ -64,6 +66,7 @@ const TEST_PROJECTS: Record<TestProjectId, TestProject> = {
       launchers: [
         {
           id: 'pnpm',
+          defaultTargets: ['dev'],
           features: {
             componentTargets: 'multi',
             launcherTargets: 'multi',
@@ -128,6 +131,62 @@ const TEST_PROJECTS: Record<TestProjectId, TestProject> = {
         } satisfies NodePackage,
       ] as ProjectComponent[],
     } as ProjectParams,
+    configs: {
+      local: {
+        launchConfigs: {},
+      },
+      global: {
+        launchConfigs: {},
+      },
+    },
+  },
+  'dummy-with-docker-compose': {
+    project: {
+      id: 'dummy-with-docker-compose',
+      root: '/tmp/somewhere',
+      ctx: {
+        getActor(param: any) {
+          if (param.root === '/tmp/somewhere') {
+            return {
+              root: '/tmp/somewhere',
+              facets: { pnpm: { roles: ['pkg-manager'] } as FacetScope<any> },
+            } as unknown as Actor
+          }
+
+          return {
+            root: '/tmp/somewhere',
+          }
+        },
+      } as WhimbrelContext,
+      launchers: [],
+      components: [
+        {
+          id: 'frontdesk-service',
+          type: 'pkgjson-script',
+          name: 'frontdesk-service',
+          package: '@omnistay/frontdesk-service',
+          root: '/tmp/somewhere/packages/frontdesk-service',
+          pkgJson: new PackageJSON({ content: {} }),
+          targets: ['dev', 'dev:local', 'test', 'typecheck'],
+        } satisfies NodePackage,
+        {
+          id: 'frontdesk-app',
+          type: 'pkgjson-script',
+          name: 'frontend',
+          package: '@omnistay/frontdesk-app',
+          root: '/tmp/somewhere/packages/frontend',
+          pkgJson: new PackageJSON({ content: '{}' }),
+          targets: ['dev', 'test', 'typecheck'],
+        } satisfies NodePackage,
+        {
+          id: 'docker-compose.yaml',
+          type: 'docker-compose',
+          name: 'docker-compose.yaml',
+          path: '/tmp/somewhere',
+          targets: ['sql', 'kibana', 'elasticsearch'],
+        } satisfies DockerComposeFile,
+      ],
+    },
     configs: {
       local: {
         launchConfigs: {},

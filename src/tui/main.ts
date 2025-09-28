@@ -49,7 +49,7 @@ export class MainController extends ApplicationController<ApplicationState> {
       model: this.store
         .get<LaunchSession>('session')
         .components.filter((cmp) =>
-          this.model.project.launchers[0].components.includes(cmp.component.id)
+          this.model.project.isLaunchable(cmp.component.id)
         ),
       store: this.store,
     },

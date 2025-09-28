@@ -37,7 +37,12 @@ export type NodePackage = BaseComponent &
     pkgJson: PackageJSON
   }
 
+export type DockerComposeFile = BaseComponent & {
+  type: 'docker-compose'
+  path: string
+}
+
 /**
  * Compound type for launchable project components
  */
-export type ProjectComponent = NodePackage
+export type ProjectComponent = NodePackage | DockerComposeFile

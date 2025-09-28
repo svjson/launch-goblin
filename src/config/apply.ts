@@ -17,6 +17,8 @@ export const applyConfig = (
   session: LaunchSession
 ): LaunchSession => {
   project.components.forEach((cmp) => {
+    const launcher = project.launcherOf(cmp.id)
+
     let { selected, targets } = launchConfig.components[cmp.id] ?? {
       selected: false,
       targets: [],
@@ -24,7 +26,9 @@ export const applyConfig = (
 
     targets =
       !targets || (Array.isArray(targets) && targets.length === 0)
-        ? cmp.targets.filter((t) => t === launchConfig.defaultTarget)
+        ? launcher
+          ? cmp.targets.filter((t) => launcher.defaultTargets.includes(t))
+          : cmp.targets.filter((t) => t === launchConfig.defaultTarget)
         : targets
 
     const sessionCmp = session.components.find((c) => c.component.id === cmp.id)

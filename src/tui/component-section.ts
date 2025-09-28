@@ -4,6 +4,7 @@ import {
   Controller,
   CtrlCtorParams,
   Label,
+  OptionBar,
 } from './framework'
 import { mergeLeft } from '@whimbrel/walk'
 import { juxt } from '@whimbrel/array'
@@ -12,6 +13,7 @@ import { CheckboxItem } from './framework/checkbox'
 import { Widget } from './framework/widget'
 import { resolveComponentStyle } from './framework/theme'
 import { SessionComponent } from '@src/project/state'
+import { pushUnique } from '@whimbrel/array'
 
 /**
  * TUI Component containing checkboxes and options for launchable
@@ -27,14 +29,18 @@ export class ComponentSection extends Controller<
       propagate: true,
       legend: 'Navigate',
       group: 'nav',
-      handler: this.moveUp,
+      handler: () => this.nextChild(-1),
     },
     down: {
       propagate: true,
       legend: 'Navigate',
       group: 'nav',
-      handler: this.moveDown,
+      handler: this.nextChild,
     },
+  })
+
+  events = this.defineEvents({
+    checkbox: this.onCheck,
   })
 
   focusedIndex = 0
@@ -59,7 +65,18 @@ export class ComponentSection extends Controller<
               )
             )
         ),
-        height: Math.max(10, model.length + 4),
+        height: Math.max(
+          15,
+          model.reduce((h, c) => {
+            h++
+            if (
+              store.get<Project>('project').launcherOf(c.component.id)?.features
+                .launcherTargets === 'multi'
+            )
+              h += c.component.targets.length
+            return h
+          }, 0) + 4
+        ),
         top: '25%',
         left: 'center',
         keys: true,
@@ -81,13 +98,19 @@ export class ComponentSection extends Controller<
     this.components = model
 
     model.forEach((c, i) => {
+      const launcher = this.store
+        .get<Project>('project')
+        .launcherOf(c.component.id)
+
+      const targetSelectable = launcher?.features.componentTargets === 'multi'
+      const multiSelect = launcher?.features.launcherTargets === 'multi'
+
       this.addChild({
         component: ComponentItem,
         model: {
           component: c as SessionComponent,
-          targetSelectable:
-            this.store.get<Project>('project').launchers[0].features
-              .componentTargets === 'multi',
+          targetSelectable,
+          targetChildren: multiSelect,
           index: i,
         } as ComponentItemModel,
         style: {
@@ -95,6 +118,26 @@ export class ComponentSection extends Controller<
           width: '100%-3',
         },
       })
+
+      if (multiSelect) {
+        c.component.targets.forEach((target, ti) => {
+          const lastChild = ti === c.component.targets.length - 1
+          this.addChild({
+            component: ComponentTargetItem,
+            model: {
+              component: c as SessionComponent,
+              target: target,
+              cmpIndex: i,
+              targetIndex: ti,
+              lastChild,
+            } as ComponentTargetModel,
+            style: {
+              top: i + ti + 2,
+              width: '100%-3',
+            },
+          })
+        })
+      }
     })
 
     this.store!.subscribe('config.activeConfigName', () => {
@@ -108,15 +151,26 @@ export class ComponentSection extends Controller<
     this.children[this.focusedIndex]?.focus()
   }
 
-  moveUp() {
-    this.focusedIndex =
-      (this.focusedIndex - 1 + this.children.length) % this.children.length
-    this.applySelection()
-  }
-
-  moveDown() {
-    this.focusedIndex = (this.focusedIndex + 1) % this.children.length
-    this.applySelection()
+  onCheck(event: CheckboxEvent) {
+    if (event.item.parentId) {
+      const parent = this.children.find(
+        (c) => c.model.component.component.id === event.item.parentId
+      ) as ComponentItem
+      parent.silent = true
+      parent.setSelected(parent.model.component.state.targets.length > 0)
+      parent.silent = false
+    } else {
+      const children = this.children.filter(
+        (c) =>
+          c.model.target && c.model.component.component.id === event.item.id
+      )
+      children.forEach((c) => {
+        const child = c as ComponentTargetItem
+        child.silent = true
+        child.setSelected(event.checked)
+        child.silent = false
+      })
+    }
   }
 
   applySelection() {
@@ -128,7 +182,16 @@ export class ComponentSection extends Controller<
 export type ComponentItemModel = {
   component: SessionComponent
   targetSelectable: boolean
+  targetChildren: boolean
   index: number
+}
+
+export type ComponentTargetModel = {
+  component: SessionComponent
+  cmpIndex: number
+  targetIndex: number
+  target: string
+  lastChild: boolean
 }
 
 class ComponentItem extends Controller<
@@ -137,6 +200,7 @@ class ComponentItem extends Controller<
   ApplicationState
 > {
   focusable = true
+  silent = false
 
   events = this.defineEvents({
     checkbox: this.onChecked,
@@ -217,13 +281,14 @@ class ComponentItem extends Controller<
     )
     this.inheritKeyMap(keyMap)
 
-    if (!this.model.targetSelectable) {
+    if (!this.model.targetSelectable || this.model.targetChildren) {
       this.components.target.hide()
     }
   }
 
   onChecked(event: CheckboxEvent) {
     this.model.component.state.selected = event.checked
+    if (!this.silent) this.emit(event)
   }
 
   cycleTarget(amount: number = 1) {
@@ -255,5 +320,241 @@ class ComponentItem extends Controller<
 
   setSelected(sel: boolean) {
     ;(this.children[0] as Checkbox).setSelected(sel)
+  }
+}
+
+class MultiTargetItem extends Controller<
+  Widget,
+  ComponentItemModel,
+  ApplicationState
+> {
+  focusable = true
+
+  events = this.defineEvents({
+    checkbox: this.onChecked,
+  })
+
+  keyMap = this.defineKeys({
+    enter: {
+      legend: 'Toggle Selection',
+      group: 'focused',
+      propagate: true,
+      handler: () => (this.children[0] as Checkbox).toggle(),
+    },
+    space: {
+      legend: 'Toggle Target',
+      group: 'focused',
+      propagate: true,
+      handler: () => (this.children[1] as OptionBar).toggle(),
+    },
+    ...(this.model.targetSelectable
+      ? {
+          left: {
+            legend: 'Previous Target',
+            group: 'nav',
+            propagate: true,
+            handler: () => this.components.targets.nextChild(-1),
+          },
+          right: {
+            legend: 'Next target',
+            group: 'nav',
+            propagate: true,
+            handler: () => this.components.targets.nextChild(),
+          },
+        }
+      : {}),
+  })
+
+  components = this.defineComponents({
+    checkbox: {
+      component: Checkbox,
+      model: {
+        id: this.model.component.component.id,
+        label: this.model.component.component.name,
+        index: this.model.index,
+        checked: this.model.component.state.selected,
+      } as CheckboxItem,
+      style: {
+        left: 1,
+        focusable: false,
+      },
+    },
+    targets: {
+      component: OptionBar,
+      model: this.model.component.component.targets.map((t) => ({
+        id: t,
+        label: t,
+        selected: this.model.component.state.targets.includes(t),
+      })),
+      style: {
+        right: 0,
+        color: 'white',
+        width: 30,
+        focusable: false,
+        ':focused': {
+          background: 'blue',
+        },
+      },
+    },
+  })
+
+  constructor({
+    widget: { env, keyMap, options },
+    state: { model },
+  }: CtrlCtorParams<ComponentItemModel>) {
+    super(
+      env,
+      env.backend.createBox(
+        mergeLeft(
+          {
+            height: 1,
+            top: model.index + 1,
+            focusable: true,
+          },
+          resolveComponentStyle(env.theme, 'CheckBox', env.tty.colorMode),
+          options
+        )
+      ),
+      model
+    )
+    this.inheritKeyMap(keyMap)
+
+    if (!this.model.targetSelectable || this.model.targetChildren) {
+      this.components.targets.hide()
+    }
+  }
+
+  onChecked(event: CheckboxEvent) {
+    this.model.component.state.selected = event.checked
+  }
+
+  cycleTarget(amount: number = 1) {
+    if (!this.model.targetSelectable) return
+
+    const currentIndex = this.model.component.component.targets.indexOf(
+      this.model.component.state.targets[0]
+    )
+
+    const newIndex =
+      (currentIndex + amount + this.model.component.component.targets.length) %
+      this.model.component.component.targets.length
+
+    this.setTargets([this.model.component.component.targets[newIndex]])
+  }
+
+  setTargets(targets: string[]) {
+    this.model.component.state.targets[0] = targets[0]
+
+    // FIXME: Setting the model should be enough here!
+    // this.components.target.model.text =
+    //   this.model.component.state.targets.join(' ')
+    this.components.targets.set(
+      'text',
+      this.model.component.state.targets.join(' ')
+    )
+    this.emit('dirty')
+  }
+
+  setSelected(sel: boolean) {
+    ;(this.children[0] as Checkbox).setSelected(sel)
+  }
+}
+
+class ComponentTargetItem extends Controller<
+  Widget,
+  ComponentTargetModel,
+  ApplicationState
+> {
+  focusable = true
+  silent = false
+
+  events = this.defineEvents({
+    checkbox: this.onChecked,
+  })
+
+  keyMap = this.defineKeys({
+    enter: {
+      legend: 'Toggle Selection',
+      group: 'focused',
+      propagate: true,
+      handler: () => (this.children[1] as Checkbox).toggle(),
+    },
+  })
+
+  components = this.defineComponents({
+    connector: {
+      component: Label,
+      model: {
+        text: this.model.lastChild ? '└──' : '├──',
+      },
+      style: {
+        left: 2,
+      },
+    },
+    checkbox: {
+      component: Checkbox,
+      model: {
+        id: this.model.component.component.id + '/' + this.model.target,
+        parentId: this.model.component.component.id,
+        label: this.model.target,
+        index: this.model.cmpIndex,
+        checked: this.model.component.state.targets.includes(this.model.target),
+      } as CheckboxItem,
+      style: {
+        left: 6,
+        focusable: false,
+      },
+    },
+  })
+
+  constructor({
+    widget: { env, keyMap, options },
+    state: { model },
+  }: CtrlCtorParams<ComponentTargetModel>) {
+    super(
+      env,
+      env.backend.createBox(
+        mergeLeft(
+          {
+            height: 1,
+            top: model.cmpIndex + model.targetIndex + 1,
+            focusable: true,
+          },
+          resolveComponentStyle(env.theme, 'CheckBox', env.tty.colorMode),
+          options
+        )
+      ),
+      model
+    )
+    this.inheritKeyMap(keyMap)
+  }
+
+  onChecked(event: CheckboxEvent) {
+    if (event.checked) {
+      pushUnique(this.model.component.state.targets, this.model.target)
+    } else if (this.model.component.state.targets.includes(this.model.target)) {
+      this.model.component.state.targets.splice(
+        this.model.component.state.targets.indexOf(this.model.target),
+        1
+      )
+    }
+    if (!this.silent) this.emit(event)
+  }
+
+  setTargets(targets: string[]) {
+    this.model.component.state.targets[0] = targets[0]
+
+    // FIXME: Setting the model should be enough here!
+    // this.components.target.model.text =
+    //   this.model.component.state.targets.join(' ')
+    // this.components.target.set(
+    //   'text',
+    //   this.model.component.state.targets.join(' ')
+    // )
+    // this.emit('dirty')
+  }
+
+  setSelected(sel: boolean) {
+    ;(this.children[1] as Checkbox).setSelected(sel)
   }
 }

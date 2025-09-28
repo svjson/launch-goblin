@@ -49,7 +49,6 @@ export class OptionBar<
       env.backend.createOptionBar(
         mergeLeft(
           {
-            width: '100%-2',
             height: 1,
             keys: true,
             focusable: true,
@@ -70,18 +69,17 @@ export class OptionBar<
       this.model[0].selected = true
     }
 
-    let left = 2
+    let left = 0
     for (let i = 0; i < this.model.length; i++) {
       const opt = this.model[i]
-      this.addChild(
-        {
-          component: Option,
-          model: opt,
-        },
-        {
+      this.addChild({
+        component: Option,
+        model: opt,
+        style: {
           left,
-        }
-      )
+          focusable: this.widget.widgetOptions.focusable ?? true,
+        },
+      })
       left += opt.label.length + 2
     }
   }

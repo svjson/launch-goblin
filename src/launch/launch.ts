@@ -139,6 +139,8 @@ const launchDetached = async (
   })
 
   bindSig(child, cmd)
+
+  return child
 }
 
 /**
@@ -159,4 +161,6 @@ const launchProxied = async (
   })
 
   bindSig(child, cmd)
+
+  return child
 }

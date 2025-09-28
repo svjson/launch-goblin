@@ -26,7 +26,7 @@ describe('ComponentSection', () => {
   ) => {
     const parent = env.backend.createBox({})
 
-    const store = createStore(state.project)
+    const store = createStore(state)
     const section = new ComponentSection({
       widget: { env, parent, keyMap: { replace: false, keys: {} } },
       state: { model: state.session.components, store },

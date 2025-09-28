@@ -1,6 +1,6 @@
 import path from 'node:path'
 
-import { Project, ProjectComponent } from '@src/project'
+import { NodePackage, Project, ProjectComponent } from '@src/project'
 import { Launcher } from './types'
 import { LGOptions } from '@src/tui/goblin-app'
 import { ApplicationEnvironment } from '@src/tui/framework'
@@ -10,11 +10,12 @@ export const turboLauncher = (
   project: Project,
   launchAction: string,
   components: ProjectComponent[]
-): Launcher => {
+): Launcher<NodePackage> => {
   const cliRunner = project.hasRootFacet('pnpm') ? 'pnpx' : 'npx'
 
   return {
     id: 'turbo',
+    defaultTargets: [launchAction],
     components: components.map((c) => c.id),
     features: {
       componentTargets: 'single',
@@ -22,7 +23,7 @@ export const turboLauncher = (
     },
     launchCommand: (
       _env: ApplicationEnvironment,
-      components: SessionComponent[]
+      components: SessionComponent<NodePackage>[]
     ) => ({
       groups: [
         {
@@ -61,11 +62,15 @@ export const identifyTurboLaunchOptions = async (
 
       if (turboJson.tasks?.[launchAction]) {
         if (options.verbose) console.log(` - task '${launchAction}' is defined`)
-        const targetComponents = project.components.filter((c) =>
-          c.pkgJson.get(['scripts', launchAction])
+        const targetComponents = project.components.filter(
+          (c) =>
+            c.type === 'pkgjson-script' &&
+            c.pkgJson.get(['scripts', launchAction])
         )
         if (targetComponents.length) {
-          return [turboLauncher(project, launchAction, targetComponents)]
+          return [
+            turboLauncher(project, launchAction, targetComponents),
+          ] as Launcher[]
         }
         if (options.verbose) console.log(' x No packages provide target action')
       }

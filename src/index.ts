@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-import { launch } from './launch'
+import { launchSession } from './launch'
 import { LaunchGoblinApp } from './tui'
 import { LogEvent } from './tui/framework'
 import { LegacyConfigType, saveLatestLaunch, saveLocalConfig } from './config'
@@ -21,10 +21,8 @@ const main = async (options: LGOptions) => {
   const facade: ActionFacade = {
     launch: async () => {
       env.backend.dispose()
-      const selected = model.session.components.filter((c) => c.state.selected)
       await saveLatestLaunch(model)
-      const cmd = model.project.launchers[0].launchCommand(env, selected)
-      await launch(env, cmd)
+      await launchSession(env, model)
     },
     saveConfig: async (state: ApplicationState, type: LegacyConfigType) => {
       if (type === 'local') {

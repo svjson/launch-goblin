@@ -1,4 +1,6 @@
-import { pnpmLauncher } from '@src/launch/pnpm'
+import { Launcher } from '@src/launch'
+import { identifyPnpmLaunchOptions, pnpmLauncher } from '@src/launch/pnpm'
+import { NodePackage, ProjectComponent } from '@src/project'
 import { makeAppState } from 'test/fixtures'
 import { applicationEnvironment } from 'test/tui/framework/fixtures'
 import { describe, expect, it } from 'vitest'
@@ -12,20 +14,25 @@ describe('pnpmLauncher', () => {
     const launcher = pnpmLauncher(
       state.project,
       'dev',
-      state.project.components
+      state.project.components as NodePackage[]
     )
 
     // Then
     expect(launcher).toEqual({
       id: 'pnpm',
+      defaultTargets: ['dev'],
       components: [
         'backend-service',
         'frontend-portal',
         'mock-provider-a',
         'mock-provider-b',
       ],
+      features: {
+        componentTargets: 'multi',
+        launcherTargets: 'multi',
+      },
       launchCommand: expect.any(Function),
-    })
+    } satisfies Launcher<NodePackage>)
   })
 
   describe('launchCommand', () => {
@@ -36,8 +43,8 @@ describe('pnpmLauncher', () => {
       const launcher = pnpmLauncher(
         state.project,
         'dev',
-        state.project.components
-      )
+        state.project.components as NodePackage[]
+      ) as Launcher<ProjectComponent>
 
       // When
       const command = launcher.launchCommand(env, state.session.components)
@@ -80,8 +87,8 @@ describe('pnpmLauncher', () => {
       const launcher = pnpmLauncher(
         state.project,
         'dev',
-        state.project.components
-      )
+        state.project.components as NodePackage[]
+      ) as Launcher<ProjectComponent>
       state.session.components[0].state.targets = ['dev:local']
 
       // When
@@ -128,5 +135,30 @@ describe('pnpmLauncher', () => {
         ],
       })
     })
+  })
+})
+
+describe('identifyPnpmLaunchOptions', () => {
+  it('should not list docker-compose component as one of its launchable components', async () => {
+    // Given
+    const state = makeAppState('dummy-with-docker-compose')
+
+    // When
+    const [launcher] = await identifyPnpmLaunchOptions(state.project, 'dev', {
+      verbose: false,
+      autoLaunch: false,
+    })
+
+    // Then
+    expect(launcher).toEqual({
+      id: 'pnpm',
+      defaultTargets: ['dev'],
+      components: ['frontdesk-service', 'frontdesk-app'],
+      features: {
+        componentTargets: 'multi',
+        launcherTargets: 'multi',
+      },
+      launchCommand: expect.any(Function),
+    } satisfies Launcher<NodePackage>)
   })
 })

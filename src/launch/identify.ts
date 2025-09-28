@@ -3,6 +3,7 @@ import { identifyTurboLaunchOptions } from './turbo'
 import { identifyPnpmLaunchOptions } from './pnpm'
 import { Launcher } from './types'
 import { LGOptions } from '@src/tui/goblin-app'
+import { identifyDockerComposeLaunchOptions } from './docker-compose'
 
 export const identifyLaunchers = async (
   project: Project,
@@ -12,6 +13,7 @@ export const identifyLaunchers = async (
   const launchers: Launcher[] = [
     ...(await identifyTurboLaunchOptions(project, launchAction, options)),
     ...(await identifyPnpmLaunchOptions(project, launchAction, options)),
+    ...(await identifyDockerComposeLaunchOptions(project)),
   ]
 
   return launchers

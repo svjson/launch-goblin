@@ -1,4 +1,4 @@
-import { Project, ProjectComponent } from '@src/project'
+import { NodePackage, Project, ProjectComponent } from '@src/project'
 import { Launcher } from './types'
 import { LGOptions } from '@src/tui/goblin-app'
 import { ApplicationEnvironment } from '@src/tui/framework'
@@ -7,10 +7,11 @@ import { SessionComponent } from '@src/project/state'
 export const pnpmLauncher = (
   _project: Project,
   launchAction: string,
-  components: ProjectComponent[]
-): Launcher => {
+  components: NodePackage[]
+): Launcher<NodePackage> => {
   return {
     id: 'pnpm',
+    defaultTargets: [launchAction],
     components: components.map((c) => c.id),
     features: {
       componentTargets: 'multi',
@@ -18,13 +19,15 @@ export const pnpmLauncher = (
     },
     launchCommand: (
       _env: ApplicationEnvironment,
-      components: SessionComponent[]
+      components: SessionComponent<NodePackage>[]
     ) => {
-      const groups: Record<string, SessionComponent[]> = {}
+      const groups: Record<string, SessionComponent<NodePackage>[]> = {}
       components.forEach((c) => {
-        c.state.targets.forEach((t) => {
-          ;(groups[t] ??= []).push(c)
-        })
+        if (c.component.type === 'pkgjson-script') {
+          c.state.targets.forEach((t) => {
+            ;(groups[t] ??= []).push(c)
+          })
+        }
       })
 
       return {
@@ -58,16 +61,19 @@ export const identifyPnpmLaunchOptions = async (
   if (options.verbose) console.log('Evaluating pnpm...')
   if (project.packageManager() === 'pnpm') {
     if (options.verbose) console.log(' - Is package manager for project')
-    const targetComponents = project.components
+    const targetComponents: NodePackage[] = project.components
+      .filter((c) => c.type === 'pkgjson-script')
+      .filter((c) => c.targets.includes(launchAction))
       .map((c) => ({
         ...c,
         targets: c.targets.filter(
           (t) => t === launchAction && t.startsWith(`${launchAction}:`)
         ),
       }))
-      .filter((c) => c.pkgJson.get(['scripts', launchAction]))
     if (targetComponents.length) {
-      return [pnpmLauncher(project, launchAction, targetComponents)]
+      return [
+        pnpmLauncher(project, launchAction, targetComponents),
+      ] as Launcher[]
     }
     if (options.verbose) console.log(' x No packages provide target action')
   } else {

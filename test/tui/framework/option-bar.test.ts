@@ -217,7 +217,7 @@ describe('OptionBar', () => {
     describe('Selection', () => {
       it('should toggle selection with enter', () => {
         // Given
-        const { optionBar, backend } = makeOptionBar(
+        const { optionBar } = makeOptionBar(
           ingredients(false, true, false),
           'multi'
         )

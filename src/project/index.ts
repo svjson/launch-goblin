@@ -1,6 +1,7 @@
 export type {
   ProjectParams,
   BaseComponent,
+  DockerComposeFile,
   Package,
   NodePackage,
   ProjectComponent,

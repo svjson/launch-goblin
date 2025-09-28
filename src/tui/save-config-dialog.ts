@@ -48,7 +48,7 @@ export class SaveConfigDialog extends ModalDialog<
           selected: false,
         },
       ],
-      style: { top: 5 },
+      style: { top: 5, left: 2, selectionMode: 'single' },
     },
 
     saveButton: {

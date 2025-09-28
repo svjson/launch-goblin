@@ -17,8 +17,10 @@ export interface ApplicationState {
   session: LaunchSession
 }
 
-export interface SessionComponent {
-  component: ProjectComponent
+export interface SessionComponent<
+  T extends ProjectComponent = ProjectComponent,
+> {
+  component: T
   state: ComponentLaunchConfig
 }
 

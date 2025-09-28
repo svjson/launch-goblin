@@ -1,11 +1,12 @@
+import { ProjectComponent } from '@src/project'
 import { SessionComponent } from '@src/project/state'
 import { ApplicationEnvironment } from '@src/tui/framework'
 
-export type LauncherId = 'turbo' | 'pnpm'
+export type LauncherId = 'turbo' | 'pnpm' | 'docker-compose'
 
-export type MakeLaunchCommand = (
+export type MakeLaunchCommand<C extends ProjectComponent = ProjectComponent> = (
   env: ApplicationEnvironment,
-  components: SessionComponent[]
+  components: SessionComponent<C>[]
 ) => LaunchCommand
 
 export interface LauncherFeatures {
@@ -13,19 +14,22 @@ export interface LauncherFeatures {
   launcherTargets: 'single' | 'multi'
 }
 
-export interface Launcher {
+export interface Launcher<C extends ProjectComponent = ProjectComponent> {
   id: LauncherId
-  launchCommand: MakeLaunchCommand
+  defaultTargets: string[]
+  launchCommand: MakeLaunchCommand<C>
   components: string[]
   features: LauncherFeatures
 }
+
+export type LaunchMode = 'parallel' | 'sequential'
 
 export interface LaunchCommand {
   groups: LaunchGroup[]
 }
 
 export interface LaunchGroup {
-  mode: 'parallel' | 'sequential'
+  mode: LaunchMode
   processes: LaunchProcess[]
 }
 
