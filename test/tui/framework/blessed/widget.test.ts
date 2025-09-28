@@ -1,9 +1,9 @@
 import blessed from 'neo-blessed'
 
-import { BlessedWidget } from '@src/tui/framework/blessed'
 import { describe, it, expect } from 'vitest'
 import { WidgetOptions } from '@src/tui/framework/widget'
 import { toBlessedBoxOptions } from '@src/tui/framework/blessed/backend'
+import { BlessedBoxWidget } from '@src/tui/framework/blessed/widget'
 
 describe('BlessedWidget', () => {
   describe('applyStyle', () => {
@@ -20,7 +20,7 @@ describe('BlessedWidget', () => {
         background: 'black',
       }
 
-      const widget = new BlessedWidget(
+      const widget = new BlessedBoxWidget(
         blessed.box(toBlessedBoxOptions(options, screen)),
         options
       )

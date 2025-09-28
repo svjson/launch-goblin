@@ -4,6 +4,8 @@ import { Appearance, Border } from './appearance'
 import { Interaction } from './interaction'
 import { Behavior } from './behavior'
 
+export type WidgetType = string
+
 export type UIState = ':focused' | ':selected' | ':disabled'
 export type SelectionMode = 'none' | 'single' | 'multi'
 
@@ -35,6 +37,7 @@ export type TextFieldOptions = BaseWidgetOptions
 export interface Widget<O extends WidgetOptions = WidgetOptions> {
   calculatedStyle: BaseWidgetOptions
   widgetOptions: O
+  type: WidgetType
 
   /**
    * Register an event handler that will be called before this Widget
@@ -67,25 +70,31 @@ export interface Widget<O extends WidgetOptions = WidgetOptions> {
 }
 
 export interface LabelWidget extends Widget {
+  type: 'label'
   setText(text: string): void
 }
 
 export interface ListWidget extends Widget {
+  type: 'list'
   clearItems(): void
   select(index: number): void
   setItems(items: string[]): void
   onItemSelected(callback: (item: any, index: number) => void): void
 }
 
-export interface OptionBarWidget extends Widget<ListOptions> {}
+export interface OptionBarWidget extends Widget<ListOptions> {
+  type: 'option-bar'
+}
 
 export interface TextFieldWidget extends Widget {
+  type: 'text-field'
   onSubmit(callback: () => void): void
   onCancel(callback: () => void): void
   getText(): string
 }
 
 export interface CheckboxWidget extends Widget {
+  type: 'checkbox'
   isChecked(): boolean
   setChecked(checked: boolean): void
 }

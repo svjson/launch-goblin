@@ -3,6 +3,8 @@ import { BackendCallback } from '../backend'
 import { LayoutProperty } from '../layout'
 import {
   BaseWidgetOptions,
+  BoxOptions,
+  ButtonOptions,
   CheckboxOptions,
   CheckboxWidget,
   LabelOptions,
@@ -18,9 +20,10 @@ import { HeadlessBackend } from './backend'
 
 export type HeadlessElement = {}
 
-export class HeadlessWidget<O extends WidgetOptions = WidgetOptions>
-  implements Widget
+export abstract class HeadlessWidget<O extends WidgetOptions = WidgetOptions>
+  implements Widget<O>
 {
+  abstract type: string
   _children: HeadlessWidget[] = []
   calculatedStyle: BaseWidgetOptions
   widgetOptions: O
@@ -70,7 +73,7 @@ export class HeadlessWidget<O extends WidgetOptions = WidgetOptions>
   isFocused(): boolean {
     return this.backend.focused === this
   }
-  applyStyle(style: BaseWidgetOptions): void {}
+  applyStyle(_style: BaseWidgetOptions): void {}
   getStyleOptions(): BaseWidgetOptions {
     throw new Error(
       'HeadlessWidget::getStyleOptions() - Method not implemented.'
@@ -85,7 +88,7 @@ export class HeadlessWidget<O extends WidgetOptions = WidgetOptions>
       this.widgetOptions.focusable = Boolean(value)
     }
   }
-  get(prop: string): string | number | undefined {
+  get(_prop: string): string | number | undefined {
     return (this.widgetOptions as any).text || (this.widgetOptions as any).label
   }
   setParent(parent: Widget): void {
@@ -94,15 +97,30 @@ export class HeadlessWidget<O extends WidgetOptions = WidgetOptions>
       this.parent.children().push(this)
     }
   }
-  setLayout(prop: LayoutProperty, value: string | number): void {
+  setLayout(_prop: LayoutProperty, _value: string | number): void {
     throw new Error('HeadlessWidget::setLayout() - Method not implemented.')
   }
+}
+
+export class HeadlessBoxWidget
+  extends HeadlessWidget<BoxOptions>
+  implements Widget
+{
+  type: 'box' = 'box'
+}
+
+export class HeadlessButtonWidget
+  extends HeadlessWidget<ButtonOptions>
+  implements Widget
+{
+  type: 'button' = 'button'
 }
 
 export class HeadlessCheckboxWidget
   extends HeadlessWidget<CheckboxOptions>
   implements CheckboxWidget
 {
+  type: 'checkbox' = 'checkbox'
   text: string = ''
   checked: boolean = false
 
@@ -130,6 +148,7 @@ export class HeadlessLabelWidget
   extends HeadlessWidget<LabelOptions>
   implements LabelWidget
 {
+  type: 'label' = 'label'
   text: string = ''
 
   get(prop: string): string | number | undefined {
@@ -148,6 +167,8 @@ export class HeadlessListWidget
   extends HeadlessWidget<ListOptions>
   implements ListWidget
 {
+  type: 'list' = 'list'
+
   clearItems(): void {
     throw new Error('HeadlessLabelWidget::clearItems - Method not implemented.')
   }
@@ -164,10 +185,19 @@ export class HeadlessListWidget
   }
 }
 
+export class HeadlessOptionBarWidget
+  extends HeadlessWidget<ListOptions>
+  implements Widget
+{
+  type: 'option-bar' = 'option-bar'
+}
+
 export class HeadlessTextFieldWidget
   extends HeadlessWidget<TextFieldOptions>
   implements TextFieldWidget
 {
+  type: 'text-field' = 'text-field'
+
   onSubmit(callback: () => void): void {
     throw new Error(
       'HeadlessTextFieldWidget::onSubmit() - Method not implemented.'

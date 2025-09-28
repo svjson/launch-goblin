@@ -1,9 +1,13 @@
 import blessed from 'neo-blessed'
 import {
   BaseWidgetOptions,
+  BoxOptions,
+  ButtonOptions,
   CheckboxWidget,
   LabelWidget,
+  ListOptions,
   ListWidget,
+  OptionBarWidget,
   TextFieldWidget,
   Widget,
   WidgetOptions,
@@ -85,11 +89,12 @@ const accessors: Record<
   },
 }
 
-export class BlessedWidget<
+export abstract class BlessedWidget<
   T extends BlessedLmnt = BlessedLmnt,
   O extends WidgetOptions = WidgetOptions,
 > implements Widget<O>
 {
+  abstract type: string
   _children: BlessedWidget[] = []
   calculatedStyle: BaseWidgetOptions
   widgetOptions: O
@@ -185,10 +190,25 @@ export class BlessedWidget<
   }
 }
 
+export class BlessedBoxWidget
+  extends BlessedWidget<blessed.Widgets.BoxElement>
+  implements Widget
+{
+  type: 'box' = 'box'
+}
+
+export class BlessedButtonWidget
+  extends BlessedWidget<blessed.Widgets.ButtonElement>
+  implements Widget
+{
+  type: 'button' = 'button'
+}
+
 export class BlessedCheckboxWidget
   extends BlessedWidget<blessed.Widgets.BoxElement>
   implements CheckboxWidget
 {
+  type: 'checkbox' = 'checkbox'
   private checked: boolean = false
 
   isChecked(): boolean {
@@ -204,6 +224,8 @@ export class BlessedLabelWidget
   extends BlessedWidget<blessed.Widgets.TextElement>
   implements LabelWidget
 {
+  type: 'label' = 'label'
+
   setText(text: string) {
     this.inner.content = text ?? ''
   }
@@ -213,6 +235,8 @@ export class BlessedListWidget
   extends BlessedWidget<blessed.Widgets.ListElement>
   implements ListWidget
 {
+  type: 'list' = 'list'
+
   clearItems() {
     this.inner.clearItems
   }
@@ -230,10 +254,19 @@ export class BlessedListWidget
   }
 }
 
+export class BlessedOptionBarWidget
+  extends BlessedWidget<blessed.Widgets.BoxElement, ListOptions>
+  implements OptionBarWidget
+{
+  type: 'option-bar' = 'option-bar'
+}
+
 export class BlessedTextFieldWidget
   extends BlessedWidget<blessed.Widgets.TextboxElement>
   implements TextFieldWidget
 {
+  type: 'text-field' = 'text-field'
+
   onSubmit(callback: () => void) {
     this.inner.on('submit', callback)
   }

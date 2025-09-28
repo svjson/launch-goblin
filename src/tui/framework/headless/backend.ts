@@ -20,9 +20,12 @@ import {
 } from '../widget'
 import { genKeyPress } from './keygen'
 import {
+  HeadlessBoxWidget,
+  HeadlessButtonWidget,
   HeadlessCheckboxWidget,
   HeadlessLabelWidget,
   HeadlessListWidget,
+  HeadlessOptionBarWidget,
   HeadlessTextFieldWidget,
   HeadlessWidget,
 } from './widget'
@@ -73,14 +76,10 @@ export const noBackend = (): Backend => {
       })
     },
     createBox(options: BoxOptions): Widget {
-      return new HeadlessWidget<BoxOptions>(
-        this,
-        {},
-        { focusable: false, ...options }
-      )
+      return new HeadlessBoxWidget(this, {}, { focusable: false, ...options })
     },
     createButton(options: ButtonOptions): Widget {
-      return new HeadlessWidget<ButtonOptions>(
+      return new HeadlessButtonWidget(
         this,
         {},
         {
@@ -120,7 +119,7 @@ export const noBackend = (): Backend => {
       )
     },
     createOptionBar(options: ListOptions): OptionBarWidget {
-      return new HeadlessWidget(
+      return new HeadlessOptionBarWidget(
         this,
         {},
         {

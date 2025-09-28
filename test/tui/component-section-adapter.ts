@@ -30,13 +30,18 @@ export const componentSectionAdapter = (
     getComponentStates() {
       return section.children.map(makeComponentState)
     },
+    getFocusedCheckboxWidget(): CheckboxWidget | undefined {
+      const w = backend.getFocusedWidget()
+      if (w) {
+        const checkboxIndex = w.children()[0].type === 'checkbox' ? 0 : 1
+        return w.children()[checkboxIndex] as CheckboxWidget
+      }
+    },
     getFocusedComponentName() {
-      return backend.getFocusedWidget()?.children()[0].get('text')
+      return adapter.getFocusedCheckboxWidget()?.get('text')
     },
     isFocusedComponentChecked() {
-      return (
-        backend.getFocusedWidget()?.children()[0] as CheckboxWidget
-      ).isChecked()
+      return adapter.getFocusedCheckboxWidget()?.isChecked()
     },
   }
 

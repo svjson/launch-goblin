@@ -19,9 +19,12 @@ import {
   OptionBarWidget,
 } from '../widget'
 import {
+  BlessedBoxWidget,
+  BlessedButtonWidget,
   BlessedCheckboxWidget,
   BlessedLabelWidget,
   BlessedListWidget,
+  BlessedOptionBarWidget,
   BlessedTextFieldWidget,
   BlessedWidget,
 } from './widget'
@@ -69,14 +72,14 @@ export class BlessedBackend implements Backend {
   }
 
   createBox(options: BoxOptions): Widget {
-    return new BlessedWidget(
+    return new BlessedBoxWidget(
       blessed.box(toBlessedBoxOptions(options, this.screen)),
       options
     )
   }
 
   createButton(options: ButtonOptions): Widget {
-    return new BlessedWidget(
+    return new BlessedButtonWidget(
       blessed.button(toBlessedButtonOptions(options, this.screen)),
       options
     )
@@ -104,7 +107,7 @@ export class BlessedBackend implements Backend {
   }
 
   createOptionBar(options: ListOptions): OptionBarWidget {
-    return new BlessedWidget(
+    return new BlessedOptionBarWidget(
       blessed.box(toBlessedListOptions(options, this.screen)),
       options
     )

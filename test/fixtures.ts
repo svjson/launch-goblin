@@ -140,6 +140,7 @@ const TEST_PROJECTS: Record<TestProjectId, TestProject> = {
       },
     },
   },
+
   'dummy-with-docker-compose': {
     project: {
       id: 'dummy-with-docker-compose',
@@ -158,7 +159,52 @@ const TEST_PROJECTS: Record<TestProjectId, TestProject> = {
           }
         },
       } as WhimbrelContext,
-      launchers: [],
+      launchers: [
+        {
+          id: 'pnpm',
+          defaultTargets: ['dev'],
+          features: {
+            componentTargets: 'multi',
+            launcherTargets: 'single',
+          },
+          components: ['frontdesk-service', 'frontdesk-app'],
+          launchCommand: (_env, _components) => ({
+            groups: [
+              {
+                mode: 'parallel',
+                processes: [
+                  {
+                    bin: 'pnpm',
+                    args: [],
+                  },
+                ],
+              },
+            ],
+          }),
+        },
+        {
+          id: 'docker-compose',
+          defaultTargets: ['sql', 'kibana', 'elasticsearch'],
+          features: {
+            componentTargets: 'multi',
+            launcherTargets: 'multi',
+          },
+          components: ['docker-compose.yaml'],
+          launchCommand: (_env, _components) => ({
+            groups: [
+              {
+                mode: 'sequential',
+                processes: [
+                  {
+                    bin: 'docker',
+                    args: [],
+                  },
+                ],
+              },
+            ],
+          }),
+        },
+      ],
       components: [
         {
           id: 'frontdesk-service',
