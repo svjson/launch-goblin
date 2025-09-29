@@ -471,7 +471,7 @@ export const runGoblinApp = async ({
     systemModule,
     configModule,
     projectModule,
-    () => noBackend()
+    async () => noBackend()
   )
 
   const concreteFacade: ActionFacade = {

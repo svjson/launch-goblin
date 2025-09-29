@@ -1,15 +1,23 @@
 import { LaunchGoblinApp } from './tui'
 import { LogEvent } from './tui/framework'
-import { setTTYTitleString } from './tui/framework/tty'
 import { Command } from 'commander'
 import { LGOptions, makeLGOptions } from './tui/goblin-app'
 import { bootstrap, inspectEnvironment } from './bootstrap'
 import { BootstrapError } from './bootstrap/error'
 
 /**
- * Launches the application with command-line options
+ * Launches the application with the command-line options contained in
+ * `options`.
+ *
+ * If `options.autoLaunch` is true, the application will immediately launch
+ * the last used configuration, bypassing the TUI.
+ *
+ * If `options.autoLaunch` is false, the TUI will be presented to the user
+ * to select a configuration to launch.
+ *
+ * @param options The command-line options
  */
-const main = async (options: LGOptions) => {
+const main = async (options: LGOptions): Promise<void> => {
   try {
     const targetAction = 'dev'
     const { env, model, facade } = await bootstrap(targetAction, options)
@@ -23,16 +31,10 @@ const main = async (options: LGOptions) => {
         env.log.push(event.message)
       })
 
-      app.mainCtrl.focus()
-
       env.backend.onKeyPress(['q', 'C-c'], (_ch, _key) => {
         env.backend.dispose()
         env.log.forEach((m) => console.log(m))
         process.exit(0)
-      })
-
-      process.on('exit', () => {
-        setTTYTitleString(model.originalWindowTitleString ?? '')
       })
 
       env.backend.render()

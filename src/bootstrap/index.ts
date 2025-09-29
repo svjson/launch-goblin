@@ -48,6 +48,9 @@ export const bootstrap = async (
     systemModule,
     configModule,
     projectModule,
-    () => (options.autoLaunch ? noBackend() : BlessedBackend.create())
+    async () =>
+      options.autoLaunch
+        ? noBackend()
+        : BlessedBackend.create(await inspectEnvironment())
   )
 }

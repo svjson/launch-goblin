@@ -28,12 +28,13 @@ import {
   BlessedTextFieldWidget,
   BlessedWidget,
 } from './widget'
-import { initTui } from '../init'
+import { initTui } from './init'
 import { destroy } from './destroy'
 import { Geometry } from '../geometry'
 import { Appearance, BorderOptions } from '../appearance'
 import { Interaction } from '../interaction'
 import { Behavior } from '../behavior'
+import { TTYEnv } from '../environment'
 
 export class BlessedBackend implements Backend {
   private screen: blessed.Widgets.Screen
@@ -42,8 +43,8 @@ export class BlessedBackend implements Backend {
     this.screen = screen ?? blessed.screen()
   }
 
-  static create(): BlessedBackend {
-    const screen = initTui()
+  static create(ttyEnv: TTYEnv): BlessedBackend {
+    const screen = initTui(ttyEnv)
     return new BlessedBackend(screen)
   }
 

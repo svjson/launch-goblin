@@ -18,7 +18,7 @@ export const bootstrap = async (
   systemModule: SystemModule,
   configModule: ConfigurationModule,
   projectModule: ProjectModule,
-  backendProvider: () => Backend
+  backendProvider: () => Promise<Backend>
 ): Promise<{
   env: ApplicationEnvironment
   model: ApplicationState
@@ -55,7 +55,7 @@ export const bootstrap = async (
   if (options.colorMode) {
     tty.colorMode = options.colorMode
   }
-  const backend = backendProvider()
+  const backend = await backendProvider()
 
   const env = { backend, tty, theme: DefaultTheme, log: [] }
 
