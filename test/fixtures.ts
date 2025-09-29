@@ -377,6 +377,42 @@ export const createContextConfig = (
   return config
 }
 
+const makeSystemModule = (): SystemModule => {
+  return {
+    userdir() {
+      return '/home/klasse'
+    },
+    async inspectEnvironment(): Promise<TTYEnv> {
+      return ttyEnv()
+    },
+    async findExecutable(bin: string): Promise<string | undefined> {
+      switch (bin) {
+        case 'docker':
+          return '/usr/bin/docker'
+      }
+
+      return undefined
+    },
+  }
+}
+
+const makeConfigModule = (config: ContextConfig): ConfigurationModule => {
+  return {
+    async readConfig(_project: Project): Promise<ContextConfig> {
+      return config
+    },
+    async saveLatestLaunch(_state: ApplicationState): Promise<void> {},
+    async savePrivateConfig(
+      _project: Project,
+      _config: GlobalConfig
+    ): Promise<void> {},
+    async saveSharedConfig(
+      _project: Project,
+      _config: LGConfig
+    ): Promise<void> {},
+  }
+}
+
 export const makeAppState = (
   projectId: TestProjectId,
   configs: {
@@ -418,37 +454,9 @@ export const runGoblinApp = async ({
   backend: HeadlessBackend
   state: ApplicationState
 }> => {
-  const systemModule: SystemModule = {
-    userdir() {
-      return '/home/klasse'
-    },
-    async inspectEnvironment(): Promise<TTYEnv> {
-      return ttyEnv()
-    },
-    async findExecutable(bin: string): Promise<string | undefined> {
-      switch (bin) {
-        case 'docker':
-          return '/usr/bin/docker'
-      }
+  const configModule = makeConfigModule(createContextConfig(projectId, configs))
 
-      return undefined
-    },
-  }
-
-  const configModule: ConfigurationModule = {
-    async readConfig(_project: Project): Promise<ContextConfig> {
-      return createContextConfig(projectId, configs)
-    },
-    async saveLatestLaunch(_state: ApplicationState): Promise<void> {},
-    async savePrivateConfig(
-      _project: Project,
-      _config: GlobalConfig
-    ): Promise<void> {},
-    async saveSharedConfig(
-      _project: Project,
-      _config: LGConfig
-    ): Promise<void> {},
-  }
+  const systemModule = makeSystemModule()
 
   const projectModule: ProjectModule = makeProjectFacade(
     systemModule,
