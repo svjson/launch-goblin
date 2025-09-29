@@ -2,7 +2,11 @@ import { mergeLeft } from '@whimbrel/walk'
 
 import { CtrlCtorParams, Label, Store } from './framework'
 import { ApplicationState } from '@src/project'
-import { launchConfigByName, launchConfigCount } from '@src/config/query'
+import {
+  launchConfigByContent,
+  launchConfigByName,
+  launchConfigCount,
+} from '@src/config/query'
 import { ListItem } from './framework/list-box'
 import {
   applyConfig,
@@ -105,6 +109,18 @@ export class ConfigSection extends CustomListBox<
     this.populateModel()
 
     this.populateList()
+
+    const lastLaunched = launchConfigByContent(
+      this.store.get<LaunchConfig>('config.global.lastConfig'),
+      this.store.get<ContextConfig>('config')
+    )
+
+    if (lastLaunched) {
+      this.focusedIndex = this.model.findIndex(
+        (i) => i.label === lastLaunched.name
+      )
+      this.itemFocused()
+    }
 
     this.adjustHeight()
   }

@@ -1,3 +1,4 @@
+import equal from 'fast-deep-equal'
 import { ContextConfig, LaunchConfig } from './types'
 
 export const launchConfigCount = (config: ContextConfig) => {
@@ -16,4 +17,18 @@ export const launchConfigByName = (
       return cfg.launchConfigs[configName]
     })
     .find((cfg) => cfg)
+}
+
+export const launchConfigByContent = (
+  configContent: LaunchConfig,
+  config: ContextConfig
+): { name: string; config: LaunchConfig } | undefined => {
+  return [config.local, config.global]
+    .flatMap((cfg) =>
+      Object.entries(cfg.launchConfigs).map(([name, config]) => ({
+        name,
+        config,
+      }))
+    )
+    .find((cfg) => equal(cfg.config, configContent))
 }

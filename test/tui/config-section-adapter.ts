@@ -13,6 +13,15 @@ export const configSectionAdapter = (
       }))
     },
 
+    getSelectedConfig() {
+      const selected = section.children.find((c) => c.isSelected())
+      if (!selected) return 'none'
+      return {
+        name: selected.model.label,
+        type: selected.model.type,
+      }
+    },
+
     getFocusedConfig() {
       //      app.focusedComponent!.model.label
       const box = backend.getFocusedWidget()!
