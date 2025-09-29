@@ -14,6 +14,7 @@ import { applicationEnvironment } from './tui/framework/fixtures'
 import { ApplicationEnvironment, HeadlessBackend } from '@src/tui/framework'
 import { ActionFacade, LGOptions, makeLGOptions } from '@src/tui/goblin-app'
 import { goblinAppAdapter, GoblinAppAdapter } from './goblin-app-adapter'
+import { mergeLeft } from '@whimbrel/walk'
 
 export type TestProjectId = 'dummy-project' | 'dummy-with-docker-compose'
 
@@ -302,7 +303,11 @@ const constructLaunchConfig = (
 
 export const makeAppState = (
   projectId: TestProjectId,
-  configs: { private?: string[]; shared?: string[] } = {},
+  configs: {
+    private?: string[]
+    shared?: string[]
+    lastLaunched?: string
+  } = {},
   options: Partial<LGOptions> = {}
 ): ApplicationState => {
   const testProject = TEST_PROJECTS[projectId]
@@ -347,8 +352,15 @@ export const makeAppState = (
     )
   }
 
+  if (configs.lastLaunched) {
+    state.config.global.lastConfig = constructLaunchConfig(
+      state,
+      TEST_SAVED_CONFIGS[projectId][configs.lastLaunched]
+    )
+  }
+
   state.session = applyConfig(
-    { defaultTarget: 'dev', components: {} },
+    state.config.global.lastConfig,
     state.project,
     state.session
   )
@@ -362,7 +374,7 @@ export const runGoblinApp = ({
   facade = {},
 }: {
   projectId: TestProjectId
-  configs?: { private?: string[]; shared?: string[] }
+  configs?: { private?: string[]; shared?: string[]; lastLaunched?: string }
   facade?: Partial<ActionFacade>
 }): {
   app: LaunchGoblinApp

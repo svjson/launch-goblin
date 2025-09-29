@@ -1,3 +1,6 @@
+export { makeProject, readProject } from './project'
+export { makeProjectFacade } from './facade'
+
 export type {
   ProjectParams,
   BaseComponent,
@@ -7,7 +10,5 @@ export type {
   ProjectComponent,
 } from './types'
 export type { Project } from './project'
-
 export type { ApplicationState } from './state'
-
-export { makeProject, readProject } from './project'
+export type { ProjectModule } from './facade'

@@ -278,7 +278,7 @@ describe('Interaction', () => {
 
             // When - Press button
             backend.performKeyPress('enter')
-            // THen - Modal has been closed
+            // Then - Modal has been closed
             expect(app.modals.length).toEqual(0)
 
             // Then - focused item is the first project component

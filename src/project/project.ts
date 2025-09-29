@@ -1,4 +1,3 @@
-import { analyze } from './analyze'
 import { identifyLaunchers, Launcher } from '@src/launch'
 import { LGOptions } from '@src/tui/goblin-app'
 import { ProjectComponent, ProjectParams } from './types'
@@ -40,6 +39,7 @@ export const makeProject = (params: ProjectParams): Project => {
 }
 
 export const readProject = async (
+  analyze: (dir: string) => Promise<ProjectParams>,
   launchAction: string,
   options: LGOptions
 ): Promise<Project> => {

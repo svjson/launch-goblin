@@ -11,6 +11,16 @@ export const setSelected = (
   })
 }
 
+/**
+ * Applies the Launch Configuration 'launchConfig' to the LaunchSession 'session'
+ *
+ * If the configuration contains no components, it is treated as "No config"
+ * and all components are enabled/selected.
+ *
+ * @param launchConfig - The launch configuration to apply
+ * @param project - The project containing the components
+ * @param session - The current launch session to modify
+ */
 export const applyConfig = (
   launchConfig: LaunchConfig,
   project: Project,
