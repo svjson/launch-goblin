@@ -55,6 +55,10 @@ export abstract class HeadlessWidget<O extends WidgetOptions = WidgetOptions>
     return this._children
   }
 
+  contains(widget: Widget): boolean {
+    return this._children.some((c) => c === widget || c.contains(widget))
+  }
+
   removeChild(widget: Widget) {
     this._children = this._children.filter((c) => c !== widget)
   }

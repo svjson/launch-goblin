@@ -2,6 +2,7 @@ import { identifyLaunchers, Launcher } from '@src/launch'
 import { LGOptions } from '@src/tui/goblin-app'
 import { ProjectComponent, ProjectParams } from './types'
 import { actorFacetScope } from '@whimbrel/core'
+import { SystemModule } from '@src/bootstrap/facade'
 
 export interface Project extends ProjectParams {
   component(componentId: string): ProjectComponent | undefined
@@ -9,7 +10,6 @@ export interface Project extends ProjectParams {
   launcherOf(componetId: string): Launcher | undefined
   hasRootFacet(facetId: string): boolean
   packageManager(): string | undefined
-  projectRoot(): string
 }
 
 export const makeProject = (params: ProjectParams): Project => {
@@ -32,18 +32,21 @@ export const makeProject = (params: ProjectParams): Project => {
       const pnpmScope = actorFacetScope(root, 'pnpm')
       if (pnpmScope?.roles.includes('pkg-manager')) return 'pnpm'
     },
-    projectRoot() {
-      return root!.root
-    },
   }
 }
 
 export const readProject = async (
+  systemModule: SystemModule,
   analyze: (dir: string) => Promise<ProjectParams>,
   launchAction: string,
   options: LGOptions
 ): Promise<Project> => {
   const project = makeProject(await analyze(process.cwd()))
-  project.launchers = await identifyLaunchers(project, launchAction, options)
+  project.launchers = await identifyLaunchers(
+    systemModule,
+    project,
+    launchAction,
+    options
+  )
   return project
 }

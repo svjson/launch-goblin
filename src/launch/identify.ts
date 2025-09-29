@@ -4,8 +4,10 @@ import { identifyPnpmLaunchOptions } from './pnpm'
 import { Launcher } from './types'
 import { LGOptions } from '@src/tui/goblin-app'
 import { identifyDockerComposeLaunchOptions } from './docker-compose'
+import { SystemModule } from '@src/bootstrap/facade'
 
 export const identifyLaunchers = async (
+  systemModule: SystemModule,
   project: Project,
   launchAction: string,
   options: LGOptions
@@ -13,7 +15,7 @@ export const identifyLaunchers = async (
   const launchers: Launcher[] = [
     ...(await identifyTurboLaunchOptions(project, launchAction, options)),
     ...(await identifyPnpmLaunchOptions(project, launchAction, options)),
-    ...(await identifyDockerComposeLaunchOptions(project)),
+    ...(await identifyDockerComposeLaunchOptions(systemModule, project)),
   ]
 
   return launchers

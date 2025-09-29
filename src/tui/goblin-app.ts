@@ -61,7 +61,7 @@ export const makeLGOptions = (params: Partial<LGOptions> = {}) => {
       verbose: false,
       autoLaunch: false,
       tui: {
-        targetOption: 'option-bar',
+        targetOption: 'checkbox',
       },
     } satisfies LGOptions,
     params

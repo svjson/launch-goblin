@@ -1,7 +1,6 @@
 import { spawn, ChildProcess } from 'child_process'
 
-import which from 'which'
-
+import { findExecutable as findExec } from '@src/system'
 import { LaunchCommand, LaunchProcess } from './types'
 import { ApplicationEnvironment } from '@src/tui/framework'
 
@@ -24,23 +23,22 @@ const children: ChildProcess[] = []
  * @param bin The binary to find
  * @returns The resolved path to the binary
  */
-export const findExecutable = async (
+const findExecutable = async (
   env: ApplicationEnvironment,
   bin: string
 ): Promise<string> => {
-  try {
-    const binPath = await which(bin)
-
-    if (env.tty.shell.endsWith('.exe')) {
-      return (binPath.includes(' ') ? `"${binPath}"` : binPath)
-        .replaceAll('\\ ', '/')
-        .replaceAll('.CMD', '.cmd')
-    }
-
-    return binPath
-  } catch {
+  const binPath = await findExec(bin)
+  if (!binPath) {
     throw new Error(`Could not find executable: ${bin}`)
   }
+
+  if (env.tty.shell.endsWith('.exe')) {
+    return (binPath.includes(' ') ? `"${binPath}"` : binPath)
+      .replaceAll('\\ ', '/')
+      .replaceAll('.CMD', '.cmd')
+  }
+
+  return binPath
 }
 
 /**

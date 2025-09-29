@@ -3,9 +3,9 @@ import { describe, expect, it } from 'vitest'
 
 describe('Interaction', () => {
   describe('Navigation', () => {
-    it('should be possible to cycle through the user interface sections using tab', () => {
+    it('should be possible to cycle through the user interface sections using tab', async () => {
       // Given
-      const { backend, app, adapter } = runGoblinApp({
+      const { backend, app, adapter } = await runGoblinApp({
         projectId: 'dummy-project',
         configs: {
           private: ['Backend Dev Environment'],
@@ -33,9 +33,9 @@ describe('Interaction', () => {
       expect(cmpSection.getFocusedComponentName()).toEqual('backend-service')
     })
 
-    it('should cycle past config section when there are no launch configs', () => {
+    it('should cycle past config section when there are no launch configs', async () => {
       // Given
-      const { backend, adapter } = runGoblinApp({
+      const { backend, adapter } = await runGoblinApp({
         projectId: 'dummy-project',
       })
       const cmpSection = adapter.componentSection()

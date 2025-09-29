@@ -4,8 +4,8 @@ import { describe, expect, it } from 'vitest'
 describe('Interaction', () => {
   describe('Launch Config Selection', () => {
     describe('Only Node Packages', () => {
-      it('should apply configurations when selected/focused', () => {
-        const { backend, adapter } = runGoblinApp({
+      it('should apply configurations when selected/focused', async () => {
+        const { backend, adapter } = await runGoblinApp({
           projectId: 'dummy-project',
           configs: {
             private: ['Backend Dev Environment'],
@@ -85,8 +85,8 @@ describe('Interaction', () => {
     })
 
     describe('Node Packages and Docker Compose File', () => {
-      it('should apply configurations when selected/focused', () => {
-        const { backend, adapter } = runGoblinApp({
+      it('should apply configurations when selected/focused', async () => {
+        const { backend, adapter } = await runGoblinApp({
           projectId: 'dummy-with-docker-compose',
           configs: {
             shared: [

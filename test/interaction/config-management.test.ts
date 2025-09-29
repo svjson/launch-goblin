@@ -7,8 +7,8 @@ import { describe, expect, test, it } from 'vitest'
 describe('Interaction', () => {
   describe('Launch Config Management', () => {
     describe('Deleting launch configurations', () => {
-      test('DEL should open cancellable confirmation modal', () => {
-        const { backend, app } = runGoblinApp({
+      test('DEL should open cancellable confirmation modal', async () => {
+        const { backend, app } = await runGoblinApp({
           projectId: 'dummy-project',
           configs: {
             private: ['Backend Dev Environment'],
@@ -42,53 +42,69 @@ describe('Interaction', () => {
           state?: ApplicationState
           type: LegacyConfigType
         }>((resolve) => {
-          const { backend, app, adapter } = runGoblinApp({
-            projectId: 'dummy-project',
-            configs: {
-              private: ['Backend Dev Environment'],
-              shared: ['Full Dev Environment', 'No Mocks'],
-            },
-            facade: {
-              saveConfig: async (state, type) => {
-                resolve({ state, type })
+          ;(async () => {
+            const { backend, app, adapter } = await runGoblinApp({
+              projectId: 'dummy-project',
+              configs: {
+                shared: ['Full Dev Environment', 'No Mocks'],
+                private: ['Backend Dev Environment'],
               },
-            },
-          })
-          const configSection = adapter.configSection()
+              facade: {
+                saveConfig: async (state, type) => {
+                  resolve({ state, type })
+                },
+              },
+            })
+            const configSection = adapter.configSection()
+            expect(configSection.getConfigs()).toEqual([
+              {
+                name: 'Full Dev Environment',
+                type: 'shared',
+              },
+              {
+                name: 'No Mocks',
+                type: 'shared',
+              },
+              {
+                name: 'Backend Dev Environment',
+                type: 'private',
+              },
+            ])
 
-          // Tab into config section
-          backend.performKeyPress('tab')
-          backend.performKeyPress('tab')
+            // Tab into config section
+            backend.performKeyPress('tab')
+            backend.performKeyPress('tab')
 
-          // Then - First shared config is selected
-          expect(configSection.getFocusedConfig()).toEqual({
-            name: 'Full Dev Environment',
-            type: 'shared',
-          })
-          // Move to next config
-          backend.performKeyPress('down')
-          expect(app.focusedComponent!.model.label).toEqual('No Mocks')
+            // Then - First shared config is selected
+            expect(configSection.getFocusedConfig()).toEqual({
+              name: 'Full Dev Environment',
+              type: 'shared',
+            })
+            // Move to next config
+            backend.performKeyPress('down')
+            expect(app.focusedComponent!.model.label).toEqual('No Mocks')
 
-          // Move to next config
-          backend.performKeyPress('down')
-          expect(configSection.getFocusedConfig()).toEqual({
-            name: 'Backend Dev Environment',
-            type: 'private',
-          })
+            // Move to next config
+            backend.performKeyPress('down')
+            expect(configSection.getFocusedConfig()).toEqual({
+              name: 'Backend Dev Environment',
+              type: 'private',
+            })
 
-          // When
-          backend.performKeyPress('delete')
-          // Then
-          expect(app.modals.length === 1)
-          expect(app.focusedComponent!.model.text).toEqual('Delete')
+            // When
+            backend.performKeyPress('delete')
+            // Then
+            expect(app.modals.length === 1)
+            expect(app.focusedComponent!.model.text).toEqual('Delete')
 
-          // When
-          backend.performKeyPress('enter')
-          // Then - First shared config is selected
-          expect(configSection.getFocusedConfig()).toEqual({
-            name: 'Full Dev Environment',
-            type: 'shared',
-          })
+            // When
+            backend.performKeyPress('enter')
+            // Then - previous config is selected
+            expect(configSection.getFocusedConfig()).toEqual({
+              name: 'No Mocks',
+              type: 'shared',
+            })
+          })()
         })
 
         const { state, type } = await saved
@@ -102,37 +118,55 @@ describe('Interaction', () => {
           state?: ApplicationState
           type: LegacyConfigType
         }>((resolve) => {
-          const { backend, app } = runGoblinApp({
-            projectId: 'dummy-project',
-            configs: {
-              private: ['Backend Dev Environment'],
-              shared: ['Full Dev Environment', 'No Mocks'],
-            },
-            facade: {
-              saveConfig: async (state, type) => {
-                resolve({ state, type })
+          ;(async () => {
+            const { backend, app, adapter } = await runGoblinApp({
+              projectId: 'dummy-project',
+              configs: {
+                private: ['Backend Dev Environment'],
+                shared: ['Full Dev Environment', 'No Mocks'],
               },
-            },
-          })
+              facade: {
+                saveConfig: async (state, type) => {
+                  resolve({ state, type })
+                },
+              },
+            })
+            const configSection = adapter.configSection()
 
-          // Tab into config section
-          backend.performKeyPress('tab')
-          backend.performKeyPress('tab')
+            expect(configSection.getConfigs()).toEqual([
+              {
+                name: 'Full Dev Environment',
+                type: 'shared',
+              },
+              {
+                name: 'No Mocks',
+                type: 'shared',
+              },
+              {
+                name: 'Backend Dev Environment',
+                type: 'private',
+              },
+            ])
 
-          // Then - First shared config is selected
-          expect(app.focusedComponent!.model.label).toEqual(
-            'Full Dev Environment'
-          )
+            // Tab into config section
+            backend.performKeyPress('tab')
+            backend.performKeyPress('tab')
 
-          // When
-          backend.performKeyPress('delete')
-          // Then
-          expect(app.modals.length === 1)
-          expect(app.focusedComponent!.model.text).toEqual('Delete')
+            // Then - First shared config is selected
+            expect(app.focusedComponent!.model.label).toEqual(
+              'Full Dev Environment'
+            )
 
-          // When
-          backend.performKeyPress('enter')
-          expect(app.focusedComponent!.model.label).toEqual('No Mocks')
+            // When
+            backend.performKeyPress('delete')
+            // Then
+            expect(app.modals.length === 1)
+            expect(app.focusedComponent!.model.text).toEqual('Delete')
+
+            // When
+            backend.performKeyPress('enter')
+            expect(app.focusedComponent!.model.label).toEqual('No Mocks')
+          })()
         })
 
         const { state, type } = await saved
@@ -149,37 +183,42 @@ describe('Interaction', () => {
           state?: ApplicationState
           type: LegacyConfigType
         }>((resolve) => {
-          const { backend, app, adapter } = runGoblinApp({
-            projectId: 'dummy-project',
-            configs: {
-              private: ['Backend Dev Environment'],
-            },
-            facade: {
-              saveConfig: async (state, type) => {
-                resolve({ state, type })
+          ;(async () => {
+            const { backend, app, adapter } = await runGoblinApp({
+              projectId: 'dummy-project',
+              configs: {
+                private: ['Backend Dev Environment'],
               },
-            },
-          })
-          appAdapter = adapter
+              facade: {
+                saveConfig: async (state, type) => {
+                  resolve({ state, type })
+                },
+              },
+            })
+            appAdapter = adapter
 
-          // Tab into config section
-          backend.performKeyPress('tab')
-          backend.performKeyPress('tab')
+            // Tab into config section
+            backend.performKeyPress('tab')
+            backend.performKeyPress('tab')
 
-          // Then - The one and only config is selected
-          expect(app.focusedComponent!.model.label).toEqual(
-            'Backend Dev Environment'
-          )
+            // Then - The one and only config is selected
+            expect(app.focusedComponent!.model.label).toEqual(
+              'Backend Dev Environment'
+            )
 
-          // When
-          backend.performKeyPress('delete')
-          // Then
-          expect(app.modals.length === 1)
-          expect(app.focusedComponent!.model.text).toEqual('Delete')
+            // When
+            backend.performKeyPress('delete')
+            // Then
+            expect(app.modals.length === 1)
+            expect(app.focusedComponent!.model.text).toEqual('Delete')
 
-          // When
-          backend.performKeyPress('enter')
-          expect(app.focusedComponent!.model.label).toEqual('No Mocks')
+            // When
+            backend.performKeyPress('enter')
+            await wait(100)
+            expect(adapter.componentSection().hasFocus()).toBe(true)
+
+            expect(adapter.configSection().hasNoConfigLabel()).toBe(true)
+          })()
         })
 
         const { state } = await saved
@@ -195,7 +234,7 @@ describe('Interaction', () => {
     describe('Creating launch configurations', () => {
       test('C-s should open a cancellable save dialog', async () => {
         let saved = false
-        const { backend, app, state, adapter } = runGoblinApp({
+        const { backend, app, state, adapter } = await runGoblinApp({
           projectId: 'dummy-project',
           facade: {
             saveConfig: async (_s, _t) => {
@@ -243,7 +282,7 @@ describe('Interaction', () => {
           type: LegacyConfigType
         }>((resolve) => {
           ;(async () => {
-            const { backend, app, adapter } = runGoblinApp({
+            const { backend, app, adapter } = await runGoblinApp({
               projectId: 'dummy-project',
               configs: {
                 private: ['Backend Dev Environment'],
@@ -303,7 +342,7 @@ describe('Interaction', () => {
           type: LegacyConfigType
         }>((resolve) => {
           ;(async () => {
-            const { backend, app, adapter } = runGoblinApp({
+            const { backend, app, adapter } = await runGoblinApp({
               projectId: 'dummy-project',
               configs: {
                 private: ['Backend Dev Environment'],
@@ -315,6 +354,21 @@ describe('Interaction', () => {
                 },
               },
             })
+            const configSection = adapter.configSection()
+            expect(configSection.getConfigs()).toEqual([
+              {
+                name: 'Full Dev Environment',
+                type: 'shared',
+              },
+              {
+                name: 'No Mocks',
+                type: 'shared',
+              },
+              {
+                name: 'Backend Dev Environment',
+                type: 'private',
+              },
+            ])
 
             expect(app.modals.length).toEqual(0)
 

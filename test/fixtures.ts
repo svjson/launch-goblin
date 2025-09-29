@@ -1,20 +1,36 @@
-import { applyConfig, LaunchConfig } from '@src/config'
+import {
+  applyConfig,
+  ConfigurationModule,
+  ContextConfig,
+  LaunchConfig,
+  LGConfig,
+} from '@src/config'
 import {
   ApplicationState,
   DockerComposeFile,
+  makeProjectFacade,
   NodePackage,
+  Project,
   ProjectComponent,
+  ProjectModule,
   ProjectParams,
 } from '@src/project'
 import { LaunchGoblinApp } from '@src/tui'
 import { Actor, FacetScope, WhimbrelContext } from '@whimbrel/core'
 import { PackageJSON } from '@whimbrel/package-json'
 import { makeProject } from '@src/project'
-import { applicationEnvironment } from './tui/framework/fixtures'
-import { ApplicationEnvironment, HeadlessBackend } from '@src/tui/framework'
+import { ttyEnv } from './tui/framework/fixtures'
+import {
+  ApplicationEnvironment,
+  HeadlessBackend,
+  noBackend,
+  TTYEnv,
+} from '@src/tui/framework'
 import { ActionFacade, LGOptions, makeLGOptions } from '@src/tui/goblin-app'
 import { goblinAppAdapter, GoblinAppAdapter } from './goblin-app-adapter'
-import { mergeLeft } from '@whimbrel/walk'
+import { SystemModule } from '@src/bootstrap/facade'
+import { bootstrap } from '@src/bootstrap/bootstrap'
+import { GlobalConfig } from '@src/config/types'
 
 export type TestProjectId = 'dummy-project' | 'dummy-with-docker-compose'
 
@@ -86,18 +102,35 @@ const TEST_SAVED_CONFIGS: Record<
   },
 }
 
+const whimbrelCtx = (...whimFacets: string[]): WhimbrelContext => {
+  const facets: Record<string, FacetScope<any>> = {}
+
+  if (whimFacets.includes('pnpm')) {
+    facets['pnpm'] = { roles: ['pkg-manager'] } as FacetScope<any>
+  }
+
+  return {
+    getActor(param: any) {
+      if (param.root === '/tmp/somewhere') {
+        return {
+          root: '/tmp/somewhere',
+          facets,
+        } as unknown as Actor
+      }
+
+      return {
+        root: '/tmp/somewhere',
+      }
+    },
+  } as WhimbrelContext
+}
+
 const TEST_PROJECTS: Record<TestProjectId, TestProject> = {
   'dummy-project': {
     project: {
       id: 'dummy-project',
       root: '/tmp/somewhere',
-      ctx: {
-        getActor(_param: any) {
-          return {
-            root: '/tmp/somewhere',
-          }
-        },
-      } as WhimbrelContext,
+      ctx: whimbrelCtx('pnpm'),
       launchers: [
         {
           id: 'pnpm',
@@ -134,7 +167,9 @@ const TEST_PROJECTS: Record<TestProjectId, TestProject> = {
           name: 'backend-service',
           package: '@acme-platform/backend-service',
           root: '/tmp/somewhere/packages/backend-service',
-          pkgJson: new PackageJSON({ content: '{}' }),
+          pkgJson: new PackageJSON({
+            content: { scripts: { dev: 'nodemon' } },
+          }),
           targets: ['dev', 'dev:local', 'test', 'typecheck'],
         } satisfies NodePackage,
         {
@@ -180,20 +215,7 @@ const TEST_PROJECTS: Record<TestProjectId, TestProject> = {
     project: {
       id: 'dummy-with-docker-compose',
       root: '/tmp/somewhere',
-      ctx: {
-        getActor(param: any) {
-          if (param.root === '/tmp/somewhere') {
-            return {
-              root: '/tmp/somewhere',
-              facets: { pnpm: { roles: ['pkg-manager'] } as FacetScope<any> },
-            } as unknown as Actor
-          }
-
-          return {
-            root: '/tmp/somewhere',
-          }
-        },
-      } as WhimbrelContext,
+      ctx: whimbrelCtx('pnpm'),
       launchers: [
         {
           id: 'pnpm',
@@ -280,10 +302,10 @@ const TEST_PROJECTS: Record<TestProjectId, TestProject> = {
 }
 
 const constructLaunchConfig = (
-  state: ApplicationState,
+  projectId: TestProjectId,
   activeComponents: TestComponentConfig[]
 ): LaunchConfig => {
-  return state.project.components.reduce(
+  return TEST_PROJECTS[projectId].project.components.reduce(
     (cfg, cmp) => {
       const cfgEntry = activeComponents.find((cf) =>
         typeof cf === 'string' ? cf === cmp.id : cf.name === cmp.id
@@ -301,6 +323,60 @@ const constructLaunchConfig = (
   )
 }
 
+export const createContextConfig = (
+  projectId: TestProjectId,
+  configs: {
+    private?: string[]
+    shared?: string[]
+    lastLaunched?: string
+  } = {}
+): ContextConfig => {
+  const config: ContextConfig = {
+    local: {
+      launchConfigs: {},
+    },
+
+    global: {
+      launchConfigs: {},
+      lastConfig: {
+        defaultTarget: 'dev',
+        components: {},
+      },
+    },
+  }
+
+  for (const configId of configs.private ?? []) {
+    const launchCfg = TEST_SAVED_CONFIGS[projectId][configId]
+    if (launchCfg === undefined)
+      throw new Error(`Test Config does not exist: ${configId}`)
+
+    config.global.launchConfigs[configId] = constructLaunchConfig(
+      projectId,
+      launchCfg
+    )
+  }
+
+  for (const configId of configs.shared ?? []) {
+    const launchCfg = TEST_SAVED_CONFIGS[projectId][configId]
+    if (launchCfg === undefined)
+      throw new Error(`Test Config does not exist: ${configId}`)
+
+    config.local.launchConfigs[configId] = constructLaunchConfig(
+      projectId,
+      launchCfg
+    )
+  }
+
+  if (configs.lastLaunched) {
+    config.global.lastConfig = constructLaunchConfig(
+      projectId,
+      TEST_SAVED_CONFIGS[projectId][configs.lastLaunched]
+    )
+  }
+
+  return config
+}
+
 export const makeAppState = (
   projectId: TestProjectId,
   configs: {
@@ -313,50 +389,9 @@ export const makeAppState = (
   const testProject = TEST_PROJECTS[projectId]
   const state: ApplicationState = {
     project: makeProject(testProject.project),
-    config: {
-      local: {
-        launchConfigs: {},
-      },
-
-      global: {
-        launchConfigs: {},
-        lastConfig: {
-          defaultTarget: 'dev',
-          components: {},
-        },
-      },
-    },
+    config: createContextConfig(projectId, configs),
     session: { components: [], target: 'dev' },
     options: makeLGOptions(options),
-  }
-
-  for (const configId of configs.private ?? []) {
-    const launchCfg = TEST_SAVED_CONFIGS[projectId][configId]
-    if (launchCfg === undefined)
-      throw new Error(`Test Config does not exist: ${configId}`)
-
-    state.config.global.launchConfigs[configId] = constructLaunchConfig(
-      state,
-      launchCfg
-    )
-  }
-
-  for (const configId of configs.shared ?? []) {
-    const launchCfg = TEST_SAVED_CONFIGS[projectId][configId]
-    if (launchCfg === undefined)
-      throw new Error(`Test Config does not exist: ${configId}`)
-
-    state.config.local.launchConfigs[configId] = constructLaunchConfig(
-      state,
-      launchCfg
-    )
-  }
-
-  if (configs.lastLaunched) {
-    state.config.global.lastConfig = constructLaunchConfig(
-      state,
-      TEST_SAVED_CONFIGS[projectId][configs.lastLaunched]
-    )
   }
 
   state.session = applyConfig(
@@ -368,7 +403,7 @@ export const makeAppState = (
   return state
 }
 
-export const runGoblinApp = ({
+export const runGoblinApp = async ({
   projectId,
   configs = {},
   facade = {},
@@ -376,15 +411,60 @@ export const runGoblinApp = ({
   projectId: TestProjectId
   configs?: { private?: string[]; shared?: string[]; lastLaunched?: string }
   facade?: Partial<ActionFacade>
-}): {
+}): Promise<{
   app: LaunchGoblinApp
   adapter: GoblinAppAdapter
   env: ApplicationEnvironment
   backend: HeadlessBackend
   state: ApplicationState
-} => {
-  const env = applicationEnvironment()
-  const state = makeAppState(projectId, configs)
+}> => {
+  const systemModule: SystemModule = {
+    userdir() {
+      return '/home/klasse'
+    },
+    async inspectEnvironment(): Promise<TTYEnv> {
+      return ttyEnv()
+    },
+    async findExecutable(bin: string): Promise<string | undefined> {
+      switch (bin) {
+        case 'docker':
+          return '/usr/bin/docker'
+      }
+
+      return undefined
+    },
+  }
+
+  const configModule: ConfigurationModule = {
+    async readConfig(_project: Project): Promise<ContextConfig> {
+      return createContextConfig(projectId, configs)
+    },
+    async saveLatestLaunch(_state: ApplicationState): Promise<void> {},
+    async savePrivateConfig(
+      _project: Project,
+      _config: GlobalConfig
+    ): Promise<void> {},
+    async saveSharedConfig(
+      _project: Project,
+      _config: LGConfig
+    ): Promise<void> {},
+  }
+
+  const projectModule: ProjectModule = makeProjectFacade(
+    systemModule,
+    async (_dir: string) => {
+      return TEST_PROJECTS[projectId].project
+    }
+  )
+
+  const { env, model: state } = await bootstrap(
+    'dev',
+    makeLGOptions(),
+    systemModule,
+    configModule,
+    projectModule,
+    () => noBackend()
+  )
 
   const concreteFacade: ActionFacade = {
     launch: async () => {},

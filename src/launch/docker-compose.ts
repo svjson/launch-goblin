@@ -1,20 +1,8 @@
-import which from 'which'
-
 import { Project, ProjectComponent } from '@src/project'
 import { Launcher } from './types'
 import { ApplicationEnvironment } from '@src/tui/framework'
 import { SessionComponent } from '@src/project/state'
-
-export const findExecutable = async (
-  bin: string
-): Promise<string | undefined> => {
-  try {
-    const binPath = await which(bin)
-    return binPath
-  } catch {
-    return undefined
-  }
-}
+import { SystemModule } from '@src/bootstrap/facade'
 
 export const dockerComposeLauncher = (
   _project: Project,
@@ -51,9 +39,10 @@ export const dockerComposeLauncher = (
 }
 
 export const identifyDockerComposeLaunchOptions = async (
+  systemModule: SystemModule,
   project: Project
 ): Promise<Launcher[]> => {
-  const dcBin = await findExecutable('docker')
+  const dcBin = await systemModule.findExecutable('docker')
   if (!dcBin) return []
 
   return project.components

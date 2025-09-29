@@ -4,36 +4,46 @@ import { setTTYTitleString } from './tui/framework/tty'
 import { Command } from 'commander'
 import { LGOptions, makeLGOptions } from './tui/goblin-app'
 import { bootstrap, inspectEnvironment } from './bootstrap'
+import { BootstrapError } from './bootstrap/error'
 
 /**
  * Launches the application with command-line options
  */
 const main = async (options: LGOptions) => {
-  const targetAction = 'dev'
-  const { env, model, facade } = await bootstrap(targetAction, options)
+  try {
+    const targetAction = 'dev'
+    const { env, model, facade } = await bootstrap(targetAction, options)
 
-  if (options.autoLaunch) {
-    await facade.launch()
-  } else {
-    const app = new LaunchGoblinApp(env, model, facade)
+    if (options.autoLaunch) {
+      await facade.launch()
+    } else {
+      const app = new LaunchGoblinApp(env, model, facade)
 
-    app.mainCtrl.on('log', (event: LogEvent) => {
-      env.log.push(event.message)
-    })
+      app.mainCtrl.on('log', (event: LogEvent) => {
+        env.log.push(event.message)
+      })
 
-    app.mainCtrl.focus()
+      app.mainCtrl.focus()
 
-    env.backend.onKeyPress(['q', 'C-c'], (_ch, _key) => {
-      env.backend.dispose()
-      env.log.forEach((m) => console.log(m))
-      process.exit(0)
-    })
+      env.backend.onKeyPress(['q', 'C-c'], (_ch, _key) => {
+        env.backend.dispose()
+        env.log.forEach((m) => console.log(m))
+        process.exit(0)
+      })
 
-    process.on('exit', () => {
-      setTTYTitleString(model.originalWindowTitleString ?? '')
-    })
+      process.on('exit', () => {
+        setTTYTitleString(model.originalWindowTitleString ?? '')
+      })
 
-    env.backend.render()
+      env.backend.render()
+    }
+  } catch (e) {
+    if (e instanceof BootstrapError) {
+      console.error(e.message)
+      process.exit(-1)
+    } else {
+      throw e
+    }
   }
 }
 

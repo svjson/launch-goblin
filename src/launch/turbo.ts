@@ -55,7 +55,7 @@ export const identifyTurboLaunchOptions = async (
 
   if (project.hasRootFacet('turborepo')) {
     if (options.verbose) console.log(' - turborepo is present')
-    const turboJsonPath = path.join(project.projectRoot(), 'turbo.json')
+    const turboJsonPath = path.join(project.root, 'turbo.json')
     if (await project.ctx.disk.exists(turboJsonPath)) {
       if (options.verbose) console.log(' - turbo.json is present')
       const turboJson = await project.ctx.disk.readJson(turboJsonPath)

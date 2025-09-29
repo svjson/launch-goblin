@@ -18,6 +18,9 @@ export const componentSectionAdapter = (
 
   const adapter = {
     section,
+    hasFocus() {
+      return section.getWidget().contains(backend.getFocusedWidget()!)
+    },
     getComponentNames() {
       const items = section.children
       return items.map((item) => {

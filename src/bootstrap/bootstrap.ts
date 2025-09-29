@@ -10,6 +10,7 @@ import {
 } from '@src/tui/framework'
 import { makeActionFacade } from './app'
 import { SystemModule } from './facade'
+import { BootstrapError } from './error'
 
 export const bootstrap = async (
   targetAction: string,
@@ -46,10 +47,9 @@ export const bootstrap = async (
   }
 
   if (model.project.launchers.length === 0) {
-    console.error(
+    throw new BootstrapError(
       `No launch strategy available for target action '${targetAction}'`
     )
-    process.exit(1)
   }
   const tty = await systemModule.inspectEnvironment()
   if (options.colorMode) {

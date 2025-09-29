@@ -4,9 +4,9 @@ import { describe, expect, it } from 'vitest'
 describe('Interaction', () => {
   describe('Node Packages Only', () => {
     describe('Component Selection', () => {
-      it('should be possible to cycle through the components using arrow-down', () => {
+      it('should be possible to cycle through the components using arrow-down', async () => {
         // Given
-        const { adapter, backend } = runGoblinApp({
+        const { adapter, backend } = await runGoblinApp({
           projectId: 'dummy-project',
         })
         const cmpSection = adapter.componentSection()
@@ -35,9 +35,9 @@ describe('Interaction', () => {
         expect(cmpSection.getFocusedComponentName()).toEqual('backend-service')
       })
 
-      it('should be possible to cycle through the components using arrow-up', () => {
+      it('should be possible to cycle through the components using arrow-up', async () => {
         // Given
-        const { backend, adapter } = runGoblinApp({
+        const { backend, adapter } = await runGoblinApp({
           projectId: 'dummy-project',
         })
         const cmpSection = adapter.componentSection()
@@ -66,9 +66,9 @@ describe('Interaction', () => {
         expect(cmpSection.getFocusedComponentName()).toEqual('backend-service')
       })
 
-      it('should be possible to toggle selection with enter', () => {
+      it('should be possible to toggle selection with enter', async () => {
         // Given
-        const { state, backend, adapter } = runGoblinApp({
+        const { state, backend, adapter } = await runGoblinApp({
           projectId: 'dummy-project',
         })
         const cmpSection = adapter.componentSection()
@@ -106,9 +106,9 @@ describe('Interaction', () => {
       })
 
       describe('Single Target Option', () => {
-        it('should be possible to cycle through script targets with arrow right', () => {
+        it('should be possible to cycle through script targets with arrow right', async () => {
           // Given
-          const { state, backend, adapter } = runGoblinApp({
+          const { state, backend, adapter } = await runGoblinApp({
             projectId: 'dummy-project',
           })
           const cmpSection = adapter.componentSection()
@@ -171,9 +171,9 @@ describe('Interaction', () => {
   })
 
   describe('Node and Docker Compose Components', () => {
-    it('should be possible to cycle through the components using arrow-down', () => {
+    it('should be possible to cycle through the components using arrow-down', async () => {
       // Given
-      const { adapter, backend } = runGoblinApp({
+      const { adapter, backend } = await runGoblinApp({
         projectId: 'dummy-with-docker-compose',
       })
       const cmpSection = adapter.componentSection()
@@ -215,9 +215,9 @@ describe('Interaction', () => {
     })
 
     describe('Selecting Target Children', () => {
-      it('should uncheck parent when all children are unchecked', () => {
+      it('should uncheck parent when all children are unchecked', async () => {
         // Given
-        const { adapter, state, backend } = runGoblinApp({
+        const { adapter, state, backend } = await runGoblinApp({
           projectId: 'dummy-with-docker-compose',
         })
         const dcCmp = state.session.components.at(-1)!

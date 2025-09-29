@@ -63,6 +63,7 @@ export interface Widget<O extends WidgetOptions = WidgetOptions> {
   isFocused(): boolean
 
   children(): Widget[]
+  contains(widget: Widget): boolean
 
   applyStyle(style: BaseWidgetOptions): void
   getStyleOptions(): BaseWidgetOptions

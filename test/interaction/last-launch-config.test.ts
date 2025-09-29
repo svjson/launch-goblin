@@ -4,9 +4,9 @@ import { describe, expect, it } from 'vitest'
 describe('Interaction', () => {
   describe('Last Launched Configuration', () => {
     describe('Matching existing', () => {
-      it('should not insert a last launch-entry when the first configuration in the list matches the last launched config', () => {
+      it('should not insert a last launch-entry when the first configuration in the list matches the last launched config', async () => {
         // Given
-        const { adapter } = runGoblinApp({
+        const { adapter } = await runGoblinApp({
           projectId: 'dummy-project',
           configs: {
             shared: ['Backend Dev Environment', 'Full Dev Environment'],
@@ -22,9 +22,9 @@ describe('Interaction', () => {
         })
       })
 
-      it('should not insert a last launch-entry when the second configuration in the list matches the last launched config', () => {
+      it('should not insert a last launch-entry when the second configuration in the list matches the last launched config', async () => {
         // Given
-        const { adapter } = runGoblinApp({
+        const { adapter } = await runGoblinApp({
           projectId: 'dummy-project',
           configs: {
             shared: ['Backend Dev Environment', 'Full Dev Environment'],

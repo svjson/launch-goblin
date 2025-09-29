@@ -6,6 +6,15 @@ export const configSectionAdapter = (
   backend: HeadlessBackend
 ) => {
   const adapter = {
+    hasNoConfigLabel() {
+      return (
+        section.children.length === 1 &&
+        section.children.some(
+          (c) => c.getWidget().get('text') === '<No Configurations>'
+        )
+      )
+    },
+
     getConfigs() {
       return section.children.map((c) => ({
         name: c.model.label,
