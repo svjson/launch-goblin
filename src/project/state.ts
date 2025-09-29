@@ -19,14 +19,33 @@ export interface ApplicationState {
   options: LGOptions
 }
 
+/**
+ * Describes the current state of launch options
+ */
+export interface LaunchSession {
+  /**
+   * The launch target, e.g, a package.json script
+   */
+  target: string
+  /**
+   * The components and their launch options.
+   */
+  components: SessionComponent[]
+}
+
+/**
+ * The mutable representation of a launchable component and its current state
+ * in the application.
+ */
 export interface SessionComponent<
   T extends ProjectComponent = ProjectComponent,
 > {
-  component: T
+  /**
+   * Immutable shared reference to the project component, owned by Project.
+   */
+  readonly component: T
+  /**
+   * The currently configured launch options for the component.
+   */
   state: ComponentLaunchConfig
-}
-
-export interface LaunchSession {
-  target: string
-  components: SessionComponent[]
 }

@@ -37,6 +37,9 @@ export type NodePackage = BaseComponent &
     pkgJson: PackageJSON
   }
 
+/**
+ * Docker Compose-file component tye
+ */
 export type DockerComposeFile = BaseComponent & {
   type: 'docker-compose'
   path: string

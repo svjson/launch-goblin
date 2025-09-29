@@ -12,6 +12,10 @@ import { makeActionFacade } from './app'
 import { SystemModule } from './facade'
 import { BootstrapError } from './error'
 
+/**
+ * Bootstrap the application using the provided modules for IO and
+ * inspecting the project context and launch options.
+ */
 export const bootstrap = async (
   targetAction: string,
   options: LGOptions,
@@ -24,12 +28,32 @@ export const bootstrap = async (
   model: ApplicationState
   facade: ActionFacade
 }> => {
+  /**
+   * Read and analyze the project on disk at cwd.
+   */
   const project: Project = await projectModule.readProject(
     targetAction,
     options
   )
 
+  /**
+   * If project/folder analysis yielded no viable launch strategies,
+   * bail and exit.
+   */
+  if (project.launchers.length === 0) {
+    throw new BootstrapError(
+      `No launch strategy available for target action '${targetAction}'`
+    )
+  }
+
+  /**
+   * Read user-private and project/shared configurations
+   */
   const config: ContextConfig = await configModule.readConfig(project)
+
+  /**
+   * Create the initial launch session/configuration state.
+   */
   const session: LaunchSession = applyConfig(
     config.global.lastConfig,
     project,
@@ -39,6 +63,9 @@ export const bootstrap = async (
     }
   )
 
+  /**
+   * Construct the root application state
+   */
   const model: ApplicationState = {
     project,
     config,
@@ -46,11 +73,6 @@ export const bootstrap = async (
     options,
   }
 
-  if (model.project.launchers.length === 0) {
-    throw new BootstrapError(
-      `No launch strategy available for target action '${targetAction}'`
-    )
-  }
   const tty = await systemModule.inspectEnvironment()
   if (options.colorMode) {
     tty.colorMode = options.colorMode

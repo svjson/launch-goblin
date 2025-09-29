@@ -20,11 +20,18 @@ import { findExecutable } from '@src/system'
 export { inspectEnvironment } from '@src/tui/framework'
 
 /**
- * Bootstrap the application using run-time collaborators
+ * Bootstrap the application using run-time collaborators.
  *
- * @param targetAction The target action to perform (e.g., project path or URL)
- * @param options The command-line options provided by the user
- * @returns An object containing the application environment, state model, and action facade
+ * This wires up the various modules, in some makeshift DI manner and
+ * calls the internal bootsrapping function to use them to analyze the
+ * project, read stored configs and initialize the TUI backend.
+ *
+ * @param targetAction - The target action to perform (ie, package.json
+ *                       script name)
+ * @param options - The command-line options provided by the user
+ *
+ * @return An object containing the application environment, state
+ *         model, and action facade
  */
 export const bootstrap = async (
   targetAction: string,

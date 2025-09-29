@@ -5,6 +5,10 @@ import { SystemModule } from '@src/bootstrap/facade'
 import path from 'node:path'
 import { toLaunchConfigComponents } from './apply'
 
+/**
+ * Module interface for reading and writing configurations to/from
+ * disk.
+ */
 export interface ConfigurationModule {
   readConfig(project: Project): Promise<ContextConfig>
   saveLatestLaunch(state: ApplicationState): Promise<void>
@@ -12,6 +16,17 @@ export interface ConfigurationModule {
   saveSharedConfig(project: Project, config: LGConfig): Promise<void>
 }
 
+/**
+ * Ensure that a de-serialized configuration is complete and required
+ * fields not present in earlier versions are filled with default values.
+ *
+ * If `defaultTarget` is missing, it is set to 'dev'.
+ * If any component is missing `targets`, it is set to an array
+ * containing `defaultTarget`.
+ *
+ * @param lc - The launch configuration to ensure
+ * @returns The resulting, correct, launch configuration
+ */
 const ensureLaunchConfigStructure = (lc: LaunchConfig) => {
   if (!lc.defaultTarget) lc.defaultTarget = 'dev'
   Object.values(lc.components).forEach((c) => {

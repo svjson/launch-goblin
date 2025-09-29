@@ -2,10 +2,17 @@ import { LaunchSession, SessionComponent } from '@src/project/state'
 import { ComponentLaunchConfig, LaunchConfig } from './types'
 import { Project } from '@src/project'
 
+/**
+ * Sets all provided component states to selected true/false,
+ * according to `selected`.
+ *
+ * @param components - The components to modify
+ * @param selected - Whether to select (true) or deselect (false) the components
+ */
 export const setSelected = (
   components: SessionComponent[],
   selected: boolean = true
-) => {
+): void => {
   components.forEach((c) => {
     c.state.selected = selected
   })
@@ -64,6 +71,13 @@ export const applyConfig = (
   return session
 }
 
+/**
+ * Transform an array of component launch options to the model used
+ * by LGConfig and disk serialization.
+ *
+ * @param components The components to transform
+ * @return The launch configuration components record
+ */
 export const toLaunchConfigComponents = (
   components: SessionComponent[]
 ): Record<string, ComponentLaunchConfig> => {
