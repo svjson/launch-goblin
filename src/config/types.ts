@@ -33,12 +33,15 @@ export interface LGConfig {
   launchConfigs: Record<string, LaunchConfig>
 }
 
-export interface GlobalConfig extends LGConfig {
+/**
+ * Contains the private configuration, stored in the system users home dir
+ */
+export interface PrivateConfig extends LGConfig {
   lastConfig: LaunchConfig
 }
 
 export interface ContextConfig {
   local: LGConfig
-  global: GlobalConfig
+  global: PrivateConfig
   activeConfigName?: string
 }

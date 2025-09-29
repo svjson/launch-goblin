@@ -1,5 +1,5 @@
 import { ApplicationState, Project } from '@src/project'
-import { ContextConfig, GlobalConfig, LaunchConfig, LGConfig } from './types'
+import { ContextConfig, PrivateConfig, LaunchConfig, LGConfig } from './types'
 import { FileSystem } from '@whimbrel/core'
 import { SystemModule } from '@src/bootstrap/facade'
 import path from 'node:path'
@@ -12,7 +12,7 @@ import { toLaunchConfigComponents } from './apply'
 export interface ConfigurationModule {
   readConfig(project: Project): Promise<ContextConfig>
   saveLatestLaunch(state: ApplicationState): Promise<void>
-  savePrivateConfig(project: Project, config: GlobalConfig): Promise<void>
+  savePrivateConfig(project: Project, config: PrivateConfig): Promise<void>
   saveSharedConfig(project: Project, config: LGConfig): Promise<void>
 }
 
@@ -121,7 +121,7 @@ export const makeConfigurationFacade = (
   }
 
   /**
-   * Read a global configuration file from `cfgFile`.
+   * Read private configuration file from `cfgFile`.
    * If the file does not exist, an empty configuration with a default
    * `lastConfig` is returned.
    *
@@ -135,10 +135,10 @@ export const makeConfigurationFacade = (
    * If `lastConfig` is missing, it is created with a default target of 'dev'
    * and no components.
    */
-  const readGlobalConfigFile = async (
+  const readPrivateConfigFile = async (
     cfgFile: string
-  ): Promise<GlobalConfig> => {
-    const cfg = (await readConfigFile(cfgFile)) as GlobalConfig
+  ): Promise<PrivateConfig> => {
+    const cfg = (await readConfigFile(cfgFile)) as PrivateConfig
     if (!cfg.lastConfig)
       cfg.lastConfig = { defaultTarget: 'dev', components: {} }
     ensureLaunchConfigStructure(cfg.lastConfig)
@@ -162,7 +162,7 @@ export const makeConfigurationFacade = (
     async readConfig(project: Project): Promise<ContextConfig> {
       return {
         local: await readConfigFile(sharedConfigPath(project)),
-        global: await readGlobalConfigFile(privateConfigPath(project)),
+        global: await readPrivateConfigFile(privateConfigPath(project)),
       }
     },
 
@@ -210,7 +210,7 @@ export const makeConfigurationFacade = (
      */
     async savePrivateConfig(
       project: Project,
-      config: GlobalConfig
+      config: PrivateConfig
     ): Promise<void> {
       await fs.writeJson(await ensurePath(privateConfigPath(project)), config)
     },

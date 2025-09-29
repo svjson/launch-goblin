@@ -30,7 +30,7 @@ import { ActionFacade, LGOptions, makeLGOptions } from '@src/tui/goblin-app'
 import { goblinAppAdapter, GoblinAppAdapter } from './goblin-app-adapter'
 import { SystemModule } from '@src/bootstrap/facade'
 import { bootstrap } from '@src/bootstrap/bootstrap'
-import { GlobalConfig } from '@src/config/types'
+import { PrivateConfig } from '@src/config/types'
 
 export type TestProjectId = 'dummy-project' | 'dummy-with-docker-compose'
 
@@ -404,7 +404,7 @@ const makeConfigModule = (config: ContextConfig): ConfigurationModule => {
     async saveLatestLaunch(_state: ApplicationState): Promise<void> {},
     async savePrivateConfig(
       _project: Project,
-      _config: GlobalConfig
+      _config: PrivateConfig
     ): Promise<void> {},
     async saveSharedConfig(
       _project: Project,
