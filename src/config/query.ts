@@ -10,8 +10,8 @@ import { ContextConfig, LaunchConfig } from './types'
  */
 export const launchConfigCount = (config: ContextConfig) => {
   return (
-    Object.keys(config.global.launchConfigs).length +
-    Object.keys(config.local.launchConfigs).length
+    Object.keys(config.private.launchConfigs).length +
+    Object.keys(config.shared.launchConfigs).length
   )
 }
 
@@ -28,7 +28,7 @@ export const launchConfigByName = (
   configName: string,
   config: ContextConfig
 ): LaunchConfig | undefined => {
-  return [config.local, config.global]
+  return [config.shared, config.private]
     .map((cfg) => {
       return cfg.launchConfigs[configName]
     })
@@ -52,7 +52,7 @@ export const launchConfigByContent = (
   configContent: LaunchConfig,
   config: ContextConfig
 ): { name: string; config: LaunchConfig } | undefined => {
-  return [config.local, config.global]
+  return [config.shared, config.private]
     .flatMap((cfg) =>
       Object.entries(cfg.launchConfigs).map(([name, config]) => ({
         name,

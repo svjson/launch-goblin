@@ -1,5 +1,11 @@
 import { ApplicationState, Project } from '@src/project'
-import { ContextConfig, PrivateConfig, LaunchConfig, LGConfig } from './types'
+import {
+  ContextConfig,
+  PrivateConfig,
+  LaunchConfig,
+  LGConfig,
+  SharedConfig,
+} from './types'
 import { FileSystem } from '@whimbrel/core'
 import { SystemModule } from '@src/bootstrap/facade'
 import path from 'node:path'
@@ -161,8 +167,8 @@ export const makeConfigurationFacade = (
      */
     async readConfig(project: Project): Promise<ContextConfig> {
       return {
-        local: await readConfigFile(sharedConfigPath(project)),
-        global: await readPrivateConfigFile(privateConfigPath(project)),
+        shared: await readConfigFile(sharedConfigPath(project)),
+        private: await readPrivateConfigFile(privateConfigPath(project)),
       }
     },
 
@@ -177,11 +183,11 @@ export const makeConfigurationFacade = (
      * @returns A promise that resolves when the configuration has been saved
      */
     async saveLatestLaunch(model: ApplicationState) {
-      model.config.global.lastConfig = {
+      model.config.private.lastConfig = {
         defaultTarget: 'dev',
         components: toLaunchConfigComponents(model.session.components),
       }
-      await this.savePrivateConfig(model.project, model.config.global)
+      await this.savePrivateConfig(model.project, model.config.private)
     },
 
     /**
@@ -194,7 +200,10 @@ export const makeConfigurationFacade = (
      * @param project - The project for which to save the configuration
      * @param config - The configuration to save
      */
-    async saveSharedConfig(project: Project, config: LGConfig): Promise<void> {
+    async saveSharedConfig(
+      project: Project,
+      config: SharedConfig
+    ): Promise<void> {
       await fs.writeJson(await ensurePath(sharedConfigPath(project)), config)
     },
 

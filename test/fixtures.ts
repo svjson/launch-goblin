@@ -37,10 +37,10 @@ export type TestProjectId = 'dummy-project' | 'dummy-with-docker-compose'
 export interface TestProject {
   project: ProjectParams
   configs: {
-    local: {
+    shared: {
       launchConfigs: Record<string, LaunchConfig>
     }
-    global: {
+    private: {
       launchConfigs: Record<string, LaunchConfig>
     }
   }
@@ -202,10 +202,10 @@ const TEST_PROJECTS: Record<TestProjectId, TestProject> = {
       ] as ProjectComponent[],
     } as ProjectParams,
     configs: {
-      local: {
+      shared: {
         launchConfigs: {},
       },
-      global: {
+      private: {
         launchConfigs: {},
       },
     },
@@ -291,10 +291,10 @@ const TEST_PROJECTS: Record<TestProjectId, TestProject> = {
       ],
     },
     configs: {
-      local: {
+      shared: {
         launchConfigs: {},
       },
-      global: {
+      private: {
         launchConfigs: {},
       },
     },
@@ -332,11 +332,11 @@ export const createContextConfig = (
   } = {}
 ): ContextConfig => {
   const config: ContextConfig = {
-    local: {
+    shared: {
       launchConfigs: {},
     },
 
-    global: {
+    private: {
       launchConfigs: {},
       lastConfig: {
         defaultTarget: 'dev',
@@ -350,7 +350,7 @@ export const createContextConfig = (
     if (launchCfg === undefined)
       throw new Error(`Test Config does not exist: ${configId}`)
 
-    config.global.launchConfigs[configId] = constructLaunchConfig(
+    config.private.launchConfigs[configId] = constructLaunchConfig(
       projectId,
       launchCfg
     )
@@ -361,14 +361,14 @@ export const createContextConfig = (
     if (launchCfg === undefined)
       throw new Error(`Test Config does not exist: ${configId}`)
 
-    config.local.launchConfigs[configId] = constructLaunchConfig(
+    config.shared.launchConfigs[configId] = constructLaunchConfig(
       projectId,
       launchCfg
     )
   }
 
   if (configs.lastLaunched) {
-    config.global.lastConfig = constructLaunchConfig(
+    config.private.lastConfig = constructLaunchConfig(
       projectId,
       TEST_SAVED_CONFIGS[projectId][configs.lastLaunched]
     )
@@ -431,7 +431,7 @@ export const makeAppState = (
   }
 
   state.session = applyConfig(
-    state.config.global.lastConfig,
+    state.config.private.lastConfig,
     state.project,
     state.session
   )

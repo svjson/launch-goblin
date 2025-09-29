@@ -7,6 +7,7 @@ export type {
   ConfigType,
   ContextConfig,
   LaunchConfig,
-  LegacyConfigType,
   LGConfig,
+  PrivateConfig,
+  SharedConfig,
 } from './types'

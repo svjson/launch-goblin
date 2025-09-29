@@ -38,12 +38,12 @@ export class SaveConfigDialog extends ModalDialog<
       component: OptionBar,
       model: [
         {
-          id: 'global',
+          id: 'private',
           label: 'Private',
           selected: true,
         },
         {
-          id: 'local',
+          id: 'shared',
           label: 'Shared',
           selected: false,
         },

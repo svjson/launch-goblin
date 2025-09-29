@@ -185,7 +185,7 @@ describe('applyConfig', () => {
 
     // When
     applyConfig(
-      config.local.launchConfigs['Frontend with Kibana/ElasticSearch'],
+      config.shared.launchConfigs['Frontend with Kibana/ElasticSearch'],
       project,
       session
     )

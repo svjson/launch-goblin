@@ -9,16 +9,6 @@
  */
 export type ConfigType = 'private' | 'shared'
 
-/**
- * Enum type with original terminology for ConfigType.
- *
- * These names are dumb. Local refers to "local to the current directory",
- * but I keep reading it as "local to the system", in other words private.
- *
- * To be killed with fire.
- */
-export type LegacyConfigType = 'global' | 'local'
-
 export interface ComponentLaunchConfig {
   selected: boolean
   targets: string[]
@@ -34,14 +24,22 @@ export interface LGConfig {
 }
 
 /**
+ * Contains the shared configuration, stored locally in a project.
+ */
+export type SharedConfig = LGConfig
+
+/**
  * Contains the private configuration, stored in the system users home dir
  */
 export interface PrivateConfig extends LGConfig {
   lastConfig: LaunchConfig
 }
 
+/**
+ * The full configuration state, joining both shared and private configurations
+ */
 export interface ContextConfig {
-  local: LGConfig
-  global: PrivateConfig
+  shared: SharedConfig
+  private: PrivateConfig
   activeConfigName?: string
 }

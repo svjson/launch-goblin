@@ -24,8 +24,8 @@ const makeFixture = (): [
   }
   const state: ApplicationState = {
     config: {
-      local: { launchConfigs: {} },
-      global: { launchConfigs: {}, lastConfig: { components: {} } },
+      shared: { launchConfigs: {} },
+      private: { launchConfigs: {}, lastConfig: { components: {} } },
     },
   } as ApplicationState
 
@@ -59,7 +59,7 @@ describe('ConfigSection', () => {
       // Given
       const [env, store, state] = makeFixture()
 
-      state.config.local.launchConfigs['Prutt'] = {
+      state.config.shared.launchConfigs['Prutt'] = {
         defaultTarget: 'dev',
         components: {
           skrutt: {

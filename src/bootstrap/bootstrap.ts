@@ -55,7 +55,7 @@ export const bootstrap = async (
    * Create the initial launch session/configuration state.
    */
   const session: LaunchSession = applyConfig(
-    config.global.lastConfig,
+    config.private.lastConfig,
     project,
     {
       target: 'dev',

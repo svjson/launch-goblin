@@ -96,12 +96,12 @@ export class ConfigSection extends CustomListBox<
       },
     })
 
-    this.store.subscribe('config.global', () => {
+    this.store.subscribe('config.private', () => {
       this.populateList()
       return true
     })
 
-    this.store.subscribe('config.local', () => {
+    this.store.subscribe('config.shared', () => {
       this.populateList()
       return true
     })
@@ -111,7 +111,7 @@ export class ConfigSection extends CustomListBox<
     this.populateList()
 
     const lastLaunched = launchConfigByContent(
-      this.store.get<LaunchConfig>('config.global.lastConfig'),
+      this.store.get<LaunchConfig>('config.private.lastConfig'),
       this.store.get<ContextConfig>('config')
     )
 
@@ -128,8 +128,8 @@ export class ConfigSection extends CustomListBox<
   populateModel() {
     const config: ContextConfig = this.store.get('config')
     this.model = [
-      ...transformEntries(config.local.launchConfigs, 'shared'),
-      ...transformEntries(config.global.launchConfigs, 'private'),
+      ...transformEntries(config.shared.launchConfigs, 'shared'),
+      ...transformEntries(config.private.launchConfigs, 'private'),
     ]
   }
 

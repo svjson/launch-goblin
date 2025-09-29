@@ -1,4 +1,4 @@
-import { LegacyConfigType } from '@src/config'
+import { ConfigType } from '@src/config'
 import { ApplicationState } from '@src/project'
 import { runGoblinApp, wait } from 'test/fixtures'
 import { GoblinAppAdapter } from 'test/goblin-app-adapter'
@@ -40,7 +40,7 @@ describe('Interaction', () => {
       it('should save private config when a private launch configuration is deleted', async () => {
         const saved = new Promise<{
           state?: ApplicationState
-          type: LegacyConfigType
+          type: ConfigType
         }>((resolve) => {
           ;(async () => {
             const { backend, app, adapter } = await runGoblinApp({
@@ -109,14 +109,14 @@ describe('Interaction', () => {
 
         const { state, type } = await saved
         expect(state).toBeDefined()
-        expect(Object.keys(state!.config.global.launchConfigs)).toEqual([])
-        expect(type).toEqual('global')
+        expect(Object.keys(state!.config.private.launchConfigs)).toEqual([])
+        expect(type).toEqual('private')
       })
 
       it('should save shared config when a shared launch configuration is deleted', async () => {
         const saved = new Promise<{
           state?: ApplicationState
-          type: LegacyConfigType
+          type: ConfigType
         }>((resolve) => {
           ;(async () => {
             const { backend, app, adapter } = await runGoblinApp({
@@ -171,17 +171,17 @@ describe('Interaction', () => {
 
         const { state, type } = await saved
         expect(state).toBeDefined()
-        expect(Object.keys(state!.config.local.launchConfigs)).toEqual([
+        expect(Object.keys(state!.config.shared.launchConfigs)).toEqual([
           'No Mocks',
         ])
-        expect(type).toEqual('local')
+        expect(type).toEqual('shared')
       })
 
       it('should return focus to component section when the last launch config is deleted', async () => {
         let appAdapter: GoblinAppAdapter
         const saved = new Promise<{
           state?: ApplicationState
-          type: LegacyConfigType
+          type: ConfigType
         }>((resolve) => {
           ;(async () => {
             const { backend, app, adapter } = await runGoblinApp({
@@ -222,8 +222,8 @@ describe('Interaction', () => {
         })
 
         const { state } = await saved
-        expect(Object.keys(state!.config.local.launchConfigs)).toEqual([])
-        expect(Object.keys(state!.config.global.launchConfigs)).toEqual([])
+        expect(Object.keys(state!.config.shared.launchConfigs)).toEqual([])
+        expect(Object.keys(state!.config.private.launchConfigs)).toEqual([])
 
         expect(
           appAdapter!.componentSection().getFocusedComponentName()
@@ -272,14 +272,14 @@ describe('Interaction', () => {
         await wait(100)
         expect(saved).toBe(false)
 
-        expect(Object.keys(state!.config.local.launchConfigs)).toEqual([])
-        expect(Object.keys(state!.config.global.launchConfigs)).toEqual([])
+        expect(Object.keys(state!.config.shared.launchConfigs)).toEqual([])
+        expect(Object.keys(state!.config.private.launchConfigs)).toEqual([])
       })
 
       it('Should save private config when a private launch configuration is created', async () => {
         const saved = new Promise<{
           state?: ApplicationState
-          type: LegacyConfigType
+          type: ConfigType
         }>((resolve) => {
           ;(async () => {
             const { backend, app, adapter } = await runGoblinApp({
@@ -329,8 +329,8 @@ describe('Interaction', () => {
 
         const { state, type } = await saved
 
-        expect(type).toEqual('global')
-        expect(Object.keys(state!.config.global.launchConfigs)).toEqual([
+        expect(type).toEqual('private')
+        expect(Object.keys(state!.config.private.launchConfigs)).toEqual([
           'Backend Dev Environment',
           'New Config',
         ])
@@ -339,7 +339,7 @@ describe('Interaction', () => {
       it('Should save shared config when a shared launch configuration is created', async () => {
         const saved = new Promise<{
           state?: ApplicationState
-          type: LegacyConfigType
+          type: ConfigType
         }>((resolve) => {
           ;(async () => {
             const { backend, app, adapter } = await runGoblinApp({
@@ -410,8 +410,8 @@ describe('Interaction', () => {
 
         const { state, type } = await saved
 
-        expect(type).toEqual('local')
-        expect(Object.keys(state!.config.local.launchConfigs)).toEqual([
+        expect(type).toEqual('shared')
+        expect(Object.keys(state!.config.shared.launchConfigs)).toEqual([
           'Full Dev Environment',
           'No Mocks',
           'Cheese Muffins',

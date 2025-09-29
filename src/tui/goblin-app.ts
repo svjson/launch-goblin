@@ -8,7 +8,7 @@ import {
   ApplicationEnvironment,
   ColorMode,
 } from './framework'
-import { LegacyConfigType, toLaunchConfigComponents } from '@src/config'
+import { ConfigType, toLaunchConfigComponents } from '@src/config'
 
 export type TuiTargetOptionType = 'checkbox' | 'option-bar'
 
@@ -73,10 +73,7 @@ export const makeLGOptions = (params: Partial<LGOptions> = {}) => {
  */
 export interface ActionFacade {
   launch: () => Promise<void>
-  saveConfig: (
-    state: ApplicationState,
-    configType: LegacyConfigType
-  ) => Promise<void>
+  saveConfig: (state: ApplicationState, configType: ConfigType) => Promise<void>
 }
 
 /**
@@ -127,15 +124,7 @@ export class LaunchGoblinApp extends Application<
 
   async deleteConfig(deleteAction: Action): Promise<void> {
     const { configId, configType } = deleteAction.details
-    this.store.delete([
-      'config',
-      configType === 'shared' ? 'local' : 'global',
-      'launchConfigs',
-      configId,
-    ])
-    await this.facade.saveConfig(
-      this.model,
-      configType === 'shared' ? 'local' : 'global'
-    )
+    this.store.delete(['config', configType, 'launchConfigs', configId])
+    await this.facade.saveConfig(this.model, configType)
   }
 }
