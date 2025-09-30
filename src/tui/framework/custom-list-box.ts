@@ -108,23 +108,30 @@ export class CustomListBox<
     this.removeAllChildren()
     for (let i = 0; i < this.model.length; i++) {
       const item = this.model[i]
-      this.addChild(
-        {
-          component: this.itemCls,
-          model: item,
-        },
-        {
+      this.addChild({
+        component: this.itemCls,
+        model: item,
+        style: {
           top: i + 1,
-        }
-      )
+        },
+      })
     }
 
     if (!this.children.length && this.emptyLabel) {
-      this.addChild(this.emptyLabel, {
-        left: 'center',
-        top: 1,
-        color: 'gray',
-      })
+      this.addChild(
+        mergeLeft(
+          {
+            ...this.emptyLabel,
+          },
+          {
+            style: {
+              left: 'center',
+              top: 1,
+              color: 'gray',
+            },
+          }
+        )
+      )
     }
 
     this.setFocusable(this.model.length > 0)

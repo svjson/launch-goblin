@@ -215,16 +215,12 @@ export abstract class Controller<
 
   addChild<T extends Controller<W, M, SM>, M, SM>(child: T): T
   addChild<T extends Controller, M = Model, SM = StoreModel>(
-    childDesc: ChildParam<T, M, SM>,
-    options?: WidgetOptions | StateParams<M, SM>,
-    ...args: any[]
+    childDesc: ChildParam<T, M, SM>
   ): T
   addChild<T extends Controller, M = Model, SM = StoreModel>(
-    childDesc: ChildParam<T, M, SM> | T,
-    options?: WidgetOptions | StateParams<M, SM>,
-    ...args: any[]
+    childDesc: ChildParam<T, M, SM> | T
   ): T {
-    const child = this.#resolveChildInstance(childDesc, options, ...args)
+    const child = this.#resolveChildInstance(childDesc)
 
     this.#mount(child)
 
@@ -238,39 +234,31 @@ export abstract class Controller<
   }
 
   #resolveChildInstance<T extends Controller, M, SM>(
-    childDesc: ChildParam<T, M, SM> | T,
-    options: WidgetOptions | StateParams<M, SM> = {},
-    ...args: any[]
+    childDesc: ChildParam<T, M, SM> | T
   ): T {
     if (childDesc instanceof Controller) {
       return childDesc
     }
 
-    const { ctrlClass, model, store, style } = this.#resolveChildParams(
-      childDesc,
-      options
-    )
+    const { ctrlClass, model, store, style } =
+      this.#resolveChildParams(childDesc)
 
-    const child = new ctrlClass(
-      {
-        widget: {
-          env: this.env,
-          options: style,
-        },
-        state: {
-          store: store!,
-          model: model!,
-        },
+    const child = new ctrlClass({
+      widget: {
+        env: this.env,
+        options: style,
       },
-      ...args
-    )
+      state: {
+        store: store!,
+        model: model!,
+      },
+    })
 
     return child
   }
 
   #resolveChildParams<T extends Controller, M, SM, W = InferWidget<T>>(
-    childDesc: ChildParam<T, M, SM>,
-    options: WidgetOptions | StateParams<M, SM> = {}
+    childDesc: ChildParam<T, M, SM>
   ): {
     ctrlClass: CtrlConstructor<T, M, SM>
     model: M
@@ -280,20 +268,7 @@ export abstract class Controller<
     const ctrlClass =
       typeof childDesc === 'function' ? childDesc : childDesc.component
 
-    if (
-      Object.keys(options).includes('model') ||
-      Object.keys(options).includes('store')
-    ) {
-      return {
-        ctrlClass,
-        ...(options as StateParams<M, SM>),
-        style: (typeof childDesc !== 'function'
-          ? (childDesc.style ?? {})
-          : {}) as InferWidgetOptions<W>,
-      }
-    }
-
-    const opts = { ...options }
+    const opts = {}
     if (typeof childDesc !== 'function' && childDesc.style) {
       Object.assign(opts, childDesc.style)
     }
