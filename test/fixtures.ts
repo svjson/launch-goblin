@@ -32,6 +32,16 @@ import { SystemModule } from '@src/bootstrap/facade'
 import { bootstrap } from '@src/bootstrap/bootstrap'
 import { PrivateConfig } from '@src/config/types'
 
+export const defer = <T>() => {
+  let resolve!: (value: T | PromiseLike<T>) => void
+  let reject!: (reason?: any) => void
+  const promise = new Promise<T>((res, rej) => {
+    resolve = res
+    reject = rej
+  })
+  return { promise, resolve, reject }
+}
+
 export type TestProjectId = 'dummy-project' | 'dummy-with-docker-compose'
 
 export interface TestProject {
