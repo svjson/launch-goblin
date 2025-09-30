@@ -1,14 +1,16 @@
 import { describe, expect, test } from 'vitest'
-import { ConfigSection } from '@src/tui/config-section'
+import { ConfigSection, LAST_LAUNCH_LABEL } from '@src/tui/config-section'
 import {
   ComponentEnvironment,
   createStore,
   DefaultTheme,
+  HeadlessBackend,
   noBackend,
   Store,
 } from '@src/tui/framework'
 import { ApplicationState } from '@src/project'
 import { ttyEnv } from './framework/fixtures'
+import { configSectionAdapter } from './config-section-adapter'
 
 const makeFixture = (): [
   ComponentEnvironment,
@@ -40,6 +42,7 @@ describe('ConfigSection', () => {
       // Given
       const [env, store, _state] = makeFixture()
 
+      // When
       const configSection = new ConfigSection({
         widget: {
           env,
@@ -50,9 +53,51 @@ describe('ConfigSection', () => {
         },
       })
       configSection.populateModel()
+      const adapter = configSectionAdapter(
+        configSection,
+        env.backend as HeadlessBackend
+      )
 
+      // Then
+      expect(adapter.hasNoConfigLabel()).toBe(true)
       expect(configSection.isFocusable()).toBe(false)
       expect(configSection.focusable).toBe(false)
+    })
+
+    test('on construction - no saved config but a last-launched config sets focusable to true', () => {
+      // Given
+      const [env, store, state] = makeFixture()
+
+      state.config.private.lastConfig = {
+        defaultTarget: 'dev',
+        components: {
+          skrutt: {
+            selected: true,
+            targets: [],
+          },
+        },
+      }
+
+      const configSection = new ConfigSection({
+        widget: {
+          env,
+        },
+        state: {
+          model: [],
+          store,
+        },
+      })
+      const adapter = configSectionAdapter(
+        configSection,
+        env.backend as HeadlessBackend
+      )
+
+      // Then
+      expect(adapter.getSelectedConfig()).toEqual({
+        name: LAST_LAUNCH_LABEL,
+        type: 'recent',
+      })
+      expect(adapter.hasNoConfigLabel()).toBe(false)
     })
 
     test('on construction - one present config sets focusable to true', () => {

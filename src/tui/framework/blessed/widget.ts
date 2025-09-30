@@ -19,14 +19,13 @@ import { LayoutProperty } from '../layout'
 import { Appearance } from '../appearance'
 import { APPEARANCE_KEYS, BASE_WIDGET_OPTIONS_KEYS } from '../options'
 import {
-  applyOptions,
   toBlessedBoxOptions,
   toBlessedButtonOptions,
   toBlessedLabelOptions,
   toBlessedListOptions,
   toBlessedTextFieldOptions,
 } from './style'
-import { mergeLeft } from '@whimbrel/walk'
+import { applyOptions } from './element'
 
 export type BlessedLmnt = blessed.Widgets.BlessedElement
 
@@ -139,25 +138,8 @@ export abstract class BlessedWidget<
   }
 
   applyStyle(style: O) {
-    this.inner.style = {
-      ...this.inner.style,
-      ...{
-        fg: style.color ?? 'default',
-        bg: style.background ?? 'default',
-      },
-      ...(typeof style.bold === 'boolean' ? { bold: style.bold } : {}),
-      ...(typeof this.inner.style.underline === 'boolean' ||
-      typeof style.underline === 'boolean'
-        ? { underline: style.underline }
-        : {}),
-      ...(typeof style.focusable === 'boolean'
-        ? { focusable: style.focusable }
-        : {}),
-    }
-    //    const blessedOpts = this.toBlessedOptions(style)
-
-    //    applyOptions(this.inner, blessedOpts)
-
+    const blessedOpts = this.toBlessedOptions(style)
+    applyOptions(this.inner, blessedOpts)
     this.calculatedStyle = style
   }
 

@@ -20,6 +20,9 @@ import { CustomListBox, CustomListBoxItem } from './framework/custom-list-box'
 import { LabelItem } from './framework/label'
 import { ComponentEnvironment } from './framework/controller'
 
+export const LAST_LAUNCH_LABEL = '< Last Launch >'
+export const LAST_LAUNCH_ID = '__!last_launch'
+
 /**
  * Transform LaunchConfig instances from the context configuration
  * or application state to ConfigListItem model instances.
@@ -36,7 +39,7 @@ const transformEntries = (
  * Specialization of the ListItem model, adding configuration type
  */
 export interface ConfigListItem extends ListItem {
-  type: 'private' | 'shared'
+  type: 'private' | 'shared' | 'recent'
 }
 
 /**
@@ -64,6 +67,8 @@ export class ConfigSection extends CustomListBox<
   events = this.defineEvents({
     selected: this.configSelected,
   })
+
+  showLastLaunched: boolean = false
 
   constructor({
     widget: { env, options = {} },
@@ -106,21 +111,28 @@ export class ConfigSection extends CustomListBox<
       return true
     })
 
+    const lastLaunched = this.store.get<LaunchConfig>(
+      'config.private.lastConfig'
+    )
     this.populateModel()
 
-    this.populateList()
-
-    const lastLaunched = launchConfigByContent(
-      this.store.get<LaunchConfig>('config.private.lastConfig'),
-      this.store.get<ContextConfig>('config')
-    )
-
-    if (lastLaunched) {
-      this.focusedIndex = this.model.findIndex(
-        (i) => i.label === lastLaunched.name
+    if (Object.keys(lastLaunched.components).length) {
+      const existingLast = launchConfigByContent(
+        lastLaunched,
+        this.store.get<ContextConfig>('config')
       )
-      this.itemFocused()
+
+      if (existingLast) {
+        this.focusedIndex = this.model.findIndex(
+          (i) => i.label === existingLast.name
+        )
+      } else {
+        this.showLastLaunched = true
+      }
     }
+
+    this.populateModel()
+    this.populateList()
 
     this.adjustHeight()
   }
@@ -128,6 +140,16 @@ export class ConfigSection extends CustomListBox<
   populateModel() {
     const config: ContextConfig = this.store.get('config')
     this.model = [
+      ...(this.showLastLaunched
+        ? [
+            {
+              id: LAST_LAUNCH_ID,
+              label: LAST_LAUNCH_LABEL,
+              type: 'recent',
+              selected: true,
+            } satisfies ConfigListItem,
+          ]
+        : []),
       ...transformEntries(config.shared.launchConfigs, 'shared'),
       ...transformEntries(config.private.launchConfigs, 'private'),
     ]
@@ -142,12 +164,22 @@ export class ConfigSection extends CustomListBox<
   adjustHeight() {
     this.widget.set(
       'height',
-      Math.min(14, Math.max(launchConfigCount(this.store.get('config')), 1) + 4)
+      Math.min(
+        14,
+        Math.max(
+          (this.showLastLaunched ? 1 : 0) +
+            launchConfigCount(this.store.get('config')),
+          1
+        ) + 4
+      )
     )
   }
 
-  configSelected(event: ItemSelectedEvent<ListItem>) {
-    const config = launchConfigByName(event.item.id, this.store.get('config'))
+  configSelected(event: ItemSelectedEvent<ConfigListItem>) {
+    const config =
+      event.item.type === 'recent'
+        ? this.store.get<LaunchConfig>('config.private.lastConfig')
+        : launchConfigByName(event.item.id, this.store.get('config'))
     if (config) {
       applyConfig(
         config,
@@ -204,6 +236,8 @@ class ConfigItemBox extends CustomListBoxItem<ConfigListItem, ConfigListItem> {
       model: { text: this.model.label },
       style: {
         left: 1,
+        textAlign: this.isRecentType() ? 'center' : 'left',
+        ...(this.isRecentType() ? { width: '100%-2' } : {}),
         ':focused': {
           color: 'black',
         },
@@ -212,13 +246,20 @@ class ConfigItemBox extends CustomListBoxItem<ConfigListItem, ConfigListItem> {
 
     typeLabel: {
       component: Label,
-      model: { text: this.model.type },
+      model: {
+        text: this.model.type,
+      },
       style: {
         right: 1,
+        hidden: this.isRecentType(),
         color: this.model.type === 'private' ? 208 : 'green',
       },
     },
   })
+
+  isRecentType() {
+    return this.model.type === 'recent'
+  }
 
   constructor({
     widget: { env, options },
