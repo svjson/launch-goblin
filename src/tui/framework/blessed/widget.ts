@@ -4,6 +4,7 @@ import {
   BoxOptions,
   ButtonOptions,
   CheckboxWidget,
+  LabelOptions,
   LabelWidget,
   ListOptions,
   ListWidget,
@@ -17,6 +18,15 @@ import {
 import { LayoutProperty } from '../layout'
 import { Appearance } from '../appearance'
 import { APPEARANCE_KEYS, BASE_WIDGET_OPTIONS_KEYS } from '../options'
+import {
+  applyOptions,
+  toBlessedBoxOptions,
+  toBlessedButtonOptions,
+  toBlessedLabelOptions,
+  toBlessedListOptions,
+  toBlessedTextFieldOptions,
+} from './style'
+import { mergeLeft } from '@whimbrel/walk'
 
 export type BlessedLmnt = blessed.Widgets.BlessedElement
 
@@ -144,8 +154,14 @@ export abstract class BlessedWidget<
         ? { focusable: style.focusable }
         : {}),
     }
+    //    const blessedOpts = this.toBlessedOptions(style)
+
+    //    applyOptions(this.inner, blessedOpts)
+
     this.calculatedStyle = style
   }
+
+  abstract toBlessedOptions(style: O): any
 
   getAppearance(): Appearance {
     return narrow(this.widgetOptions, APPEARANCE_KEYS)
@@ -199,6 +215,8 @@ export class BlessedBoxWidget
   implements Widget
 {
   type: 'box' = 'box'
+
+  toBlessedOptions = toBlessedBoxOptions
 }
 
 export class BlessedButtonWidget
@@ -206,6 +224,8 @@ export class BlessedButtonWidget
   implements Widget
 {
   type: 'button' = 'button'
+
+  toBlessedOptions = toBlessedButtonOptions
 }
 
 export class BlessedCheckboxWidget
@@ -214,6 +234,8 @@ export class BlessedCheckboxWidget
 {
   type: 'checkbox' = 'checkbox'
   private checked: boolean = false
+
+  toBlessedOptions = toBlessedBoxOptions
 
   isChecked(): boolean {
     return this.checked
@@ -225,10 +247,12 @@ export class BlessedCheckboxWidget
 }
 
 export class BlessedLabelWidget
-  extends BlessedWidget<blessed.Widgets.TextElement>
+  extends BlessedWidget<blessed.Widgets.BoxElement, LabelOptions>
   implements LabelWidget
 {
   type: 'label' = 'label'
+
+  toBlessedOptions = toBlessedLabelOptions
 
   setText(text: string) {
     this.inner.content = text ?? ''
@@ -236,10 +260,12 @@ export class BlessedLabelWidget
 }
 
 export class BlessedListWidget
-  extends BlessedWidget<blessed.Widgets.ListElement>
+  extends BlessedWidget<blessed.Widgets.ListElement, ListOptions>
   implements ListWidget
 {
   type: 'list' = 'list'
+
+  toBlessedOptions = toBlessedListOptions
 
   clearItems() {
     this.inner.clearItems
@@ -263,6 +289,8 @@ export class BlessedOptionBarWidget
   implements OptionBarWidget
 {
   type: 'option-bar' = 'option-bar'
+
+  toBlessedOptions = toBlessedListOptions
 }
 
 export class BlessedTextFieldWidget
@@ -270,6 +298,8 @@ export class BlessedTextFieldWidget
   implements TextFieldWidget
 {
   type: 'text-field' = 'text-field'
+
+  toBlessedOptions = toBlessedTextFieldOptions
 
   onSubmit(callback: () => void) {
     this.inner.on('submit', callback)

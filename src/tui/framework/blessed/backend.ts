@@ -101,7 +101,7 @@ export class BlessedBackend implements Backend {
 
   createLabel(options: LabelOptions): LabelWidget {
     return new BlessedLabelWidget(
-      blessed.text(withParent(toBlessedLabelOptions(options), this.screen)),
+      blessed.box(withParent(toBlessedLabelOptions(options), this.screen)),
       options
     )
   }

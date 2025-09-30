@@ -68,12 +68,13 @@ describe('WidgetOptions types to Blessed options', () => {
 
   describe('toBlessedLabelOptions', () => {
     test.each([
-      [{}, { tags: true, style: {} }],
+      [{}, { tags: true, style: {}, shrink: true }],
       [
         { right: 1, hidden: true, color: 'green' },
         {
           content: undefined,
           right: 1,
+          shrink: true,
           hidden: true,
           style: { fg: 'green' },
           tags: true,
@@ -81,7 +82,7 @@ describe('WidgetOptions types to Blessed options', () => {
       ],
       [
         { left: 1, textAlign: 'center' },
-        { left: 1, align: 'center', tags: true, style: {} },
+        { left: 1, align: 'center', shrink: false, tags: true, style: {} },
       ],
     ] as [LabelOptions, any][])(
       'input %o gives %o',

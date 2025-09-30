@@ -7,7 +7,7 @@ import {
   CtrlCtorParams,
 } from './controller'
 import { KeyMap } from './keymap'
-import { Widget } from './widget'
+import { BoxOptions, Widget } from './widget'
 
 type Elem<T extends readonly unknown[]> = T[number]
 
@@ -32,7 +32,7 @@ export class CustomListBox<
   EmptyM,
   Model extends Array<any>,
   Store,
-> extends Controller<Widget, Model, Store> {
+> extends Controller<Widget<BoxOptions>, Model, Store> {
   keyMap: KeyMap = this.defineKeys({
     up: {
       propagate: true,

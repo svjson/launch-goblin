@@ -149,10 +149,14 @@ export const toBlessedButtonOptions = (options: ButtonOptions) => {
 }
 
 export const toBlessedLabelOptions = (options: LabelOptions) => {
-  return {
+  const labelOpts = {
     ...toBlessedElementOptions(options),
     content: options.label,
   }
+
+  labelOpts.shrink = options.textAlign !== 'center'
+
+  return labelOpts
 }
 
 export const toBlessedTextFieldOptions = (options: TextFieldOptions) => {

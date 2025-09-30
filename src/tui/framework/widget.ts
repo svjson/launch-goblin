@@ -78,12 +78,12 @@ export interface Widget<O extends WidgetOptions = WidgetOptions> {
   setLayout(prop: LayoutProperty, value: string | number): void
 }
 
-export interface LabelWidget extends Widget {
+export interface LabelWidget extends Widget<LabelOptions> {
   type: 'label'
   setText(text: string): void
 }
 
-export interface ListWidget extends Widget {
+export interface ListWidget extends Widget<ListOptions> {
   type: 'list'
   clearItems(): void
   select(index: number): void
@@ -95,14 +95,14 @@ export interface OptionBarWidget extends Widget<ListOptions> {
   type: 'option-bar'
 }
 
-export interface TextFieldWidget extends Widget {
+export interface TextFieldWidget extends Widget<TextFieldOptions> {
   type: 'text-field'
   onSubmit(callback: () => void): void
   onCancel(callback: () => void): void
   getText(): string
 }
 
-export interface CheckboxWidget extends Widget {
+export interface CheckboxWidget extends Widget<CheckboxOptions> {
   type: 'checkbox'
   isChecked(): boolean
   setChecked(checked: boolean): void
