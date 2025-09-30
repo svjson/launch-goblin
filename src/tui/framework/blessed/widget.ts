@@ -128,7 +128,7 @@ export abstract class BlessedWidget<
     return this._children.some((c) => c === widget || c.contains(widget))
   }
 
-  applyStyle(style: BaseWidgetOptions) {
+  applyStyle(style: O) {
     this.inner.style = {
       ...this.inner.style,
       ...{

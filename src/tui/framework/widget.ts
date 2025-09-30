@@ -65,7 +65,8 @@ export interface Widget<O extends WidgetOptions = WidgetOptions> {
   children(): Widget[]
   contains(widget: Widget): boolean
 
-  applyStyle(style: BaseWidgetOptions): void
+  applyStyle(style: O): void
+
   getStyleOptions(): BaseWidgetOptions
   getAppearance(): Appearance
 

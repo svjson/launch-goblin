@@ -27,4 +27,8 @@ export interface Border {
   border?: BorderOptions | 'none'
 }
 
-export type Appearance = ColorOptions & TextStyle
+export interface Visibility {
+  hidden?: boolean
+}
+
+export type Appearance = ColorOptions & TextStyle & Visibility

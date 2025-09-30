@@ -77,7 +77,7 @@ export abstract class HeadlessWidget<O extends WidgetOptions = WidgetOptions>
   isFocused(): boolean {
     return this.backend.focused === this
   }
-  applyStyle(_style: BaseWidgetOptions): void {}
+  applyStyle(_style: O): void {}
   getStyleOptions(): BaseWidgetOptions {
     throw new Error(
       'HeadlessWidget::getStyleOptions() - Method not implemented.'
