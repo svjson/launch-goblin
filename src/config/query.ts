@@ -35,6 +35,27 @@ export const launchConfigByName = (
     .find((cfg) => cfg)
 }
 
+const configsMatch = (a: LaunchConfig, b: LaunchConfig) => {
+  if (a.defaultTarget !== b.defaultTarget) return false
+
+  const entriesA = Object.entries(a.components)
+  const entriesB = Object.entries(b.components)
+
+  // pick the smaller one to iterate
+  const [smaller, larger] =
+    entriesA.length <= entriesB.length
+      ? [entriesA, b.components]
+      : [entriesB, a.components]
+
+  return smaller.every(([name, comp]) => {
+    const other = larger[name]
+    if (!other) return false
+    return (
+      comp.selected === other.selected && equal(comp.targets, other.targets)
+    )
+  })
+}
+
 /**
  * Find a launch configuration by content in the given context configuration,
  * considering both private and shared configs.
@@ -59,5 +80,5 @@ export const launchConfigByContent = (
         config,
       }))
     )
-    .find((cfg) => equal(cfg.config, configContent))
+    .find((cfg) => configsMatch(cfg.config, configContent))
 }

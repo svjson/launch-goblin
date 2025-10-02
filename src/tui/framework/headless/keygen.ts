@@ -1,3 +1,4 @@
+import { KeyEvent } from '../event'
 import { KeyPress, KeyMeta } from '../input'
 
 const CHAR_0 = 48
@@ -161,4 +162,14 @@ export const genKeyPress = (keyName: string): [string | undefined, KeyMeta] => {
     : (KeyGen[keyName] ?? {})
 
   return [ch, key]
+}
+
+export const keyPressEvent = (keyName: string): KeyEvent => {
+  const [ch, key] = genKeyPress(keyName)
+  if (ch === undefined) throw new Error('Unsupported key: ' + keyName)
+  return {
+    type: 'key',
+    ch,
+    key,
+  }
 }

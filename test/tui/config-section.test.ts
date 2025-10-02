@@ -59,6 +59,7 @@ describe('ConfigSection', () => {
       )
 
       // Then
+      expect(adapter.getConfigs()).toEqual([])
       expect(adapter.hasNoConfigLabel()).toBe(true)
       expect(configSection.isFocusable()).toBe(false)
       expect(configSection.focusable).toBe(false)

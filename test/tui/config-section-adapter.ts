@@ -16,10 +16,20 @@ export const configSectionAdapter = (
     },
 
     getConfigs() {
-      return section.children.map((c) => ({
-        name: c.model.label,
-        type: c.model.type,
-      }))
+      return section.children
+        .filter(
+          (c) =>
+            section.emptyLabel === undefined ||
+            c.model.text !== section.emptyLabel?.model?.text
+        )
+        .map((c) => ({
+          name: c.model.label,
+          type: c.model.type,
+        }))
+    },
+
+    getOptionLabels() {
+      return section.children.map((c) => c.model.label || c.model.text)
     },
 
     getSelectedConfig() {

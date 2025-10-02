@@ -19,9 +19,14 @@ import { ConfirmDialog } from './framework/modal'
 import { CustomListBox, CustomListBoxItem } from './framework/custom-list-box'
 import { LabelItem } from './framework/label'
 import { ComponentEnvironment } from './framework/controller'
+import { LaunchSession } from '@src/project/state'
+import { toLaunchConfig } from '@src/config/apply'
 
 export const LAST_LAUNCH_LABEL = '< Last Launch >'
 export const LAST_LAUNCH_ID = '__!last_launch'
+
+export const NEW_CONFIG_LABEL = '< New Config >'
+export const NEW_CONFIG_ID = '__!new_config'
 
 /**
  * Transform LaunchConfig instances from the context configuration
@@ -39,7 +44,7 @@ const transformEntries = (
  * Specialization of the ListItem model, adding configuration type
  */
 export interface ConfigListItem extends ListItem {
-  type: 'private' | 'shared' | 'recent'
+  type: 'private' | 'shared' | 'recent' | 'unsaved'
 }
 
 /**
@@ -69,6 +74,8 @@ export class ConfigSection extends CustomListBox<
   })
 
   showLastLaunched: boolean = false
+  showNewConfig: boolean = false
+  newConfig?: LaunchConfig
 
   constructor({
     widget: { env, options = {} },
@@ -111,6 +118,28 @@ export class ConfigSection extends CustomListBox<
       return true
     })
 
+    this.store.subscribe('session', (_path, session: LaunchSession) => {
+      const sessionState = toLaunchConfig(session)
+      if (this.newConfig && this.focusedIndex === 0) {
+        this.newConfig = sessionState
+      } else {
+        const existing = launchConfigByContent(
+          sessionState,
+          this.store.get<ContextConfig>('config')
+        )
+        if (!existing) {
+          if (!this.showNewConfig) {
+            this.showNewConfig = true
+            this.newConfig = sessionState
+            this.focusedIndex = 0
+            this.populateList()
+            this.emit('dirty')
+          }
+        }
+      }
+      return true
+    })
+
     const lastLaunched = this.store.get<LaunchConfig>(
       'config.private.lastConfig'
     )
@@ -131,22 +160,29 @@ export class ConfigSection extends CustomListBox<
       }
     }
 
-    this.populateModel()
     this.populateList()
-
-    this.adjustHeight()
   }
 
   populateModel() {
     const config: ContextConfig = this.store.get('config')
     this.model = [
+      ...(this.showNewConfig
+        ? [
+            {
+              id: NEW_CONFIG_ID,
+              label: NEW_CONFIG_LABEL,
+              type: 'unsaved',
+              selected: false,
+            } satisfies ConfigListItem,
+          ]
+        : []),
       ...(this.showLastLaunched
         ? [
             {
               id: LAST_LAUNCH_ID,
               label: LAST_LAUNCH_LABEL,
               type: 'recent',
-              selected: true,
+              selected: false,
             } satisfies ConfigListItem,
           ]
         : []),
@@ -167,7 +203,8 @@ export class ConfigSection extends CustomListBox<
       Math.min(
         14,
         Math.max(
-          (this.showLastLaunched ? 1 : 0) +
+          (this.showNewConfig ? 1 : 0) +
+            (this.showLastLaunched ? 1 : 0) +
             launchConfigCount(this.store.get('config')),
           1
         ) + 4
@@ -176,10 +213,19 @@ export class ConfigSection extends CustomListBox<
   }
 
   configSelected(event: ItemSelectedEvent<ConfigListItem>) {
-    const config =
-      event.item.type === 'recent'
-        ? this.store.get<LaunchConfig>('config.private.lastConfig')
-        : launchConfigByName(event.item.id, this.store.get('config'))
+    let config: LaunchConfig | undefined
+
+    switch (event.item.type) {
+      case 'recent':
+        config = this.store.get<LaunchConfig>('config.private.lastConfig')
+        break
+      case 'unsaved':
+        config = this.newConfig
+        break
+      default:
+        config = launchConfigByName(event.item.id, this.store.get('config'))
+    }
+
     if (config) {
       applyConfig(
         config,
@@ -236,8 +282,8 @@ class ConfigItemBox extends CustomListBoxItem<ConfigListItem, ConfigListItem> {
       model: { text: this.model.label },
       style: {
         left: 1,
-        textAlign: this.isRecentType() ? 'center' : 'left',
-        ...(this.isRecentType() ? { width: '100%-2' } : {}),
+        textAlign: this.isTransientConfig() ? 'center' : 'left',
+        ...(this.isTransientConfig() ? { width: '100%-2' } : {}),
         ':focused': {
           color: 'black',
         },
@@ -251,14 +297,14 @@ class ConfigItemBox extends CustomListBoxItem<ConfigListItem, ConfigListItem> {
       },
       style: {
         right: 1,
-        hidden: this.isRecentType(),
+        hidden: this.isTransientConfig(),
         color: this.model.type === 'private' ? 208 : 'green',
       },
     },
   })
 
-  isRecentType() {
-    return this.model.type === 'recent'
+  isTransientConfig() {
+    return this.model.type === 'recent' || this.model.type === 'unsaved'
   }
 
   constructor({

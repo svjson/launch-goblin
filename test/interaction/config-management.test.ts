@@ -10,8 +10,8 @@ describe('Interaction', () => {
         const { backend, app } = await runGoblinApp({
           projectId: 'dummy-project',
           configs: {
-            private: ['Backend Dev Environment'],
             shared: ['Full Dev Environment', 'No Mocks'],
+            private: ['Backend Dev Environment'],
           },
         })
         // Tab into config section
@@ -172,7 +172,7 @@ describe('Interaction', () => {
         expect(type).toEqual('shared')
       })
 
-      it('should return focus to component section when the last launch config is deleted', async () => {
+      it('should return focus to component section when the only launch config is deleted', async () => {
         const saved = defer<{
           state?: ApplicationState
           type: ConfigType

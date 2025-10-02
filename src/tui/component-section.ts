@@ -189,6 +189,7 @@ export class ComponentSection extends Controller<
         c.setSelected(event.checked, true)
       })
     }
+    this.store.touch('session')
   }
 
   applySelection() {

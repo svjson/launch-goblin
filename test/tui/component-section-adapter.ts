@@ -3,6 +3,7 @@ import {
   ComponentItemModel,
 } from '@src/tui/component-section'
 import { Controller, HeadlessBackend, Widget } from '@src/tui/framework'
+import { keyPressEvent } from '@src/tui/framework/headless/keygen'
 import { CheckboxWidget } from '@src/tui/framework/widget'
 
 export const componentSectionAdapter = (
@@ -55,6 +56,12 @@ export const componentSectionAdapter = (
           sc.component.name,
           ...(sc.component.type === 'docker-compose' ? sc.state.targets : []),
         ])
+    },
+
+    toggleCurrentComponent() {
+      this.section.children[this.section.focusedIndex].receive(
+        keyPressEvent('enter')
+      )
     },
   }
 

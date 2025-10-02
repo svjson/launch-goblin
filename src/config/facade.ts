@@ -9,7 +9,7 @@ import {
 import { FileSystem } from '@whimbrel/core'
 import { SystemModule } from '@src/bootstrap/facade'
 import path from 'node:path'
-import { toLaunchConfigComponents } from './apply'
+import { toLaunchConfig, toLaunchConfigComponents } from './apply'
 
 /**
  * Module interface for reading and writing configurations to/from
@@ -183,10 +183,7 @@ export const makeConfigurationFacade = (
      * @returns A promise that resolves when the configuration has been saved
      */
     async saveLatestLaunch(model: ApplicationState) {
-      model.config.private.lastConfig = {
-        defaultTarget: 'dev',
-        components: toLaunchConfigComponents(model.session.components),
-      }
+      model.config.private.lastConfig = toLaunchConfig(model.session)
       await this.savePrivateConfig(model.project, model.config.private)
     },
 

@@ -1,3 +1,4 @@
+import { LAST_LAUNCH_LABEL } from '@src/tui/config-section'
 import { runGoblinApp } from 'test/fixtures'
 import { describe, expect, it } from 'vitest'
 
@@ -16,6 +17,10 @@ describe('Interaction', () => {
         const configSection = adapter.configSection()
 
         // Then
+        expect(configSection.getOptionLabels()).toEqual([
+          'Backend Dev Environment',
+          'Full Dev Environment',
+        ])
         expect(configSection.getSelectedConfig()).toEqual({
           name: 'Backend Dev Environment',
           type: 'shared',
@@ -34,9 +39,38 @@ describe('Interaction', () => {
         const configSection = adapter.configSection()
 
         // Then
+        expect(configSection.getOptionLabels()).toEqual([
+          'Backend Dev Environment',
+          'Full Dev Environment',
+        ])
         expect(configSection.getSelectedConfig()).toEqual({
           name: 'Full Dev Environment',
           type: 'shared',
+        })
+      })
+    })
+
+    describe('No existing match', () => {
+      it('should insert and select a last launch-entry when no existing configuration matches last launched config', async () => {
+        // Given
+        const { adapter } = await runGoblinApp({
+          projectId: 'dummy-project',
+          configs: {
+            shared: ['Backend Dev Environment', 'Full Dev Environment'],
+            lastLaunched: 'No Mocks',
+          },
+        })
+        const configSection = adapter.configSection()
+
+        // Then
+        expect(configSection.getOptionLabels()).toEqual([
+          LAST_LAUNCH_LABEL,
+          'Backend Dev Environment',
+          'Full Dev Environment',
+        ])
+        expect(configSection.getSelectedConfig()).toEqual({
+          name: LAST_LAUNCH_LABEL,
+          type: 'recent',
         })
       })
     })

@@ -71,6 +71,13 @@ export const applyConfig = (
   return session
 }
 
+export const toLaunchConfig = (session: LaunchSession): LaunchConfig => {
+  return {
+    defaultTarget: session.target,
+    components: toLaunchConfigComponents(session.components),
+  }
+}
+
 /**
  * Transform an array of component launch options to the model used
  * by LGConfig and disk serialization.

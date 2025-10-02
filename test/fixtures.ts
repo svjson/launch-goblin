@@ -323,11 +323,14 @@ const constructLaunchConfig = (
       cfg.components[cmp.id] = {
         selected: Boolean(cfgEntry),
         targets:
-          !cfgEntry || typeof cfgEntry === 'string' ? [] : cfgEntry.targets,
+          !cfgEntry || typeof cfgEntry === 'string'
+            ? ['dev']
+            : cfgEntry.targets,
       }
       return cfg
     },
     {
+      defaultTarget: 'dev',
       components: {},
     } as LaunchConfig
   )
