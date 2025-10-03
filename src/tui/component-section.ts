@@ -111,6 +111,7 @@ export class ComponentSection extends Controller<
           targetChildren: multiSelect,
           index: i,
         } as ComponentItemModel,
+        store: this.store,
         style: {
           top: i + 1,
           width: '100%-3',
@@ -129,6 +130,7 @@ export class ComponentSection extends Controller<
               targetIndex: ti,
               lastChild,
             } as ComponentTargetModel,
+            store: this.store,
             style: {
               top: i + ti + 2,
               width: '100%-3',
@@ -138,7 +140,7 @@ export class ComponentSection extends Controller<
       }
     })
 
-    this.store!.subscribe('config.activeConfigName', () => {
+    this.store.subscribe('config.activeConfigName', () => {
       juxt(this.children, this.components).forEach(([checkbox, cmp]) => {
         if (checkbox && cmp) {
           const item = checkbox as ComponentItem
@@ -340,6 +342,7 @@ class ComponentItem extends AbstractComponentItem {
       this.model.component.component.targets.length
 
     this.setTargets([this.model.component.component.targets[newIndex]])
+    this.store.touch('session')
   }
 
   setTargets(targets: string[]) {
@@ -434,6 +437,7 @@ class MultiTargetItem extends AbstractComponentItem {
       this.model.component.component.targets.length
 
     this.setTargets([this.model.component.component.targets[newIndex]])
+    this.store.touch('session')
   }
 
   setTargets(targets: string[]) {
