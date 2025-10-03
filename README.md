@@ -15,14 +15,13 @@ Instead of juggling `turbo run` and `pnpm dev` with endless `--filter` sequences
 - Inspect available modules
 - Select what to launch
 - Run targets interactively
-- Keep visibility into what’s running
+- Keep both shared and private launch configurations
 
-
-
-## Features (0.1.2)
+## Features (0.1.3)
 
 - **Turborepo integration** – browse and run `turbo run` targets per module.  
 - **pnpm integration** – run `pnpm` scripts directly from the interface.  
+- **docker compose** - run all or a selection of services from your `docker-compose.yaml`.  
 - **Interactive TUI** – keyboard-driven, curses-style UI with focus and navigation.  
 - **Granularity** – pick specific modules or run multiple together.  
 
@@ -89,6 +88,14 @@ or inform the project setup, and this will be enabled as the project matures.
 
 ## Version History
 
+### 0.1.3 - Docker Compose + Transient Configs - 2025-10-03
+
+- Support for launching docker-compose.yaml services
+- Show target/package script name per component when relevant
+- Select target/package script per component for capable launchers
+- Show last launched configuration as "Last Launch" config option if not saved
+- Show transient launch session as "New Config" config option 
+
 ### 0.1.2 - Stability - 2025-09-23
 
 - Fixed crash when attempting to delete a launch configuration.
@@ -109,14 +116,18 @@ or inform the project setup, and this will be enabled as the project matures.
 ## Roadmap
 
 ### Short-term (0.1.x - 0.2.0)
-- Config management: create, rename, and edit launch configs.
-- Auto-keep “last launched” setup, even if not saved as config.
+- Config management: 
+  - ✅ Create 
+  - rename
+  - Edit
+- ✅ Auto-keep “last launched” setup, even if not saved as config.
 - CLI mode: run configs directly without opening the TUI.
-- Allow different modules to be launched with different launch scripts.
+- ✅ Allow different modules to be launched with different launch scripts.
 - More control over process lifecycle for launcher strategies where it makes sense (restart/stop).
 - Additional backends: Docker Compose, tmux, and more.
+  - ✅ Docker Compose
 - Configurable keymaps and themes.
-- Persisted state across sessions.
+- ✅ Persisted state across sessions.
 - Support for parallel vs sequential launch strategies.
 
 ## License
