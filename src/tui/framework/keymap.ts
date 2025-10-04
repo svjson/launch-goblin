@@ -13,8 +13,12 @@ export type KeyMap = Record<string, KeyMapping>
 
 export type KeyIdentifier = string | string[]
 
-export interface KeyMapping {
+export type KeyMapping = {
   propagate?: boolean
+  handler: Function
+} & KeyLegend
+
+export interface KeyLegend {
   legend?: string
   /**
    * Defines the `category` of this mapped keystroke. When a KeystrokeLegend
@@ -32,7 +36,6 @@ export interface KeyMapping {
    * The handler function that will be invoked when the mapped keystroke is
    * performed.
    */
-  handler: Function
 }
 
 export interface LegendGroup {

@@ -69,6 +69,9 @@ export class SaveConfigDialog extends ModalDialog<
       component: Button,
       model: { text: 'Save' },
       style: { top: 7, left: '50%-14' },
+      legend: {
+        enter: 'Save Configuration',
+      },
     },
 
     /**
@@ -78,6 +81,9 @@ export class SaveConfigDialog extends ModalDialog<
       component: Button,
       model: { text: 'Cancel' },
       style: { top: 7, left: '50%+2' },
+      legend: {
+        enter: 'Cancel',
+      },
     },
   })
 

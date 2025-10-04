@@ -82,6 +82,9 @@ export class MainController extends ApplicationController<ApplicationState> {
      */
     launchButton: {
       component: Button,
+      legend: {
+        enter: 'Launch!',
+      },
       model: { text: 'Launch' },
     },
 

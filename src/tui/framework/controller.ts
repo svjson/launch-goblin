@@ -5,7 +5,7 @@ import {
   StringEvent,
   ScopedEventMap,
 } from './event'
-import { keyHandler, KeyMap } from './keymap'
+import { keyHandler, KeyLegend, KeyMap } from './keymap'
 import { createStore, Store } from './store'
 import { ControllerLayout, LayoutProperty } from './layout'
 import { Backend } from './backend'
@@ -111,6 +111,7 @@ export interface ChildDescription<T extends Controller, M, SM> {
   component: CtrlConstructor<T, M, SM>
   model?: M
   store?: Store<SM>
+  legend?: Record<string, KeyLegend | string>
   style?: WidgetOptions
 }
 
@@ -251,7 +252,7 @@ export abstract class Controller<
       return childDesc
     }
 
-    const { ctrlClass, model, store, style } =
+    const { ctrlClass, model, store, style, legend } =
       this.#resolveChildParams(childDesc)
 
     const child = new ctrlClass({
@@ -265,6 +266,19 @@ export abstract class Controller<
       },
     })
 
+    if (legend) {
+      Object.entries(legend).forEach(([key, entry]) => {
+        const mapping = child.keyMap[key]
+        if (mapping) {
+          if (typeof entry === 'string') {
+            mapping.legend = entry
+          } else {
+            Object.assign(mapping, entry)
+          }
+        }
+      })
+    }
+
     return child
   }
 
@@ -275,6 +289,7 @@ export abstract class Controller<
     model: M
     store: Store<SM>
     style: InferWidgetOptions<W>
+    legend?: Record<string, KeyLegend | string>
   } {
     const ctrlClass =
       typeof childDesc === 'function' ? childDesc : childDesc.component
@@ -293,6 +308,7 @@ export abstract class Controller<
         ? this.store
         : childDesc.store) as Store<SM>,
       style: opts as InferWidgetOptions<W>,
+      legend: typeof childDesc === 'function' ? undefined : childDesc.legend,
     }
   }
 

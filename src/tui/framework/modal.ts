@@ -117,19 +117,6 @@ export class ConfirmDialog<
     cancel: this.onCancel.bind(this),
   }
 
-  keyMap = this.defineKeys({
-    escape: {
-      legend: 'Cancel',
-      propagate: true,
-      handler: this.onCancel,
-    },
-    tab: {
-      propagate: true,
-      legend: 'Next',
-      handler: this.nextChild,
-    },
-  })
-
   constructor({
     env,
     store,
@@ -189,6 +176,9 @@ export class ConfirmDialog<
         style: {
           top: vPos,
           left: `50%${withSign(-(buttonBarWidth / 2) + add(...buttonWidths.slice(0, i)) + i * buttonSpacing)}`,
+        },
+        legend: {
+          enter: btn.buttonText,
         },
       })
       button.on('pressed', () => {
