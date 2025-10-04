@@ -15,8 +15,9 @@ import { ActionFacade } from '@src/tui'
 import { LGOptions } from '@src/tui/goblin-app'
 import { analyze } from '@src/project/analyze'
 import { BlessedBackend } from '@src/tui/framework/blessed'
-import { makeSystemModule } from './facade'
+import { makeSystemModule } from '@src/system'
 import { findExecutable } from '@src/system'
+import { spawnDetachedProcess, spawnProxiedProcess } from '@src/launch/launch'
 export { inspectEnvironment } from '@src/tui/framework'
 
 /**
@@ -42,9 +43,12 @@ export const bootstrap = async (
   facade: ActionFacade
 }> => {
   const systemModule = makeSystemModule(
+    (signal: number) => process.exit(signal),
     () => os.homedir(),
     inspectEnvironment,
-    findExecutable
+    findExecutable,
+    spawnDetachedProcess,
+    spawnProxiedProcess
   )
   const configModule = makeConfigurationFacade(systemModule, DiskFileSystem)
   const projectModule = makeProjectFacade(systemModule, analyze)

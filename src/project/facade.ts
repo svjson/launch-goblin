@@ -1,7 +1,7 @@
 import { LGOptions } from '@src/tui'
 import { Project, readProject } from './project'
 import { ProjectParams } from './types'
-import { SystemModule } from '@src/bootstrap/facade'
+import { SystemModule } from '@src/system'
 
 /**
  * Module interface for reading the project structure.

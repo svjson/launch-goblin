@@ -7,9 +7,9 @@ import {
   SharedConfig,
 } from './types'
 import { FileSystem } from '@whimbrel/core'
-import { SystemModule } from '@src/bootstrap/facade'
+import { SystemModule } from '@src/system'
 import path from 'node:path'
-import { toLaunchConfig, toLaunchConfigComponents } from './apply'
+import { toLaunchConfig } from './apply'
 
 /**
  * Module interface for reading and writing configurations to/from

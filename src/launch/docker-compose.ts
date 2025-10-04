@@ -2,7 +2,7 @@ import { Project, ProjectComponent } from '@src/project'
 import { Launcher } from './types'
 import { ApplicationEnvironment } from '@src/tui/framework'
 import { SessionComponent } from '@src/project/state'
-import { SystemModule } from '@src/bootstrap/facade'
+import { SystemModule } from '@src/system'
 
 export const dockerComposeLauncher = (
   _project: Project,

@@ -38,3 +38,13 @@ export interface LaunchProcess {
   args: string[]
   critical?: boolean
 }
+
+export type ProcessEvent = 'exit'
+
+export interface LaunchedProcess {
+  command: LaunchProcess
+
+  kill(sig: NodeJS.Signals): void
+
+  on(event: ProcessEvent, callback: () => void): void
+}

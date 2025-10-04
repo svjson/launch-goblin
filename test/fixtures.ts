@@ -1,9 +1,11 @@
+import { Actor, FacetScope, WhimbrelContext } from '@whimbrel/core'
 import {
   applyConfig,
   ConfigurationModule,
   ContextConfig,
   LaunchConfig,
   LGConfig,
+  PrivateConfig,
 } from '@src/config'
 import {
   ApplicationState,
@@ -16,21 +18,18 @@ import {
   ProjectParams,
 } from '@src/project'
 import { LaunchGoblinApp } from '@src/tui'
-import { Actor, FacetScope, WhimbrelContext } from '@whimbrel/core'
+import { ActionFacade, LGOptions, makeLGOptions } from '@src/tui/goblin-app'
 import { PackageJSON } from '@whimbrel/package-json'
 import { makeProject } from '@src/project'
-import { ttyEnv } from './tui/framework/fixtures'
 import {
   ApplicationEnvironment,
   HeadlessBackend,
   noBackend,
-  TTYEnv,
 } from '@src/tui/framework'
-import { ActionFacade, LGOptions, makeLGOptions } from '@src/tui/goblin-app'
-import { goblinAppAdapter, GoblinAppAdapter } from './goblin-app-adapter'
-import { SystemModule } from '@src/bootstrap/facade'
 import { bootstrap } from '@src/bootstrap/bootstrap'
-import { PrivateConfig } from '@src/config/types'
+
+import { goblinAppAdapter, GoblinAppAdapter } from './goblin-app-adapter'
+import { TestSystemModule } from './process-fixtures'
 
 export const defer = <T>() => {
   let resolve!: (value: T | PromiseLike<T>) => void
@@ -390,25 +389,6 @@ export const createContextConfig = (
   return config
 }
 
-const makeSystemModule = (): SystemModule => {
-  return {
-    userdir() {
-      return '/home/klasse'
-    },
-    async inspectEnvironment(): Promise<TTYEnv> {
-      return ttyEnv()
-    },
-    async findExecutable(bin: string): Promise<string | undefined> {
-      switch (bin) {
-        case 'docker':
-          return '/usr/bin/docker'
-      }
-
-      return undefined
-    },
-  }
-}
-
 const makeConfigModule = (config: ContextConfig): ConfigurationModule => {
   return {
     async readConfig(_project: Project): Promise<ContextConfig> {
@@ -469,7 +449,11 @@ export const runGoblinApp = async ({
 }> => {
   const configModule = makeConfigModule(createContextConfig(projectId, configs))
 
-  const systemModule = makeSystemModule()
+  const systemModule = new TestSystemModule({
+    execPaths: {
+      docker: '/usr/bin/docker',
+    },
+  })
 
   const projectModule: ProjectModule = makeProjectFacade(
     systemModule,

@@ -2,7 +2,7 @@ import { identifyLaunchers, Launcher } from '@src/launch'
 import { LGOptions } from '@src/tui/goblin-app'
 import { ProjectComponent, ProjectParams } from './types'
 import { actorFacetScope } from '@whimbrel/core'
-import { SystemModule } from '@src/bootstrap/facade'
+import { SystemModule } from '@src/system'
 
 /**
  * Project model that describes the project on disk, its components,

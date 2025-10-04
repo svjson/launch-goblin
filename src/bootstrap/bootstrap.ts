@@ -3,14 +3,15 @@ import { makeLaunchFacade } from '@src/launch'
 import { ApplicationState, Project, ProjectModule } from '@src/project'
 import { LaunchSession } from '@src/project/state'
 import { ActionFacade, LGOptions } from '@src/tui'
+import { SystemModule } from '@src/system'
 import {
   ApplicationEnvironment,
   Backend,
   DefaultTheme,
 } from '@src/tui/framework'
 import { makeActionFacade } from './app'
-import { SystemModule } from './facade'
 import { BootstrapError } from './error'
+import { makeProcessTracker } from '@src/launch/process-tracker'
 
 /**
  * Bootstrap the application using the provided modules for IO and
@@ -81,7 +82,8 @@ export const bootstrap = async (
 
   const env = { backend, tty, theme: DefaultTheme, log: [] }
 
-  const launchModule = makeLaunchFacade()
+  const processTracker = makeProcessTracker(systemModule)
+  const launchModule = makeLaunchFacade(processTracker)
   const facade = makeActionFacade(env, model, configModule, launchModule)
 
   return { env, model, facade }
