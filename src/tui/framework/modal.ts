@@ -29,12 +29,20 @@ export class ModalDialog<
     escape: {
       propagate: true,
       legend: 'Cancel',
+      category: 'app',
       handler: this.destroy,
     },
     tab: {
       propagate: true,
       legend: 'Next',
+      category: 'nav',
       handler: this.nextChild,
+    },
+    'S-tab': {
+      propagate: true,
+      legend: 'Prev',
+      category: 'nav',
+      handler: this.prevChild,
     },
   })
 

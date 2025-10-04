@@ -320,9 +320,11 @@ export abstract class Controller<
   }
 
   receive(event: TUIEvent) {
+    const eventType = event.type === 'custom' ? event.name : event.type
+
     const eventKeys = [
-      event.source?.name ? `${event.source.name}:${event.type}` : '',
-      event.type,
+      event.source?.name ? `${event.source.name}:${eventType}` : '',
+      eventType,
     ].filter(Boolean)
 
     for (const eventKey of eventKeys) {

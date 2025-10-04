@@ -61,16 +61,9 @@ export class ConfigSection extends CustomListBox<
   ConfigListItem[],
   ApplicationState
 > {
-  keyMap = this.defineKeys({
-    delete: {
-      legend: 'Delete Config',
-      propagate: true,
-      handler: this.confirmDelete,
-    },
-  })
-
   events = this.defineEvents({
     selected: this.configSelected,
+    delete: this.confirmDelete,
   })
 
   showLastLaunched: boolean = false
@@ -275,6 +268,20 @@ export class ConfigSection extends CustomListBox<
 
 class ConfigItemBox extends CustomListBoxItem<ConfigListItem, ConfigListItem> {
   focusable = true
+
+  keyMap = this.defineKeys(
+    this.isTransientConfig()
+      ? {}
+      : {
+          delete: {
+            legend: 'Delete Config',
+            propagate: true,
+            category: 'focused',
+            handler: () =>
+              this.emit({ type: 'custom', name: 'delete', source: this }),
+          },
+        }
+  )
 
   components = this.defineComponents({
     nameLabel: {

@@ -25,15 +25,18 @@ export class MainController extends ApplicationController<ApplicationState> {
     'C-s': {
       propagate: true,
       legend: 'Save Configuration',
+      category: 'app',
       handler: this.openSaveConfigDialog,
     },
     tab: {
       propagate: true,
+      category: 'nav',
       legend: 'Next Section',
       handler: this.nextChild,
     },
     'S-tab': {
       propagate: true,
+      category: 'nav',
       legend: 'Prev Section',
       handler: this.prevChild,
     },

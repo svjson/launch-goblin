@@ -28,13 +28,15 @@ export class ComponentSection extends Controller<
     up: {
       propagate: true,
       legend: 'Navigate',
-      group: 'nav',
+      group: 'Navigate',
+      category: 'focused',
       handler: this.prevChild,
     },
     down: {
       propagate: true,
       legend: 'Navigate',
-      group: 'nav',
+      group: 'Navigate',
+      category: 'focused',
       handler: this.nextChild,
     },
   })
@@ -230,7 +232,7 @@ class AbstractComponentItem<
   keyMap = this.defineKeys({
     enter: {
       legend: 'Toggle Selection',
-      group: 'focused',
+      category: 'focused',
       propagate: true,
       handler: () => this.getCheckbox().toggle(),
     },
@@ -278,14 +280,16 @@ class ComponentItem extends AbstractComponentItem {
     this.model.targetSelectable
       ? {
           left: {
-            legend: 'Cycle target',
-            group: 'focused',
+            legend: 'Previous Target',
+            group: 'Prev/Next Target',
+            category: 'focused',
             propagate: true,
             handler: () => this.cycleTarget(-1),
           },
           right: {
-            legend: 'Cycle target',
-            group: 'focused',
+            legend: 'Previous Target',
+            group: 'Prev/Next Target',
+            category: 'focused',
             propagate: true,
             handler: () => this.cycleTarget(),
           },
@@ -363,7 +367,7 @@ class MultiTargetItem extends AbstractComponentItem {
   keyMap = this.defineKeys({
     space: {
       legend: 'Toggle Target',
-      group: 'focused',
+      category: 'focused',
       propagate: true,
       handler: () => (this.children[1] as OptionBar).toggle(),
     },
@@ -371,13 +375,15 @@ class MultiTargetItem extends AbstractComponentItem {
       ? {
           left: {
             legend: 'Previous Target',
-            group: 'nav',
+            group: 'Prev/Next Target',
+            category: 'focused',
             propagate: true,
             handler: () => this.components.targets.prevChild(),
           },
           right: {
             legend: 'Next target',
-            group: 'nav',
+            group: 'Prev/Next Target',
+            category: 'focused',
             propagate: true,
             handler: () => this.components.targets.nextChild(),
           },

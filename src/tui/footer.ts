@@ -1,5 +1,5 @@
 import { Controller, CtrlCtorParams, Label, LegendEntry } from './framework'
-import { getEffectiveKeyMap } from './framework/keymap'
+import { generateKeystrokeLegend, getEffectiveKeyMap } from './framework/keymap'
 
 /**
  * Replacement dictionary for the keyboard command legend.
@@ -22,10 +22,20 @@ export class FooterController extends Controller {
   focusable = false
 
   components = this.defineComponents({
-    label: {
+    appLegend: {
       component: Label,
       style: {
-        width: '100%',
+        right: 1,
+      },
+    },
+    focusedLegend: {
+      component: Label,
+      style: {},
+    },
+    navLegend: {
+      component: Label,
+      style: {
+        left: 1,
       },
     },
   })
@@ -47,42 +57,46 @@ export class FooterController extends Controller {
   }
 
   buildKeyLegend(controller: Controller) {
-    const entries: LegendEntry[] = [{ symbol: 'q', description: 'Quit' }]
+    const legend = generateKeystrokeLegend(controller, {
+      keySymbols: KEY_SYMBOLS,
+      categories: ['app', 'focused', 'nav'],
+      initial: {
+        categories: {
+          app: {
+            q: { symbol: 'q', description: 'Quit' },
+          },
+        },
+      },
+    })
 
-    const groups: Record<string, LegendEntry> = {}
-
-    const keyMap = getEffectiveKeyMap(controller)
-
-    for (const [key, spec] of Object.entries(keyMap)) {
-      const keySym = KEY_SYMBOLS[key] ?? key
-      let groupName = spec.group
-
-      if (!spec.legend) {
-        continue
-      } else if (groupName) {
-        let group = groups[groupName]
-        if (!group) {
-          group = {
-            symbol: '',
-            description: groupName,
-          }
-          groups[groupName] = group
-          entries.push(group)
-        }
-        group.symbol += keySym
-      } else {
-        entries.push({ symbol: keySym, description: spec.legend })
-      }
+    const joinCategory = (cat: Record<string, LegendEntry>) => {
+      return Object.values(cat)
+        .map((e) => [e.symbol, '=', e.description].join(' '))
+        .join(' • ')
     }
 
-    return [
-      ' ',
-      entries.map((e) => [e.symbol, '=', e.description].join(' ')).join(' • '),
-    ].join('')
+    return Object.entries(legend.categories).reduce(
+      (result, [name, entries]) => {
+        result[name] = joinCategory(entries)
+        return result
+      },
+      {
+        default: '',
+        app: '',
+        focused: '',
+        nav: '',
+      } as Record<string, string>
+    )
   }
 
   applyContext(controller: Controller) {
     const legend = this.buildKeyLegend(controller)
-    this.components.label.setText(legend)
+    this.components.appLegend.setText(legend.app)
+    this.components.navLegend.setText(legend.nav)
+    this.components.focusedLegend.setText(legend.focused)
+    this.components.focusedLegend.set(
+      'left',
+      `50%-${Math.round(legend.focused.length / 2)}`
+    )
   }
 }

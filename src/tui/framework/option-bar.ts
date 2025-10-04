@@ -14,24 +14,28 @@ export class OptionBar<
   ItemModel extends OptionItem = OptionItem,
 > extends Controller<OptionBarWidget, ItemModel[], undefined> {
   keyMap = this.defineKeys({
-    right: {
-      propagate: true,
-      legend: 'Next',
-      group: 'nav',
-      handler: this.nextChild,
-    },
     left: {
       propagate: true,
-      legend: 'Previous',
-      group: 'nav',
+      legend: 'Prev Option',
+      category: 'focused',
       handler: this.prevChild,
     },
-    enter: {
+    right: {
       propagate: true,
-      legend: 'Toggle',
-      group: 'focused',
-      handler: this.toggle,
+      legend: 'Next Option',
+      category: 'focused',
+      handler: this.nextChild,
     },
+    ...(this.widget.widgetOptions.selectionMode === 'multi'
+      ? {
+          enter: {
+            propagate: true,
+            legend: 'Toggle',
+            category: 'focused',
+            handler: this.toggle,
+          },
+        }
+      : {}),
   })
 
   events = this.defineEvents({

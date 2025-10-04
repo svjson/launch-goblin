@@ -14,6 +14,7 @@ export class Button extends Controller<Widget, ButtonModel> {
   keyMap = this.defineKeys({
     enter: {
       legend: 'Press Button',
+      category: 'focused',
       handler: this.pressed,
     },
   })
