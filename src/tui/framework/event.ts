@@ -4,52 +4,55 @@ import { KeyPress } from './input'
 
 export type StringEvent = 'dirty' | 'pressed' | 'launch'
 
-export interface NoArgEvent {
+export interface TUIEventBase {
+  source?: Controller
+}
+
+export type NoArgEvent = TUIEventBase & {
   type: StringEvent
 }
 
-export interface CheckboxEvent {
+export type CheckboxEvent = TUIEventBase & {
   type: 'checkbox'
   item: any
   checked: boolean
 }
 
-export interface ItemSelectedEvent<T> {
+export type ItemSelectedEvent<T> = TUIEventBase & {
   type: 'selected'
   item: T
 }
 
-export interface TextChangedEvent {
+export type TextChangedEvent = TUIEventBase & {
   type: 'text-changed'
   value: string
 }
 
-export interface FocusEvent {
+export type FocusEvent = TUIEventBase & {
   type: 'focus'
-  component: Controller
+  source: Controller
 }
 
-export interface DestroyEvent {
+export type DestroyEvent = TUIEventBase & {
   type: 'destroy'
-  component: Controller
+  source: Controller
 }
 
-export interface DestroyedEvent {
+export type DestroyedEvent = TUIEventBase & {
   type: 'destroyed'
-  component: Controller
 }
 
-export interface LogEvent {
+export type LogEvent = TUIEventBase & {
   type: 'log'
   message: string
 }
 
-export interface ActionEvent {
+export type ActionEvent = TUIEventBase & {
   type: 'action'
   action: Action
 }
 
-export type KeyEvent = {
+export type KeyEvent = TUIEventBase & {
   type: 'key'
 } & KeyPress
 
@@ -65,4 +68,8 @@ export type TUIEvent =
   | LogEvent
   | TextChangedEvent
 
+export type EventDefinition = Function | EventMap
+
 export type EventMap = Record<string, Function>
+
+export type ScopedEventMap = Record<string, EventDefinition>

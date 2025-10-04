@@ -1,4 +1,10 @@
-import { DestroyEvent, TUIEvent, EventMap, StringEvent } from './event'
+import {
+  DestroyEvent,
+  TUIEvent,
+  EventMap,
+  StringEvent,
+  ScopedEventMap,
+} from './event'
 import { keyHandler, KeyMap } from './keymap'
 import { createStore, Store } from './store'
 import { ControllerLayout, LayoutProperty } from './layout'
@@ -201,6 +207,11 @@ export abstract class Controller<
    */
   enabled = true
 
+  /**
+   * Component name
+   */
+  name?: string
+
   constructor(
     protected env: ComponentEnvironment,
     protected widget: W,
@@ -309,10 +320,21 @@ export abstract class Controller<
   }
 
   receive(event: TUIEvent) {
-    const handler = this.events[event.type]
-    if (handler) {
-      handler(event)
+    const eventKeys = [
+      event.source?.name ? `${event.source.name}:${event.type}` : '',
+      event.type,
+    ].filter(Boolean)
+
+    for (const eventKey of eventKeys) {
+      const handler = this.events[eventKey]
+      if (handler) {
+        const handleResult = handler(event)
+        if (handleResult === true) {
+          return
+        }
+      }
     }
+
     if (event.type === 'key') {
       const kHandler = keyHandler(this.keyMap, event.ch, event.key)
       if (kHandler) {
@@ -322,7 +344,7 @@ export abstract class Controller<
     }
 
     if (event.type === 'destroy') {
-      this.#destroyChild((event as DestroyEvent).component)
+      this.#destroyChild((event as DestroyEvent).source)
     }
 
     if (
@@ -390,7 +412,7 @@ export abstract class Controller<
 
   destroy() {
     this.widget.destroy()
-    this.emit({ type: 'destroyed', component: this })
+    this.emit({ type: 'destroyed', source: this })
   }
 
   #destroyChild(component: Controller) {
@@ -406,9 +428,13 @@ export abstract class Controller<
   }
 
   emit(event: TUIEvent | StringEvent) {
-    event = typeof event === 'string' ? { type: event } : event
+    const concreteEvent: TUIEvent =
+      typeof event === 'string' ? { type: event, source: this } : event
+    if (!concreteEvent.source) {
+      concreteEvent.source = this
+    }
     this.listeners.forEach((l) => {
-      l.receive(event)
+      l.receive(concreteEvent)
     })
   }
 
@@ -435,20 +461,33 @@ export abstract class Controller<
 
     for (const [name, spec] of Object.entries(components)) {
       const ctrl = this.addChild(spec)
+      ctrl.name = name
       cmps[name] = ctrl
     }
 
     return cmps
   }
 
-  defineEvents(events: EventMap): Record<string, Function> {
-    return Object.entries({ ...this.events, ...events }).reduce(
-      (map, [event, handler]) => {
-        map[event] = /^bound /.test(handler.name) ? handler : handler.bind(this)
-        return map
+  defineEvents(events: ScopedEventMap): EventMap {
+    const flatEvents = Object.entries({ ...this.events, ...events }).reduce(
+      (flat, [key, entry]) => {
+        if (typeof entry === 'function') {
+          flat[key] = entry
+        } else {
+          Object.entries(entry).forEach(([eventName, handler]) => {
+            flat[`${key}:${eventName}`] = handler
+          })
+        }
+
+        return flat
       },
       {} as EventMap
     )
+
+    return Object.entries(flatEvents).reduce((map, [event, handler]) => {
+      map[event] = /^bound /.test(handler.name) ? handler : handler.bind(this)
+      return map
+    }, {} as EventMap)
   }
 
   defineKeys(keyMap: KeyMap): KeyMap {
@@ -561,7 +600,7 @@ export abstract class Controller<
 
     if (this.isFocusable()) {
       this.widget.focus()
-      this.emit({ type: 'focus', component: this })
+      this.emit({ type: 'focus', source: this })
     }
   }
 

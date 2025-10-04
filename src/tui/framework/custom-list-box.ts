@@ -91,6 +91,7 @@ export class CustomListBox<
     this.receive({
       type: 'selected',
       item: this.model[this.focusedIndex],
+      source: this.children[this.focusedIndex],
     })
   }
 

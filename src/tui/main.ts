@@ -4,7 +4,6 @@ import {
   ApplicationCtrlCtorParams,
   Backend,
   Button,
-  TUIEvent,
   FocusEvent,
   Store,
 } from './framework'
@@ -19,11 +18,14 @@ import { LaunchSession } from '@src/project/state'
  * The main TUI component of the Launch Goblin user interface
  */
 export class MainController extends ApplicationController<ApplicationState> {
+  /**
+   * Globally available keyboard commands
+   */
   keyMap = this.defineKeys({
     'C-s': {
       propagate: true,
       legend: 'Save Configuration',
-      handler: this.saveConfig,
+      handler: this.openSaveConfigDialog,
     },
     tab: {
       propagate: true,
@@ -37,13 +39,26 @@ export class MainController extends ApplicationController<ApplicationState> {
     },
   })
 
+  /**
+   * React to all component focus events
+   */
   events = this.defineEvents({
-    focus: this.componentFocused,
+    focus: this.updateFooter,
   })
 
+  /**
+   * Main UI Component
+   */
   components = this.defineComponents({
+    /**
+     * The Launch Goblin header bar
+     */
     header: HeaderController,
 
+    /**
+     * The Component section, showing components and targets selected
+     * for launch
+     */
     componentSection: {
       component: ComponentSection,
       model: this.store
@@ -54,13 +69,22 @@ export class MainController extends ApplicationController<ApplicationState> {
       store: this.store,
     },
 
+    /**
+     * The Launch-button
+     */
     launchButton: {
       component: Button,
       model: { text: 'Launch' },
     },
 
+    /**
+     * The Config section, showing stored and transient configurations
+     */
     configSection: ConfigSection,
 
+    /**
+     * The application footer, showing available keyboard commands
+     */
     footer: FooterController,
   })
 
@@ -83,15 +107,19 @@ export class MainController extends ApplicationController<ApplicationState> {
     this.focusedIndex = 1
   }
 
-  componentFocused(event: FocusEvent) {
-    this.components.footer.applyContext(event.component)
+  /**
+   * Catches FocusEvents and updates the application footer with available
+   * keyboard commands for the focused component's context.
+   */
+  updateFooter(event: FocusEvent) {
+    this.components.footer.applyContext(event.source)
   }
 
-  emit(event: TUIEvent) {
-    super.emit(event)
-  }
-
-  saveConfig() {
+  /**
+   * Open a dialog with options for saving the current session as a
+   * configuration.
+   */
+  openSaveConfigDialog() {
     this.dispatch({
       type: 'open-modal',
       details: {

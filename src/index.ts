@@ -31,7 +31,7 @@ const main = async (options: LGOptions): Promise<void> => {
         env.log.push(event.message)
       })
 
-      env.backend.onKeyPress(['q', 'C-c'], (_ch, _key) => {
+      env.backend.onKeyPress(['q', 'C-c'], () => {
         env.backend.dispose()
         env.log.forEach((m) => console.log(m))
         process.exit(0)

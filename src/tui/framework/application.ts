@@ -79,7 +79,7 @@ export class Application<Model, MainCtrl extends ApplicationController<Model>> {
     })
 
     this.mainCtrl.on('focus', (event: FocusEvent) => {
-      this.focusedComponent = event.component
+      this.focusedComponent = event.source
     })
 
     this.mainCtrl.on('action', async (event: ActionEvent) => {

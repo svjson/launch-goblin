@@ -21,11 +21,17 @@ export class SaveConfigDialog extends ModalDialog<
   ApplicationState
 > {
   components = this.defineComponents({
+    /**
+     * The text input field for the configuration name
+     */
     nameField: {
       component: TextField,
       model: { label: 'Configuration Name:', value: '' },
       style: { top: 1, left: 2, width: '100%-6' },
     },
+    /**
+     * The field label for the configuration type option-bar
+     */
     configTypeLabel: {
       component: Label,
       model: { text: 'Configuration Type:' },
@@ -34,6 +40,9 @@ export class SaveConfigDialog extends ModalDialog<
         top: 4,
       },
     },
+    /**
+     * The configuration type OptionBar
+     */
     configTypeSelect: {
       component: OptionBar,
       model: [
@@ -51,16 +60,55 @@ export class SaveConfigDialog extends ModalDialog<
       style: { top: 5, left: 2, selectionMode: 'single' },
     },
 
+    /**
+     * The save-button that saves the configuration and closes the dialog.
+     * Disabled if the nameField-component does not contain a valid
+     * configuration name
+     */
     saveButton: {
       component: Button,
       model: { text: 'Save' },
       style: { top: 7, left: '50%-14' },
     },
 
+    /**
+     * The cancel-button that closes the dialog without saving any state.
+     */
     cancelButton: {
       component: Button,
       model: { text: 'Cancel' },
       style: { top: 7, left: '50%+2' },
+    },
+  })
+
+  events = this.defineEvents({
+    nameField: {
+      'text-changed': (event: TextChangedEvent) => {
+        if (!event.value || event.value.trim() === '') {
+          this.components.saveButton.disable()
+        } else {
+          this.components.saveButton.enable()
+        }
+      },
+    },
+    saveButton: {
+      pressed: () => {
+        const { configTypeSelect, nameField } = this.components
+        this.dispatch({
+          type: 'create-config',
+          details: {
+            type: configTypeSelect.getSelectedItemId(),
+            name: nameField.getText(),
+          },
+        })
+        this.destroy()
+      },
+    },
+
+    cancelButton: {
+      pressed: () => {
+        this.destroy()
+      },
     },
   })
 
@@ -78,33 +126,9 @@ export class SaveConfigDialog extends ModalDialog<
       options: { height: 11, width: 45 },
     })
 
-    const { nameField, configTypeSelect, saveButton, cancelButton } =
-      this.components
+    const { saveButton } = this.components
 
     saveButton.disable()
-
-    this.components.nameField.on('text-changed', (event: TextChangedEvent) => {
-      if (!event.value || event.value.trim() === '') {
-        saveButton.disable()
-      } else {
-        saveButton.enable()
-      }
-    })
-
-    saveButton.on('pressed', () => {
-      this.dispatch({
-        type: 'create-config',
-        details: {
-          type: configTypeSelect.getSelectedItemId(),
-          name: nameField.getText(),
-        },
-      })
-      this.destroy()
-    })
-
-    cancelButton.on('pressed', () => {
-      this.destroy()
-    })
 
     this.focus()
   }
