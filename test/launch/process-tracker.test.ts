@@ -1,6 +1,5 @@
 import { makeProcessTracker } from '@src/launch/process-tracker'
 import { LaunchGroup } from '@src/launch/types'
-import { ADDRGETNETWORKPARAMS } from 'node:dns'
 import { wait } from 'test/fixtures'
 import { LaunchedDummyProcess, TestSystemModule } from 'test/process-fixtures'
 import { applicationEnvironment } from 'test/tui/framework/fixtures'

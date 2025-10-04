@@ -1,5 +1,3 @@
-import blessed from 'neo-blessed'
-
 import { describe, expect, test } from 'vitest'
 
 import { Behavior } from '@src/tui/framework/behavior'

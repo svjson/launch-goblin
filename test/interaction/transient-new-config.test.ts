@@ -1,8 +1,6 @@
-import { ConfigType } from '@src/config'
-import { ApplicationState } from '@src/project'
 import { LAST_LAUNCH_LABEL, NEW_CONFIG_LABEL } from '@src/tui/config-section'
-import { defer, runGoblinApp, wait } from 'test/fixtures'
-import { describe, expect, test, it, should } from 'vitest'
+import { runGoblinApp } from 'test/fixtures'
+import { describe, expect, it } from 'vitest'
 
 describe('Interaction', () => {
   describe('Transient New Config-option', () => {
