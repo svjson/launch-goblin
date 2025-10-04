@@ -44,6 +44,11 @@ export class MainController extends ApplicationController<ApplicationState> {
    */
   events = this.defineEvents({
     focus: this.updateFooter,
+    launchButton: {
+      pressed: () => {
+        this.dispatch({ type: 'launch' })
+      },
+    },
   })
 
   /**
@@ -93,9 +98,6 @@ export class MainController extends ApplicationController<ApplicationState> {
     const { componentSection, configSection, launchButton } = this.components
 
     launchButton.layout.bind('top', () => Number(componentSection.bottom()) + 1)
-    launchButton.on('pressed', () => {
-      this.dispatch({ type: 'launch' })
-    })
 
     configSection.layout.bind('top', () => componentSection.top())
     configSection.layout.bind(
