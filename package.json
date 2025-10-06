@@ -4,6 +4,10 @@
   "type": "commonjs",
   "license": "MIT",
   "author": "Sven Johansson",
+  "packageManager": "pnpm@10.16.1",
+  "engines": {
+    "node": ">=20"
+  },
   "main": "./dist/index.cjs",
   "files": [
     "dist"
@@ -16,9 +20,6 @@
       "require": "./dist/index.cjs",
       "import": "./dist/index.js"
     }
-  },
-  "engines": {
-    "node": ">=20"
   },
   "scripts": {
     "build": "tsup",
