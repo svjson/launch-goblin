@@ -56,7 +56,7 @@ export type KeyEvent = TUIEventBase & {
   type: 'key'
 } & KeyPress
 
-export type CustomEvent = TUIEventBase & {
+export type CustomTUIEvent = TUIEventBase & {
   type: 'custom'
   name: 'delete'
   payload?: any
@@ -73,7 +73,7 @@ export type TUIEvent =
   | ItemSelectedEvent<any>
   | LogEvent
   | TextChangedEvent
-  | CustomEvent
+  | CustomTUIEvent
 
 export type EventDefinition = Function | EventMap
 
