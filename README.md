@@ -18,7 +18,7 @@ Instead of juggling `turbo run` and `pnpm dev` with endless `--filter` sequences
 - Run targets interactively
 - Keep both shared and private launch configurations
 
-## Features (0.1.3)
+## Features (0.1.4)
 
 - **Turborepo integration** – browse and run `turbo run` targets per module.  
 - **pnpm integration** – run `pnpm` scripts directly from the interface.  
@@ -34,7 +34,7 @@ Instead of juggling `turbo run` and `pnpm dev` with endless `--filter` sequences
 To install `launch-goblin` as a global command on your system, you typically use a package manager. 
 
 ```sh
-$ npm install -g launch-goblin
+$ pnpm install -g launch-goblin
 ```
 
 Then run it from your repository/multi-module product root:
@@ -48,7 +48,7 @@ $ launch-goblin
 To use launch-goblin in a NodeJS project, add it as a devDependency and create a package.json script:
 
 ```sh
-$ npm add -D launch-goblin
+$ pnpm add -D launch-goblin
 ```
 
 **package.json**
@@ -88,6 +88,11 @@ The aim will always be to not force the user to configure or specify what could 
 or inform the project setup, and this will be enabled as the project matures.
 
 ## Version History
+
+### 0.1.4 - Grouped key legends + Docker Compose fix - 2025-11-19
+
+- Fixed issue when docker compose failed to launch due to references to missing services in configs
+- Grouped footer keyboard legend into categories
 
 ### 0.1.3 - Docker Compose + Transient Configs - 2025-10-03
 
