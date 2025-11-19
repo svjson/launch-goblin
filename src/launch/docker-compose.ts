@@ -4,12 +4,19 @@ import { ApplicationEnvironment } from '@src/tui/framework'
 import { SessionComponent } from '@src/project/state'
 import { SystemModule } from '@src/system'
 
+/**
+ * Launcher for docker compose
+ *
+ * Supports launching individual services from the same docker compose file.
+ */
 export const dockerComposeLauncher = (
   _project: Project,
   _launchAction: string,
   components: ProjectComponent[]
 ): Launcher => {
-  return {
+  const availableTargets = [...components[0].targets]
+
+  const launcher: Launcher = {
     id: 'docker-compose',
     defaultTargets: [...components[0].targets],
     components: components.map((c) => c.id),
@@ -28,7 +35,19 @@ export const dockerComposeLauncher = (
             processes: [
               {
                 bin: 'docker',
-                args: ['compose', 'up', '-d', ...components[0].state.targets],
+                args: [
+                  'compose',
+                  'up',
+                  '-d',
+                  // Launch configurations may contain references to services
+                  // that do not exist in the target project, as they may have been
+                  // removed or only exist on a certain branch. So we need to filter
+                  // out any component that wasn't known to the launcher when it was
+                  // created.
+                  ...components[0].state.targets.filter((t) =>
+                    availableTargets.includes(t)
+                  ),
+                ],
               },
             ],
           },
@@ -36,6 +55,7 @@ export const dockerComposeLauncher = (
       }
     },
   }
+  return launcher
 }
 
 export const identifyDockerComposeLaunchOptions = async (
