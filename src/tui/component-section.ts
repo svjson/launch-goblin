@@ -363,7 +363,7 @@ class ComponentItem extends AbstractComponentItem {
   }
 }
 
-class MultiTargetItem extends AbstractComponentItem {
+export class MultiTargetItem extends AbstractComponentItem {
   keyMap = this.defineKeys({
     space: {
       legend: 'Toggle Target',
