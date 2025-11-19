@@ -4,6 +4,7 @@
 > A terminal-based launcher for multimodule projects.  
 > Granular control over what you start, how you start it, and when.
 
+[![Build and Test](https://github.com/svjson/launch-goblin/actions/workflows/build-and-test.yaml/badge.svg)](https://github.com/svjson/launch-goblin/actions/workflows/build-and-test.yaml)
 [![npm version](https://img.shields.io/npm/v/launch-goblin.svg)](https://www.npmjs.com/package/launch-goblin)
 [![GitHub](https://img.shields.io/badge/GitHub-svjson%2Flaunch--goblin-blue?logo=github)](https://github.com/svjson/launch-goblin)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
