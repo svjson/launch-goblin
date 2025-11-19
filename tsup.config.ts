@@ -19,4 +19,5 @@ export default defineConfig({
   outExtension: ({ format }) =>
     format === 'cjs' ? { js: '.cjs' } : { js: '.js' },
   external: [/^(?!@src)([^./].*)/],
+  noExternal: ['supports-color'],
 })
