@@ -7,7 +7,19 @@ import {
 import { describe, expect, it } from 'vitest'
 
 describe('keyHandler', () => {
+  interface KeyHandlerTestCase {
+    full: string
+    ch?: string
+    response?: string
+  }
+
   const keyMap: KeyMap = {
+    up: {
+      handler: () => 'up pressed!',
+    },
+    'S-up': {
+      handler: () => 'Meta/Alt+up pressed!',
+    },
     left: {
       handler: () => 'left pressed!',
     },
@@ -20,6 +32,15 @@ describe('keyHandler', () => {
     P: {
       handler: () => 'P pressed!',
     },
+    s: {
+      handler: () => 's pressed!',
+    },
+    'C-s': {
+      handler: () => 'Ctrl+S pressed!',
+    },
+    'M-return': {
+      handler: () => 'Meta/Alt+return pressed!',
+    },
     '/[0-9]/': {
       handler: () => 'Pattern triggered',
     },
@@ -31,15 +52,7 @@ describe('keyHandler', () => {
     { full: 'P', ch: undefined, response: 'P pressed!' },
   ])(
     `Should resolve handler function on literal key match '%o'`,
-    ({
-      full,
-      ch,
-      response,
-    }: {
-      full: string
-      ch?: string
-      response: string
-    }) => {
+    ({ full, ch, response }: KeyHandlerTestCase) => {
       const handler = keyHandler(keyMap, ch, { full })
       expect(handler).toBeTypeOf('function')
       expect(handler()).toEqual(response)
@@ -47,12 +60,12 @@ describe('keyHandler', () => {
   )
 
   it.each([
-    { full: 'up', ch: undefined },
+    { full: 'M-up', ch: undefined },
     { full: 'down', ch: undefined },
     { full: 'F', ch: 'F' },
   ])(
-    `Should not resolve handler function when no matching entry exists`,
-    ({ full, ch }: { full: string; ch?: string }) => {
+    `Should not resolve handler function when no matching entry exists: %s`,
+    ({ full, ch }: KeyHandlerTestCase) => {
       const handler = keyHandler(keyMap, ch, { full })
       expect(handler).toBeUndefined()
     }
@@ -69,6 +82,19 @@ describe('keyHandler', () => {
       ch?: string
       response: string
     }) => {
+      const handler = keyHandler(keyMap, ch, { full })
+      expect(handler).toBeTypeOf('function')
+      expect(handler()).toEqual(response)
+    }
+  )
+
+  it.each([
+    { full: 'C-s', ch: 's', response: 'Ctrl+S pressed!' },
+    { full: 'M-return', ch: undefined, response: 'Meta/Alt+return pressed!' },
+    { full: 'S-up', ch: undefined, response: 'Meta/Alt+up pressed!' },
+  ])(
+    `should resolve modifier mapping over bare key: %s`,
+    ({ full, ch, response }: KeyHandlerTestCase) => {
       const handler = keyHandler(keyMap, ch, { full })
       expect(handler).toBeTypeOf('function')
       expect(handler()).toEqual(response)
