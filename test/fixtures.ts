@@ -486,7 +486,6 @@ export const runGoblinApp = async ({
   const app = new LaunchGoblinApp(env, state, concreteFacade)
 
   env.backend.render()
-
   const adapter = goblinAppAdapter(app, env.backend as HeadlessBackend)
   applicationEvents = adapter.applicationEvents
   return {

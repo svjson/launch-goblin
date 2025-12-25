@@ -1,5 +1,8 @@
-import { Controller, CtrlCtorParams, Label, LegendEntry } from './framework'
-import { generateKeystrokeLegend } from './framework/legend'
+import { Controller, CtrlCtorParams, Label } from './framework'
+import {
+  generateKeystrokeLegend,
+  renderLegendCategories,
+} from './framework/legend'
 
 /**
  * Replacement dictionary for the keyboard command legend.
@@ -56,6 +59,13 @@ export class FooterController extends Controller {
     )
   }
 
+  /**
+   * Build a keyboard command legend for the given controller.
+   *
+   * @param controller The controller to generate the legend for
+   *
+   * @returns The rendered legend, split into categories
+   */
   buildKeyLegend(controller: Controller) {
     const legend = generateKeystrokeLegend(controller, {
       keySymbols: KEY_SYMBOLS,
@@ -69,34 +79,42 @@ export class FooterController extends Controller {
       },
     })
 
-    const joinCategory = (cat: Record<string, LegendEntry>) => {
-      return Object.values(cat)
-        .map((e) => [e.symbol, '=', e.description].join(' '))
-        .join(' • ')
-    }
+    const maxWidth = Number(this.width()) - 2
 
-    return Object.entries(legend.categories).reduce(
-      (result, [name, entries]) => {
-        result[name] = joinCategory(entries)
-        return result
+    return renderLegendCategories(legend, {
+      categoryConstraints: {
+        nav: {
+          maxWidth: (cats) =>
+            maxWidth / 2 - (cats.focused?.rendered?.length ?? 0) / 2 - 3,
+        },
+        app: {
+          maxWidth: (cats) =>
+            maxWidth / 2 - (cats.focused?.rendered?.length ?? 0) / 2 - 3,
+        },
       },
-      {
-        default: '',
-        app: '',
-        focused: '',
-        nav: '',
-      } as Record<string, string>
-    )
+      spacing: 3,
+      mapping: ' = ',
+      separator: ' • ',
+      maxWidth,
+      cullingStrategy: 'priority',
+    })
   }
 
+  /**
+   * Re-generate and re-display the keyboard legend, treating `controller`
+   * as the focused context.
+   *
+   * @param controller The controller to generate the legend for
+   */
   applyContext(controller: Controller) {
     const legend = this.buildKeyLegend(controller)
+
     this.components.appLegend.setText(legend.app)
     this.components.navLegend.setText(legend.nav)
     this.components.focusedLegend.setText(legend.focused)
     this.components.focusedLegend.set(
       'left',
-      `50%-${Math.round(legend.focused.length / 2)}`
+      `50%-${Math.round((legend.focused?.length ?? 0) / 2)}`
     )
   }
 }
