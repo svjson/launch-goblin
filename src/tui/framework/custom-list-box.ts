@@ -86,6 +86,26 @@ export class CustomListBox<
     this.emptyLabel = emptyLabel
   }
 
+  /**
+   * Select the previous item relative to the currently selected item.
+   *
+   * If the list is focused, the newly selected item will also be focused.
+   */
+  selectPrev() {
+    this.prevChild({ focus: this.isFocused({ down: true }) })
+    this.itemFocused()
+  }
+
+  /**
+   * Select the next item relative to the currently selected item.
+   *
+   * If the list is focused, the newly selected item will also be focused.
+   */
+  selectNext() {
+    this.nextChild({ focus: this.isFocused({ down: true }) })
+    this.itemFocused()
+  }
+
   itemFocused() {
     this.flushSelection()
     this.receive({

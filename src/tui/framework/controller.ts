@@ -141,6 +141,27 @@ type InferComponents<T extends Record<string, any>> = {
 }
 
 /**
+ * Options for selecting a child controller/widget, ie via
+ * nextChild/prevChild.
+ *
+ * @property focus - whether to focus the selected child (default: true)
+ */
+interface SelectChildOptions {
+  focus?: boolean
+}
+
+/**
+ * Options for querying controller state.
+ *
+ * @property up - whether to consider "up" state (default: false)
+ * @property down - whether to consider "down" state (default: false)
+ */
+interface ControllerQueryOptions {
+  up?: boolean
+  down?: boolean
+}
+
+/**
  * Base class for all controllers.
  *
  * @param T The type of the blessed widget managed by this controller.
@@ -398,11 +419,19 @@ export abstract class Controller<
     return false
   }
 
+  /**
+   * Get the widget adapter managed by this controller.
+   *
+   * @return The widget adapter
+   */
   getWidget() {
     return this.widget
   }
 
-  #nextChild(dir: number): Controller | undefined {
+  #nextChild(
+    dir: number,
+    opts: SelectChildOptions = { focus: true }
+  ): Controller | undefined {
     dir = typeof dir !== 'number' ? 1 : dir
     this.focusedIndex =
       (this.focusedIndex + dir + this.children.length) % this.children.length
@@ -410,22 +439,38 @@ export abstract class Controller<
     const child = this.children[this.focusedIndex]
     if (!child || !child.isFocusable()) {
       if (this.children.some((c) => c.isFocusable())) {
-        return this.#nextChild(dir)
+        return this.#nextChild(dir, opts)
       }
       return
     }
 
-    child.focus()
+    if (opts.focus !== false) {
+      child.focus()
+    }
     this.emit('dirty')
     return child
   }
 
-  nextChild(): Controller | undefined {
-    return this.#nextChild(1)
+  /**
+   * Select the next child controller/widget.
+   *
+   * @param opts Options for selecting the child
+   *
+   * @return The selected child controller, or undefined if no child could
+   */
+  nextChild(opts?: SelectChildOptions): Controller | undefined {
+    return this.#nextChild(1, opts)
   }
 
-  prevChild(): Controller | undefined {
-    return this.#nextChild(-1)
+  /**
+   * Select the previous child controller/widget.
+   *
+   * @param opts Options for selecting the child
+   *
+   * @return The selected child controller, or undefined if no child could
+   */
+  prevChild(opts?: SelectChildOptions): Controller | undefined {
+    return this.#nextChild(-1, opts)
   }
 
   destroy() {
@@ -578,8 +623,25 @@ export abstract class Controller<
     }
   }
 
-  isFocused(): boolean {
-    return this.widget.isFocused()
+  /**
+   * Determine whether this controller or its hierarchy is currently
+   * focused.
+   *
+   * @param opts Options for querying focus state
+   *
+   * @return True if focused, false otherwise
+   */
+  isFocused(opts: ControllerQueryOptions = {}): boolean {
+    const thisFocused = this.widget.isFocused()
+    if ((!opts.down && !opts.up) || thisFocused) return thisFocused
+
+    if (opts.down) {
+      for (const child of this.children) {
+        if (child.isFocused({ down: true })) return true
+      }
+    }
+
+    return false
   }
 
   setFocusable(focusable: boolean) {

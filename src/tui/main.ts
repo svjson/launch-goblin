@@ -46,6 +46,18 @@ export class MainController extends ApplicationController<ApplicationState> {
       legend: 'Prev Section',
       handler: this.prevChild,
     },
+    'S-up': {
+      propagate: true,
+      category: 'nav',
+      legend: 'Prev Config',
+      handler: this.prevConfig,
+    },
+    'S-down': {
+      propagate: true,
+      category: 'nav',
+      legend: 'Next Config',
+      handler: this.nextConfig,
+    },
   })
 
   /**
@@ -134,6 +146,20 @@ export class MainController extends ApplicationController<ApplicationState> {
    */
   launch() {
     this.dispatch({ type: 'launch' })
+  }
+
+  /**
+   * Focus the previous configuration in the ConfigSection.
+   */
+  prevConfig() {
+    this.components.configSection.selectPrev()
+  }
+
+  /**
+   * Focus the next configuration in the ConfigSection.
+   */
+  nextConfig() {
+    this.components.configSection.selectNext()
   }
 
   /**
