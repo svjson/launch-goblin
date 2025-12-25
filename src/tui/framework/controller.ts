@@ -5,7 +5,8 @@ import {
   StringEvent,
   ScopedEventMap,
 } from './event'
-import { keyHandler, KeyLegend, KeyMap } from './keymap'
+import { keyHandler, KeyMap } from './keymap'
+import type { KeyLegend } from './legend'
 import { createStore, Store } from './store'
 import { ControllerLayout, LayoutProperty } from './layout'
 import { Backend } from './backend'

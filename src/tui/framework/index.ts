@@ -34,6 +34,7 @@ export type {
   NoArgEvent,
   TextChangedEvent,
 } from './event'
-export type { KeyMap, KeyMapping, KeyIdentifier, LegendEntry } from './keymap'
+export type { LegendEntry } from './legend'
+export type { KeyMap, KeyMapping, KeyIdentifier } from './keymap'
 export type { ModalDialogModel } from './modal'
 export type { Widget } from './widget'

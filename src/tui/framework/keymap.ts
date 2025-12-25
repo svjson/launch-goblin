@@ -1,4 +1,4 @@
-import { mergeLeft } from '@whimbrel/walk'
+import { KeyLegend } from './legend'
 import { Controller } from './controller'
 
 /**
@@ -17,38 +17,6 @@ export type KeyMapping = {
   propagate?: boolean
   handler: Function
 } & KeyLegend
-
-export interface KeyLegend {
-  legend?: string
-  /**
-   * Defines the `category` of this mapped keystroke. When a KeystrokeLegend
-   * is computed, KeyMappings of the same category will be grouped together.
-   */
-  category?: string
-  /**
-   * Defines a `group` for this mapped keystroke. When a KeystrokeLegend
-   * is computed, KeyMappings belonging to the same group will be merged into
-   * a single entry, ie, if mappings for keys `up` and `down` both specify
-   * 'Navigation' as their group, they will appear as 'up/down = Navigate'
-   */
-  group?: string
-  /**
-   * The handler function that will be invoked when the mapped keystroke is
-   * performed.
-   */
-}
-
-export interface LegendGroup {
-  symbol: string
-  description: string
-}
-
-export interface LegendKey {
-  symbol: string
-  description: string
-}
-
-export type LegendEntry = LegendGroup | LegendKey
 
 /**
  * Resolves the handler function for the keypress described by `ch` and `key`
@@ -98,85 +66,4 @@ export const getEffectiveKeyMap = (controller: Controller) => {
   }
 
   return keyMap
-}
-
-export interface KeystrokeLegend {
-  categories: Record<string, Record<string, LegendEntry>>
-}
-
-export interface KeystrokeLegendOptions {
-  initial?: KeystrokeLegend
-  categories?: string[]
-  keySymbols?: Record<string, string>
-}
-
-/**
- * Generate a KeystrokeLegend for `controller`, collecting all active
- * keymappings of the component and its parents.
- *
- * An initial KeystrokeLegend can be provided, including global level defaults
- * or mappings otherwise not readable from the component hierarchy.
- *
- * The legend is divided into categories according to the individual
- * KeyMappings of the effective KeyMap. KeyMappings that do not specify a
- * category will be collected in the `default` category.
- *
- * Categories can be limited to a specific set if `options.categories` is
- * provided. Any KeyMapping specifying a category not present in the
- * `options.categories` will then be grouped into `default`.
- *
- * A map of key symbol substitutions can be provided in `keySymbols`, in which
- * case any matching key will appear in the result as the substitute string.
- * This can, for example, be used to replace `up` and `down` with arrow icons.
- *
- * @param controller The controller to generate the legend for
- * @param opts Options for legend generation
- * @return The generated KeystrokeLegend
- */
-export const generateKeystrokeLegend = (
-  controller: Controller,
-  opts: KeystrokeLegendOptions = { keySymbols: {} }
-) => {
-  const { initial, categories, keySymbols = {} } = opts
-
-  const result: KeystrokeLegend = initial
-    ? mergeLeft({}, initial)
-    : { categories: {} }
-
-  const keyMap = getEffectiveKeyMap(controller)
-
-  for (const [key, mapping] of Object.entries(keyMap)) {
-    const {
-      legend,
-      group,
-      category = 'default',
-    } = typeof mapping === 'function' ? {} : mapping
-
-    if (!legend) continue
-
-    const effectiveCategory = categories
-      ? categories.includes(category)
-        ? category
-        : 'default'
-      : category
-
-    const legendCategory: Record<string, LegendEntry> = (result.categories[
-      effectiveCategory
-    ] ??= {})
-
-    if (group) {
-      const gr = (legendCategory[group] ??= {
-        symbol: '',
-        description: group,
-      })
-      gr.symbol += keySymbols[key] ?? key
-    } else {
-      legendCategory[key] = {
-        symbol: keySymbols[key] ?? key,
-        description: legend,
-      }
-    }
-  }
-
-  return result
 }

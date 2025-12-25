@@ -1,5 +1,5 @@
 import { Controller, CtrlCtorParams, Label, LegendEntry } from './framework'
-import { generateKeystrokeLegend } from './framework/keymap'
+import { generateKeystrokeLegend } from './framework/legend'
 
 /**
  * Replacement dictionary for the keyboard command legend.
