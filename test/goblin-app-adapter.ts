@@ -1,7 +1,7 @@
 import { LaunchGoblinApp } from '@src/tui'
 import { componentSectionAdapter } from './tui/component-section-adapter'
 import { ComponentSection } from '@src/tui/component-section'
-import { HeadlessBackend } from '@src/tui/framework'
+import { HeadlessBackend, Widget } from '@src/tui/framework'
 import { configSectionAdapter } from './tui/config-section-adapter'
 import { ConfigSection } from '@src/tui/config-section'
 import { saveConfigDialogAdapter } from './tui/save-config-dialog-adapter'
@@ -12,6 +12,8 @@ export const goblinAppAdapter = (
   backend: HeadlessBackend
 ) => {
   return {
+    applicationEvents: [] as string[],
+
     componentSection() {
       return componentSectionAdapter(
         app.mainCtrl.children[1] as ComponentSection,
@@ -29,6 +31,14 @@ export const goblinAppAdapter = (
         throw new Error('Save Config Dialog not present')
 
       return saveConfigDialogAdapter(app.modals[0] as SaveConfigDialog, backend)
+    },
+
+    async keyPress(key: string) {
+      return backend.performKeyPress(key)
+    },
+
+    getFocusedWidget(): Widget | undefined {
+      return backend.getFocusedWidget()
     },
   }
 }

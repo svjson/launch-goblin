@@ -1,15 +1,43 @@
 import { describe, expect, it } from 'vitest'
-import { HeadlessBackend } from '@src/tui/framework'
 import { runGoblinApp } from 'test/fixtures'
 
 describe('LaunchGoblinApp', () => {
-  it('should start with component section focused', async () => {
-    const { env } = await runGoblinApp({ projectId: 'dummy-project' })
+  describe('Initial state', () => {
+    it('should start with component section focused', async () => {
+      const { adapter } = await runGoblinApp({
+        projectId: 'dummy-project',
+      })
 
-    const backend = env.backend as HeadlessBackend
+      await adapter.keyPress('tab')
 
-    await backend.performKeyPress('tab')
+      expect(adapter.getFocusedWidget()).toBeDefined()
+    })
+  })
 
-    expect(backend.getFocusedWidget()).toBeDefined()
+  describe('Global keys', () => {
+    it.each([
+      ['ComponentSection', { tabStop: 0 }],
+      ['ConfigSection', { tabStop: 2 }],
+      ['Button', { tabStop: 1 }],
+    ])(
+      'should trigger launch on C-l when %s is focused',
+      async (_origin: string, opts: { tabStop: number }) => {
+        // Given
+        const { adapter } = await runGoblinApp({
+          projectId: 'dummy-project',
+        })
+        // ...focused component according to case
+        for (let i = 0; i < opts.tabStop; i++) {
+          await adapter.keyPress('tab')
+        }
+        expect(adapter.applicationEvents).toEqual([])
+
+        // When
+        await adapter.keyPress('C-l')
+
+        // Then
+        expect(adapter.applicationEvents).toEqual(['launch'])
+      }
+    )
   })
 })

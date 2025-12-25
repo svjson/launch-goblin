@@ -28,6 +28,12 @@ export class MainController extends ApplicationController<ApplicationState> {
       category: 'app',
       handler: this.openSaveConfigDialog,
     },
+    'C-l': {
+      propagate: true,
+      category: 'nav',
+      legend: 'Launch',
+      handler: this.launch,
+    },
     tab: {
       propagate: true,
       category: 'nav',
@@ -48,9 +54,7 @@ export class MainController extends ApplicationController<ApplicationState> {
   events = this.defineEvents({
     focus: this.updateFooter,
     launchButton: {
-      pressed: () => {
-        this.dispatch({ type: 'launch' })
-      },
+      pressed: this.launch,
     },
   })
 
@@ -121,6 +125,15 @@ export class MainController extends ApplicationController<ApplicationState> {
    */
   updateFooter(event: FocusEvent) {
     this.components.footer.applyContext(event.source)
+  }
+
+  /**
+   * Trigger the launch of the currently selected session.
+   *
+   * This will dispatch a 'launch' action to the controlling layer.
+   */
+  launch() {
+    this.dispatch({ type: 'launch' })
   }
 
   /**

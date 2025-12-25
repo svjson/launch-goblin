@@ -471,19 +471,28 @@ export const runGoblinApp = async ({
     async () => noBackend()
   )
 
+  let applicationEvents: string[] = []
+
   const concreteFacade: ActionFacade = {
-    launch: async () => {},
-    saveConfig: async (_state, _type) => {},
+    launch: async () => {
+      applicationEvents.push('launch')
+    },
+    saveConfig: async (_state, _type) => {
+      applicationEvents.push('saveConfig')
+    },
     ...facade,
   }
 
   const app = new LaunchGoblinApp(env, state, concreteFacade)
 
   env.backend.render()
+
+  const adapter = goblinAppAdapter(app, env.backend as HeadlessBackend)
+  applicationEvents = adapter.applicationEvents
   return {
     env,
     app,
-    adapter: goblinAppAdapter(app, env.backend as HeadlessBackend),
+    adapter,
     state,
     backend: env.backend as HeadlessBackend,
   }
