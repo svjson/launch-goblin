@@ -1,6 +1,6 @@
 import { Launcher } from '@src/launch'
 import { identifyPnpmLaunchOptions, pnpmLauncher } from '@src/launch/pnpm'
-import { NodePackage, ProjectComponent } from '@src/project'
+import { makeDefaultFilter, NodePackage, ProjectComponent } from '@src/project'
 import { makeLGOptions } from '@src/tui'
 import { makeAppState } from 'test/fixtures'
 import { applicationEnvironment } from 'test/tui/framework/fixtures'
@@ -147,10 +147,13 @@ describe('identifyPnpmLaunchOptions', () => {
     // When
     const [launcher] = await identifyPnpmLaunchOptions(
       state.project,
-      'dev',
       makeLGOptions({
         verbose: false,
-        autoLaunch: false,
+        launch: {
+          autoLaunch: false,
+          defaultTarget: 'dev',
+          targetFilter: makeDefaultFilter('dev'),
+        },
       })
     )
 

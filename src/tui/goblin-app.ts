@@ -1,6 +1,6 @@
 import { mergeLeft } from '@whimbrel/walk'
 
-import { ApplicationState } from '@src/project'
+import { ApplicationState, TargetFilter } from '@src/project'
 import { MainController } from './main'
 import {
   Action,
@@ -9,6 +9,7 @@ import {
   ColorMode,
 } from './framework'
 import { ConfigType, toLaunchConfigComponents } from '@src/config'
+import { makeDefaultFilter } from '@src/project/target'
 
 export type TuiTargetOptionType = 'checkbox' | 'option-bar'
 
@@ -28,15 +29,28 @@ export interface LGOptions {
   colorMode?: ColorMode
 
   /**
-   * Instructs the application to bypass the Launch Goblin TUI and
-   * immediately launch a named configuration or the last launched
-   * configuration.
-   *
-   * true - launch the most recently launched configuration immediately
-   * false - run the Launch Goblin TUI normally
-   * string - launch a named configuration immediately
+   * Launcher options
    */
-  autoLaunch: boolean | string
+  launch: {
+    /**
+     * Instructs the application to bypass the Launch Goblin TUI and
+     * immediately launch a named configuration or the last launched
+     * configuration.
+     *
+     * true - launch the most recently launched configuration immediately
+     * false - run the Launch Goblin TUI normally
+     * string - launch a named configuration immediately
+     */
+    autoLaunch?: boolean | string
+    /**
+     * The default/primary launch target
+     */
+    defaultTarget: string
+    /**
+     * Filters launchable ProjectComponents and targets
+     */
+    targetFilter: TargetFilter
+  }
 
   /**
    * TUI Options
@@ -56,10 +70,16 @@ export interface LGOptions {
  * overridden the values of `params`.
  */
 export const makeLGOptions = (params: Partial<LGOptions> = {}) => {
+  const defaultTarget = params.launch?.defaultTarget ?? 'dev'
+
   return mergeLeft(
     {
       verbose: false,
-      autoLaunch: false,
+      launch: {
+        autoLaunch: false,
+        defaultTarget,
+        targetFilter: makeDefaultFilter(defaultTarget),
+      },
       tui: {
         targetOption: 'checkbox',
       },

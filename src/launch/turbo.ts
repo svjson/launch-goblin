@@ -48,10 +48,11 @@ export const turboLauncher = (
 
 export const identifyTurboLaunchOptions = async (
   project: Project,
-  launchAction: string,
   options: LGOptions
 ): Promise<Launcher[]> => {
   if (options.verbose) console.log('Evaluating turborepo...')
+
+  const launchAction = options.launch.defaultTarget
 
   if (project.hasRootFacet('turborepo')) {
     if (options.verbose) console.log(' - turborepo is present')

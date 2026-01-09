@@ -10,12 +10,11 @@ export interface ProjectModule {
   /**
    * Read and analyze the project on disk at cwd.
    *
-   * @param launchAction The action/target to be launched.
    * @param options The command-line options provided by the user.
    *
    * @return The project model containing launchable components.
    */
-  readProject: (launchAction: string, options: LGOptions) => Promise<Project>
+  readProject: (options: LGOptions) => Promise<Project>
 }
 
 /**
@@ -29,7 +28,7 @@ export const makeProjectFacade = (
   systemModule: SystemModule,
   analyzeFunction: (dir: string) => Promise<ProjectParams>
 ): ProjectModule => ({
-  async readProject(launchAction, options) {
-    return readProject(systemModule, analyzeFunction, launchAction, options)
+  async readProject(options) {
+    return readProject(systemModule, analyzeFunction, options)
   },
 })

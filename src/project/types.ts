@@ -28,6 +28,8 @@ export interface Package {
   root: string
 }
 
+export type ComponentType = 'pkgjson-script' | 'docker-compose'
+
 /**
  * NodeJS package component type
  */

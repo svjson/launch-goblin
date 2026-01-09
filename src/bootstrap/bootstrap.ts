@@ -18,7 +18,6 @@ import { makeProcessTracker } from '@src/launch/process-tracker'
  * inspecting the project context and launch options.
  */
 export const bootstrap = async (
-  targetAction: string,
   options: LGOptions,
   systemModule: SystemModule,
   configModule: ConfigurationModule,
@@ -32,10 +31,7 @@ export const bootstrap = async (
   /**
    * Read and analyze the project on disk at cwd.
    */
-  const project: Project = await projectModule.readProject(
-    targetAction,
-    options
-  )
+  const project: Project = await projectModule.readProject(options)
 
   /**
    * If project/folder analysis yielded no viable launch strategies,
@@ -43,7 +39,7 @@ export const bootstrap = async (
    */
   if (project.launchers.length === 0) {
     throw new BootstrapError(
-      `No launch strategy available for target action '${targetAction}'`
+      `No launch strategy available for target action ${options.launch.targetFilter.describe()}`
     )
   }
 

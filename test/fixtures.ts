@@ -463,7 +463,6 @@ export const runGoblinApp = async ({
   )
 
   const { env, model: state } = await bootstrap(
-    'dev',
     makeLGOptions(),
     systemModule,
     configModule,

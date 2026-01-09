@@ -72,15 +72,9 @@ export const makeProject = (params: ProjectParams): Project => {
 export const readProject = async (
   systemModule: SystemModule,
   analyze: (dir: string) => Promise<ProjectParams>,
-  launchAction: string,
   options: LGOptions
 ): Promise<Project> => {
   const project = makeProject(await analyze(process.cwd()))
-  project.launchers = await identifyLaunchers(
-    systemModule,
-    project,
-    launchAction,
-    options
-  )
+  project.launchers = await identifyLaunchers(systemModule, project, options)
   return project
 }

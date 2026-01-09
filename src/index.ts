@@ -4,25 +4,25 @@ import { Command } from 'commander'
 import { LGOptions, makeLGOptions } from './tui/goblin-app'
 import { bootstrap, inspectEnvironment } from './bootstrap'
 import { BootstrapError } from './bootstrap/error'
+import { makeDefaultFilter, makePassThroughFilter } from './project'
 
 /**
  * Launches the application with the command-line options contained in
  * `options`.
  *
- * If `options.autoLaunch` is true, the application will immediately launch
- * the last used configuration, bypassing the TUI.
+ * If `options.launch.autoLaunch` is true, the application will immediately
+ * launch the last used configuration, bypassing the TUI.
  *
- * If `options.autoLaunch` is false, the TUI will be presented to the user
- * to select a configuration to launch.
+ * If `options.launch.autoLaunch` is false, the TUI will be presented to the
+ * user to select/shape a configuration to launch.
  *
  * @param options The command-line options
  */
 const main = async (options: LGOptions): Promise<void> => {
   try {
-    const targetAction = 'dev'
-    const { env, model, facade } = await bootstrap(targetAction, options)
+    const { env, model, facade } = await bootstrap(options)
 
-    if (options.autoLaunch) {
+    if (options.launch.autoLaunch) {
       await facade.launch()
     } else {
       const app = new LaunchGoblinApp(env, model, facade)
@@ -63,7 +63,11 @@ program
 program.action(async (opts: LGOptions) => {
   await main({
     ...opts,
-    autoLaunch: false,
+    launch: {
+      autoLaunch: false,
+      defaultTarget: 'dev',
+      targetFilter: makeDefaultFilter('dev'),
+    },
   })
 })
 
@@ -90,7 +94,11 @@ program
     await main(
       makeLGOptions({
         verbose: false,
-        autoLaunch: true,
+        launch: {
+          autoLaunch: true,
+          defaultTarget: 'dev',
+          targetFilter: makePassThroughFilter(),
+        },
       })
     )
   })

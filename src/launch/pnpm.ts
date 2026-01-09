@@ -55,24 +55,19 @@ export const pnpmLauncher = (
 
 export const identifyPnpmLaunchOptions = async (
   project: Project,
-  launchAction: string,
   options: LGOptions
 ): Promise<Launcher[]> => {
   if (options.verbose) console.log('Evaluating pnpm...')
   if (project.packageManager() === 'pnpm') {
     if (options.verbose) console.log(' - Is package manager for project')
-    const targetComponents: NodePackage[] = project.components
-      .filter((c) => c.type === 'pkgjson-script')
-      .filter((c) => c.targets.includes(launchAction))
-      .map((c) => ({
-        ...c,
-        targets: c.targets.filter(
-          (t) => t === launchAction && t.startsWith(`${launchAction}:`)
-        ),
-      }))
+    const targetComponents: NodePackage[] =
+      options.launch.targetFilter.targetComponents(
+        project.components.filter((c) => c.type === 'pkgjson-script')
+      )
+
     if (targetComponents.length) {
       return [
-        pnpmLauncher(project, launchAction, targetComponents),
+        pnpmLauncher(project, options.launch.defaultTarget, targetComponents),
       ] as Launcher[]
     }
     if (options.verbose) console.log(' x No packages provide target action')

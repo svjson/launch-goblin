@@ -9,12 +9,11 @@ import { SystemModule } from '@src/system'
 export const identifyLaunchers = async (
   systemModule: SystemModule,
   project: Project,
-  launchAction: string,
   options: LGOptions
 ): Promise<Launcher[]> => {
   const launchers: Launcher[] = [
-    ...(await identifyTurboLaunchOptions(project, launchAction, options)),
-    ...(await identifyPnpmLaunchOptions(project, launchAction, options)),
+    ...(await identifyTurboLaunchOptions(project, options)),
+    ...(await identifyPnpmLaunchOptions(project, options)),
     ...(await identifyDockerComposeLaunchOptions(systemModule, project)),
   ]
 

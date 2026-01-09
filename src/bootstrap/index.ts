@@ -21,21 +21,20 @@ import { spawnDetachedProcess, spawnProxiedProcess } from '@src/launch/launch'
 export { inspectEnvironment } from '@src/tui/framework'
 
 /**
- * Bootstrap the application using run-time collaborators.
+ * Bootstrap the application using the provided command-line options.
  *
  * This wires up the various modules, in some makeshift DI manner and
  * calls the internal bootsrapping function to use them to analyze the
  * project, read stored configs and initialize the TUI backend.
  *
- * @param targetAction - The target action to perform (ie, package.json
- *                       script name)
+ * @param defaultAction - The target action to perform (ie, package.json
+ *                        script name)
  * @param options - The command-line options provided by the user
  *
  * @return An object containing the application environment, state
  *         model, and action facade
  */
 export const bootstrap = async (
-  targetAction: string,
   options: LGOptions
 ): Promise<{
   env: ApplicationEnvironment
@@ -54,13 +53,12 @@ export const bootstrap = async (
   const projectModule = makeProjectFacade(systemModule, analyze)
 
   return bootstrapInternal(
-    targetAction,
     options,
     systemModule,
     configModule,
     projectModule,
     async () =>
-      options.autoLaunch
+      options.launch.autoLaunch
         ? noBackend()
         : BlessedBackend.create(await inspectEnvironment())
   )
