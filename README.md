@@ -89,35 +89,17 @@ or inform the project setup, and this will be enabled as the project matures.
 
 ## Version History
 
-### 0.1.4 - Grouped key legends + Docker Compose fix - 2025-11-19
+See [CHANGELOG.md](./CHANGELOG.md)
 
-- Fixed issue when docker compose failed to launch due to references to missing services in configs
+### Latest Release: [0.1.4] - 2025-11-19
+Grouped key legends + Docker Compose fix
+
+#### Added
 - Grouped footer keyboard legend into categories
 
-### 0.1.3 - Docker Compose + Transient Configs - 2025-10-03
+#### Fixed
+- Fixed issue when docker compose failed to launch due to references to missing services in configs
 
-- Support for launching docker-compose.yaml services
-- Show target/package script name per component when relevant
-- Select target/package script per component for capable launchers
-- Show last launched configuration as "Last Launch" config option if not saved
-- Show transient launch session as "New Config" config option 
-
-### 0.1.2 - Stability - 2025-09-23
-
-- Fixed crash when attempting to delete a launch configuration.
-- Fixed crash when deleting the last launch configuration kept focus on destroyed UI component
-
-### 0.1.1 - Windows support & Color Theme adjustment - 2025-09-20
-
-- Proper/better resolution of executables
-- Support for launching child process on Windows
-- Query terminal environment for capabilities and adjustment of color theme / launch strategy
-- Added `env` and `last` commands
-
-### 0.1.0 - Initial Release - 2025-09-14
-
-- Basic Project Discovery and launching capabilities for NodeJS projects
-- Basic component selection and create/launch/delete launch configurations
 
 ## Roadmap
 
