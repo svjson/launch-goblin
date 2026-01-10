@@ -39,7 +39,7 @@ export class OptionBar<
   })
 
   events = this.defineEvents({
-    focus: this.itemFocused,
+    focus: this.updateSelection,
   })
 
   focusable = true
@@ -90,6 +90,12 @@ export class OptionBar<
     return this.model[this.focusedIndex].id
   }
 
+  setSelectedItemId(itemId?: string) {
+    const index = this.model.findIndex((i) => i.id === itemId)
+    if (index === -1) return
+    this.focusedIndex = index
+  }
+
   toggle() {
     if (this.widget.widgetOptions.selectionMode === 'multi') {
       this.model[this.focusedIndex].selected =
@@ -97,7 +103,7 @@ export class OptionBar<
     }
   }
 
-  itemFocused() {
+  updateSelection() {
     if (this.widget.widgetOptions.selectionMode === 'single') {
       this.model.forEach((item, i) => {
         item.selected = this.focusedIndex === i
