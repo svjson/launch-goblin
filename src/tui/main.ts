@@ -37,26 +37,30 @@ export class MainController extends ApplicationController<ApplicationState> {
     tab: {
       propagate: true,
       category: 'nav',
+      group: 'Next/Prev Section',
       legend: 'Next Section',
       handler: this.nextChild,
     },
     'S-tab': {
       propagate: true,
       category: 'nav',
+      group: 'Next/Prev Section',
       legend: 'Prev Section',
       handler: this.prevChild,
-    },
-    'S-up': {
-      propagate: true,
-      category: 'nav',
-      legend: 'Prev Config',
-      handler: this.prevConfig,
     },
     'S-down': {
       propagate: true,
       category: 'nav',
+      group: 'Next/Prev Config',
       legend: 'Next Config',
       handler: this.nextConfig,
+    },
+    'S-up': {
+      propagate: true,
+      category: 'nav',
+      group: 'Next/Prev Config',
+      legend: 'Prev Config',
+      handler: this.prevConfig,
     },
   })
 

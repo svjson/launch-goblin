@@ -4,15 +4,16 @@
 
 ### Added
 - A CLI arg can now be passed to center launch around a different target than 'dev'
+- **npm**-launcher.
 - Keyboard shortcut: `C-l` - launch immediately
 - Keyboard shortcut: `S-↑` / `S-↓` - Cycle through configurations regardless of focused component
-- Trim footer legend to fit terminal width using priority-based culling of keyboard shortcut entries
-- **npm**-launcher.
 - Substitute modifier-prefixed key symbols when generating key legend
 
 ### Changed
 - CLI arg for repeating last launch has been changed to `--repeat` / `-r`
-- CLI arg for outputting terminal capabilities has been changed to `--term-info` / `-i`.
+- CLI arg for outputting terminal capabilities has been changed to `--term-info` / `-i`
+- Trim footer legend to fit terminal width using priority-based culling of keyboard shortcut entries
+- Grouped Next/Prev Section and Next/Prev Section to preserve space and reduce clutter in footer
 
 ---
 

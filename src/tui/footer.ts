@@ -1,6 +1,7 @@
 import { Controller, CtrlCtorParams, Label } from './framework'
 import {
   generateKeystrokeLegend,
+  legendKey,
   renderLegendCategories,
 } from './framework/legend'
 
@@ -70,6 +71,9 @@ export class FooterController extends Controller {
     const legend = generateKeystrokeLegend(controller, {
       keySymbols: KEY_SYMBOLS,
       categories: ['app', 'focused', 'nav'],
+      grouping: {
+        separator: '/',
+      },
       initial: {
         categories: {
           app: {
