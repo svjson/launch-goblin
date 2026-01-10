@@ -6,7 +6,8 @@
 - A CLI arg can now be passed to center launch around a different target than 'dev'
 - Keyboard shortcut: `C-l` - launch immediately
 - Keyboard shortcut: `S-↑` / `S-↓` - Cycle through configurations regardless of focused component
-- Priority-based culling of keyboard shortcut legend in footer
+- Trim footer legend to fit terminal width using priority-based culling of keyboard shortcut entries
+- **npm**-launcher.
 
 ### Changed
 - CLI arg for repeating last launch has been changed to `--repeat` / `-r`

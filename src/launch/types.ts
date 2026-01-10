@@ -2,7 +2,7 @@ import { ProjectComponent } from '@src/project'
 import { SessionComponent } from '@src/project/state'
 import { ApplicationEnvironment } from '@src/tui/framework'
 
-export type LauncherId = 'turbo' | 'pnpm' | 'docker-compose'
+export type LauncherId = 'turbo' | 'npm' | 'pnpm' | 'docker-compose'
 
 export type MakeLaunchCommand<C extends ProjectComponent = ProjectComponent> = (
   env: ApplicationEnvironment,

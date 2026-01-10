@@ -30,6 +30,7 @@ import { bootstrap } from '@src/bootstrap/bootstrap'
 
 import { goblinAppAdapter, GoblinAppAdapter } from './goblin-app-adapter'
 import { TestSystemModule } from './process-fixtures'
+import { Launcher } from '@src/launch'
 
 export const defer = <T>() => {
   let resolve!: (value: T | PromiseLike<T>) => void
@@ -41,7 +42,10 @@ export const defer = <T>() => {
   return { promise, resolve, reject }
 }
 
-export type TestProjectId = 'dummy-project' | 'dummy-with-docker-compose'
+export type TestProjectId =
+  | 'dummy-project'
+  | 'dummy-with-docker-compose'
+  | 'npm-dummy-with-docker-compose'
 
 export interface TestProject {
   project: ProjectParams
@@ -109,6 +113,31 @@ const TEST_SAVED_CONFIGS: Record<
     ],
     'No Docker': ['frontdesk-service', 'frontdesk-app'],
   },
+  'npm-dummy-with-docker-compose': {
+    'Full Dev Environment': [
+      'frontdesk-service',
+      'frontdesk-app',
+      {
+        name: 'docker-compose.yaml',
+        targets: ['sql', 'kibana', 'elasticsearch'],
+      },
+    ],
+    'Backend with SQL': [
+      'frontdesk-service',
+      {
+        name: 'docker-compose.yaml',
+        targets: ['sql'],
+      },
+    ],
+    'Frontend with Kibana/ElasticSearch': [
+      'frontdesk-app',
+      {
+        name: 'docker-compose.yaml',
+        targets: ['kibana', 'elasticsearch'],
+      },
+    ],
+    'No Docker': ['frontdesk-service', 'frontdesk-app'],
+  },
 }
 
 const whimbrelCtx = (...whimFacets: string[]): WhimbrelContext => {
@@ -134,6 +163,118 @@ const whimbrelCtx = (...whimFacets: string[]): WhimbrelContext => {
   } as WhimbrelContext
 }
 
+const dummyNodeLauncher = (pkgManager: string, cmpIds: string[]): Launcher => {
+  if (pkgManager === 'pnpm') {
+    return {
+      id: 'pnpm',
+      defaultTargets: ['dev'],
+      features: {
+        componentTargets: 'multi',
+        launcherTargets: 'single',
+      },
+      components: cmpIds,
+      launchCommand: (_env, _components) => ({
+        groups: [
+          {
+            mode: 'parallel',
+            processes: [
+              {
+                bin: 'pnpm',
+                args: [],
+              },
+            ],
+          },
+        ],
+      }),
+    }
+  } else if (pkgManager === 'npm') {
+    return {
+      id: 'npm',
+      defaultTargets: ['dev'],
+      features: {
+        componentTargets: 'multi',
+        launcherTargets: 'single',
+      },
+      components: cmpIds,
+      launchCommand: (_env, _components) => ({
+        groups: [
+          {
+            mode: 'parallel',
+            processes: [
+              {
+                bin: 'npm',
+                args: [],
+              },
+            ],
+          },
+        ],
+      }),
+    }
+  }
+
+  throw new Error()
+}
+
+const dummyProjectWithDockerCompose = (pkgManager: string): ProjectParams => {
+  return {
+    id: 'dummy-with-docker-compose',
+    root: '/tmp/somewhere',
+    ctx: whimbrelCtx(pkgManager),
+    launchers: [
+      dummyNodeLauncher(pkgManager, ['frontdesk-service', 'frontdesk-app']),
+      {
+        id: 'docker-compose',
+        defaultTargets: ['sql', 'kibana', 'elasticsearch'],
+        features: {
+          componentTargets: 'multi',
+          launcherTargets: 'multi',
+        },
+        components: ['docker-compose.yaml'],
+        launchCommand: (_env, _components) => ({
+          groups: [
+            {
+              mode: 'sequential',
+              processes: [
+                {
+                  bin: 'docker',
+                  args: [],
+                },
+              ],
+            },
+          ],
+        }),
+      } satisfies Launcher,
+    ],
+    components: [
+      {
+        id: 'frontdesk-service',
+        type: 'pkgjson-script',
+        name: 'frontdesk-service',
+        package: '@omnistay/frontdesk-service',
+        root: '/tmp/somewhere/packages/frontdesk-service',
+        pkgJson: new PackageJSON({ content: {} }),
+        targets: ['dev', 'dev:local', 'test', 'typecheck'],
+      } satisfies NodePackage,
+      {
+        id: 'frontdesk-app',
+        type: 'pkgjson-script',
+        name: 'frontend',
+        package: '@omnistay/frontdesk-app',
+        root: '/tmp/somewhere/packages/frontend',
+        pkgJson: new PackageJSON({ content: '{}' }),
+        targets: ['dev', 'test', 'typecheck'],
+      } satisfies NodePackage,
+      {
+        id: 'docker-compose.yaml',
+        type: 'docker-compose',
+        name: 'docker-compose.yaml',
+        path: '/tmp/somewhere',
+        targets: ['sql', 'kibana', 'elasticsearch'],
+      } satisfies DockerComposeFile,
+    ],
+  }
+}
+
 const TEST_PROJECTS: Record<TestProjectId, TestProject> = {
   'dummy-project': {
     project: {
@@ -141,33 +282,12 @@ const TEST_PROJECTS: Record<TestProjectId, TestProject> = {
       root: '/tmp/somewhere',
       ctx: whimbrelCtx('pnpm'),
       launchers: [
-        {
-          id: 'pnpm',
-          defaultTargets: ['dev'],
-          features: {
-            componentTargets: 'multi',
-            launcherTargets: 'single',
-          },
-          components: [
-            'backend-service',
-            'frontend-portal',
-            'mock-provider-a',
-            'mock-provider-b',
-          ],
-          launchCommand: (_env, _components) => ({
-            groups: [
-              {
-                mode: 'parallel',
-                processes: [
-                  {
-                    bin: 'pnpm',
-                    args: [],
-                  },
-                ],
-              },
-            ],
-          }),
-        },
+        dummyNodeLauncher('pnpm', [
+          'backend-service',
+          'frontend-portal',
+          'mock-provider-a',
+          'mock-provider-b',
+        ]),
       ],
       components: [
         {
@@ -221,84 +341,18 @@ const TEST_PROJECTS: Record<TestProjectId, TestProject> = {
   },
 
   'dummy-with-docker-compose': {
-    project: {
-      id: 'dummy-with-docker-compose',
-      root: '/tmp/somewhere',
-      ctx: whimbrelCtx('pnpm'),
-      launchers: [
-        {
-          id: 'pnpm',
-          defaultTargets: ['dev'],
-          features: {
-            componentTargets: 'multi',
-            launcherTargets: 'single',
-          },
-          components: ['frontdesk-service', 'frontdesk-app'],
-          launchCommand: (_env, _components) => ({
-            groups: [
-              {
-                mode: 'parallel',
-                processes: [
-                  {
-                    bin: 'pnpm',
-                    args: [],
-                  },
-                ],
-              },
-            ],
-          }),
-        },
-        {
-          id: 'docker-compose',
-          defaultTargets: ['sql', 'kibana', 'elasticsearch'],
-          features: {
-            componentTargets: 'multi',
-            launcherTargets: 'multi',
-          },
-          components: ['docker-compose.yaml'],
-          launchCommand: (_env, _components) => ({
-            groups: [
-              {
-                mode: 'sequential',
-                processes: [
-                  {
-                    bin: 'docker',
-                    args: [],
-                  },
-                ],
-              },
-            ],
-          }),
-        },
-      ],
-      components: [
-        {
-          id: 'frontdesk-service',
-          type: 'pkgjson-script',
-          name: 'frontdesk-service',
-          package: '@omnistay/frontdesk-service',
-          root: '/tmp/somewhere/packages/frontdesk-service',
-          pkgJson: new PackageJSON({ content: {} }),
-          targets: ['dev', 'dev:local', 'test', 'typecheck'],
-        } satisfies NodePackage,
-        {
-          id: 'frontdesk-app',
-          type: 'pkgjson-script',
-          name: 'frontend',
-          package: '@omnistay/frontdesk-app',
-          root: '/tmp/somewhere/packages/frontend',
-          pkgJson: new PackageJSON({ content: '{}' }),
-          targets: ['dev', 'test', 'typecheck'],
-        } satisfies NodePackage,
-        {
-          id: 'docker-compose.yaml',
-          type: 'docker-compose',
-          name: 'docker-compose.yaml',
-          path: '/tmp/somewhere',
-          targets: ['sql', 'kibana', 'elasticsearch'],
-        } satisfies DockerComposeFile,
-      ],
+    project: dummyProjectWithDockerCompose('pnpm'),
+    configs: {
+      shared: {
+        launchConfigs: {},
+      },
+      private: {
+        launchConfigs: {},
+      },
     },
+  },
+  'npm-dummy-with-docker-compose': {
+    project: dummyProjectWithDockerCompose('npm'),
     configs: {
       shared: {
         launchConfigs: {},

@@ -1,18 +1,18 @@
-import { describe, expect, it } from 'vitest'
 import { Launcher } from '@src/launch'
-import { identifyPnpmLaunchOptions, pnpmLauncher } from '@src/launch/pnpm'
+import { identifyNpmLaunchOptions, npmLauncher } from '@src/launch/npm'
 import { makeDefaultFilter, NodePackage, ProjectComponent } from '@src/project'
 import { makeLGOptions } from '@src/tui'
 import { makeAppState } from 'test/fixtures'
 import { applicationEnvironment } from 'test/tui/framework/fixtures'
+import { describe, expect, it } from 'vitest'
 
-describe('pnpmLauncher', () => {
-  it('should construct a pnpm launcher', () => {
+describe('npmLauncher', () => {
+  it('should construct an npm launcher', () => {
     // Given
     const state = makeAppState('dummy-project')
 
     // When
-    const launcher = pnpmLauncher(
+    const launcher = npmLauncher(
       state.project,
       'dev',
       state.project.components as NodePackage[]
@@ -20,7 +20,7 @@ describe('pnpmLauncher', () => {
 
     // Then
     expect(launcher).toEqual({
-      id: 'pnpm',
+      id: 'npm',
       defaultTargets: ['dev'],
       components: [
         'backend-service',
@@ -29,7 +29,7 @@ describe('pnpmLauncher', () => {
         'mock-provider-b',
       ],
       features: {
-        componentTargets: 'multi',
+        componentTargets: 'single',
         launcherTargets: 'single',
       },
       launchCommand: expect.any(Function),
@@ -37,11 +37,11 @@ describe('pnpmLauncher', () => {
   })
 
   describe('launchCommand', () => {
-    it('should construct a pnpm command with all selected project components', () => {
+    it('should construct an npm command with all selected project components', () => {
       // Given
       const env = applicationEnvironment()
       const state = makeAppState('dummy-project')
-      const launcher = pnpmLauncher(
+      const launcher = npmLauncher(
         state.project,
         'dev',
         state.project.components as NodePackage[]
@@ -57,77 +57,42 @@ describe('pnpmLauncher', () => {
             mode: 'parallel',
             processes: [
               {
-                bin: 'pnpm',
+                bin: 'npm',
                 args: [
-                  '-r',
-                  '--parallel',
-                  '--stream',
-                  '--filter',
-                  '@acme-platform/backend-service',
-                  '--filter',
-                  '@acme-platform/frontend-portal',
-                  '--filter',
-                  '@acme-platform/mock-provider-a',
-                  '--filter',
-                  '@acme-platform/mock-provider-b',
                   'run',
                   'dev',
-                ],
-                critical: false,
-              },
-            ],
-          },
-        ],
-      })
-    })
-
-    it('should construct a pnpm command with two process when one component uses a different target', () => {
-      // Given
-      const env = applicationEnvironment()
-      const state = makeAppState('dummy-project')
-      const launcher = pnpmLauncher(
-        state.project,
-        'dev',
-        state.project.components as NodePackage[]
-      ) as Launcher<ProjectComponent>
-      state.session.components[0].state.targets = ['dev:local']
-
-      // When
-      const command = launcher.launchCommand(env, state.session.components)
-
-      // Then
-      expect(command).toEqual({
-        groups: [
-          {
-            mode: 'parallel',
-            processes: [
-              {
-                bin: 'pnpm',
-                args: [
-                  '-r',
-                  '--parallel',
-                  '--stream',
-                  '--filter',
+                  '--workspace',
                   '@acme-platform/backend-service',
-                  'run',
-                  'dev:local',
                 ],
                 critical: false,
               },
               {
-                bin: 'pnpm',
+                bin: 'npm',
                 args: [
-                  '-r',
-                  '--parallel',
-                  '--stream',
-                  '--filter',
-                  '@acme-platform/frontend-portal',
-                  '--filter',
-                  '@acme-platform/mock-provider-a',
-                  '--filter',
-                  '@acme-platform/mock-provider-b',
                   'run',
                   'dev',
+                  '--workspace',
+                  '@acme-platform/frontend-portal',
+                ],
+                critical: false,
+              },
+              {
+                bin: 'npm',
+                args: [
+                  'run',
+                  'dev',
+                  '--workspace',
+                  '@acme-platform/mock-provider-a',
+                ],
+                critical: false,
+              },
+              {
+                bin: 'npm',
+                args: [
+                  'run',
+                  'dev',
+                  '--workspace',
+                  '@acme-platform/mock-provider-b',
                 ],
                 critical: false,
               },
@@ -139,13 +104,13 @@ describe('pnpmLauncher', () => {
   })
 })
 
-describe('identifyPnpmLaunchOptions', () => {
+describe('identifyNpmLaunchOptions', () => {
   it('should not list docker-compose component as one of its launchable components', async () => {
     // Given
-    const state = makeAppState('dummy-with-docker-compose')
+    const state = makeAppState('npm-dummy-with-docker-compose')
 
     // When
-    const [launcher] = await identifyPnpmLaunchOptions(
+    const [launcher] = await identifyNpmLaunchOptions(
       state.project,
       makeLGOptions({
         verbose: false,
@@ -159,11 +124,11 @@ describe('identifyPnpmLaunchOptions', () => {
 
     // Then
     expect(launcher).toEqual({
-      id: 'pnpm',
+      id: 'npm',
       defaultTargets: ['dev'],
       components: ['frontdesk-service', 'frontdesk-app'],
       features: {
-        componentTargets: 'multi',
+        componentTargets: 'single',
         launcherTargets: 'single',
       },
       launchCommand: expect.any(Function),
