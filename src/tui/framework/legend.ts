@@ -28,6 +28,11 @@ export interface KeyLegend {
  */
 export interface LegendGroup {
   /**
+   * Discriminator
+   */
+  type: 'group'
+
+  /**
    * The combined symbols of the grouped keys, ie, `up/down`
    * for the Arrow Up and Arrow Down keys.
    */
@@ -37,6 +42,11 @@ export interface LegendGroup {
    * The description of the grouped keys, ie, `Navigate`
    */
   description: string
+
+  /**
+   * The individual key legend entries that make up this group.
+   */
+  keys: LegendKey[]
 
   /**
    * The priority of the group when culling entries to fit
@@ -53,13 +63,20 @@ export interface LegendGroup {
  */
 export interface LegendKey {
   /**
+   * Discriminator
+   */
+  type: 'key'
+
+  /**
    * The symbol of the key, ie, `C-c`
    */
   symbol: string
+
   /**
    * The description of the key, ie, `Quit`
    */
   description: string
+
   /**
    * The priority of the key when culling entries to fit
    * within a maximum width. Lower priority values indicate
@@ -94,6 +111,13 @@ export interface KeystrokeLegend {
   categories: Record<string, Record<string, LegendEntry>>
 }
 
+export interface LegendGroupOptions {
+  /**
+   * The separator string to use between grouped keystroke symbols.
+   */
+  separator?: string
+}
+
 /**
  * Options for generating a KeystrokeLegend.
  */
@@ -111,6 +135,11 @@ export interface KeystrokeLegendOptions {
    * A list of categories to include in the generated legend.
    */
   categories?: string[]
+
+  /**
+   * Keystroke grouping options
+   */
+  grouping?: LegendGroupOptions
 
   /**
    * A map of key symbols to use in the legend.
@@ -217,19 +246,23 @@ export interface LegendRenderOptions {
    * The max width of the rendered legend string
    */
   maxWidth?: number
+
   /**
    * The separator string between legend entries (default: ' | ')
    */
   separator?: string
+
   /**
    * The mapping string between symbol and description (default: ' = ')
    */
   mapping?: string
+
   /**
    * Spacing between categories, expressed either as a separator string
    * or number of spaces. (default: 3/'   ')
    */
   spacing?: string | number
+
   /**
    * Specifies the strategy to use for culling entries from the rendered
    * result in order to fit within a provided max width
@@ -258,6 +291,66 @@ export const substituteKeySymbols = (
   const parts = parseKeyIdentifier(keyExpr)
 
   return [...(parts.mod ?? []), keySymbols?.[parts.key] ?? parts.key].join('-')
+}
+
+/**
+ * Utility factory-function for creating a LegendKey instance
+ *
+ * @param symbol The symbol of the key
+ * @param description The description of the key
+ * @param priority (Optional) The priority of the key when culling entries
+ *
+ * @return The created LegendKey instance
+ */
+export const legendKey = (
+  symbol: string,
+  description: string,
+  priority?: number
+): LegendKey => {
+  return {
+    type: 'key',
+    symbol,
+    description,
+    ...(priority === undefined ? {} : { priority }),
+  }
+}
+
+/**
+ * Utility factory-function for creating a LegendGroup instance
+ *
+ * @param description The description of the group
+ * @param keys The keys that make up the group
+ * @param symbol (Optional) The combined symbol of the group
+ *
+ * @return The created LegendGroup instance
+ */
+export const legendGroup = ({
+  description,
+  keys,
+  symbol,
+}: Partial<LegendGroup>) => {
+  return {
+    type: 'group',
+    symbol: symbol ?? '',
+    keys: keys ?? [],
+    description: description ?? '',
+  } satisfies LegendGroup
+}
+
+/**
+ * Add a LegendKey entry to a LegendGroup, updating the group's
+ * symbol accordingly.
+ *
+ * @param group The LegendGroup to add the entry to
+ * @param entry The LegendKey entry to add
+ */
+export const addToGroup = (
+  group: LegendGroup,
+  entry: LegendKey,
+  opts?: LegendGroupOptions
+) => {
+  group.keys.push(entry)
+  group.symbol = group.keys.map((k) => k.symbol).join(opts?.separator ?? '')
 }
 
 /**
@@ -314,17 +407,16 @@ export const generateKeystrokeLegend = (
       effectiveCategory
     ] ??= {})
 
+    const keyEntry = legendKey(substituteKeySymbols(key, keySymbols), legend)
+
     if (group) {
-      const gr = (legendCategory[group] ??= {
-        symbol: '',
-        description: group,
-      })
-      gr.symbol += substituteKeySymbols(key, keySymbols)
-    } else {
-      legendCategory[key] = {
-        symbol: substituteKeySymbols(key, keySymbols),
-        description: legend,
+      const gr = (legendCategory[group] ??= legendGroup({ description: group }))
+
+      if (gr.type === 'group') {
+        addToGroup(gr, keyEntry, opts.grouping)
       }
+    } else {
+      legendCategory[key] = keyEntry
     }
   }
 

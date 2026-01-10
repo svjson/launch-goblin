@@ -3,6 +3,8 @@ import {
   entriesByPriority,
   generateKeystrokeLegend,
   KeystrokeLegend,
+  legendGroup,
+  legendKey,
   RenderedCategories,
   renderLegendCategories,
 } from '@src/tui/framework/legend'
@@ -31,8 +33,8 @@ describe('generateKeystrokeLegend', () => {
     expect(legend).toEqual({
       categories: {
         default: {
-          up: { symbol: 'up', description: 'Move Up' },
-          down: { symbol: 'down', description: 'Move Down' },
+          up: legendKey('up', 'Move Up'),
+          down: legendKey('down', 'Move Down'),
         },
       },
     })
@@ -57,8 +59,8 @@ describe('generateKeystrokeLegend', () => {
           },
         },
         expectedLegendEntries: {
-          up: { symbol: '↑', description: 'Move Up' },
-          down: { symbol: '↓', description: 'Move Down' },
+          up: legendKey('↑', 'Move Up'),
+          down: legendKey('↓', 'Move Down'),
         },
       },
     ],
@@ -80,8 +82,8 @@ describe('generateKeystrokeLegend', () => {
           },
         },
         expectedLegendEntries: {
-          'S-up': { symbol: 'S-↑', description: 'Move Up' },
-          'M-down': { symbol: 'M-↓', description: 'Move Down' },
+          'S-up': legendKey('S-↑', 'Move Up'),
+          'M-down': legendKey('M-↓', 'Move Down'),
         },
       },
     ],
@@ -125,7 +127,7 @@ describe('generateKeystrokeLegend', () => {
       initial: {
         categories: {
           app: {
-            'C-c': { symbol: 'C-c', description: 'Quit' },
+            'C-c': legendKey('C-c', 'Quit'),
           },
         },
       },
@@ -139,65 +141,123 @@ describe('generateKeystrokeLegend', () => {
     expect(legend).toEqual({
       categories: {
         app: {
-          'C-c': { symbol: 'C-c', description: 'Quit' },
+          'C-c': legendKey('C-c', 'Quit'),
         },
         default: {
-          up: { symbol: 'arrow up', description: 'Move Up' },
-          down: { symbol: 'arrow down', description: 'Move Down' },
+          up: legendKey('arrow up', 'Move Up'),
+          down: legendKey('arrow down', 'Move Down'),
         },
       },
     })
   })
 
-  it('should merge mappings belonging to the same group', () => {
-    // Given
-    const component = {
-      keyMap: {
-        tab: {
-          legend: 'Next Section',
-          handler: () => null,
-        },
-        up: {
-          legend: 'Move Up',
-          group: 'Navigate',
-          handler: () => null,
-        },
-        down: {
-          legend: 'Move Down',
-          group: 'Navigate',
-          handler: () => null,
-        },
-      },
-    } as unknown as Controller
-
-    // When
-    const legend = generateKeystrokeLegend(component, {
-      initial: {
-        categories: {
-          app: {
-            'C-c': { symbol: 'C-c', description: 'Quit' },
+  it.each([
+    [
+      'up+down => ↑↓',
+      {
+        keyMapEntries: {
+          up: {
+            legend: 'Move Up',
+            group: 'Navigate',
+            handler: () => null,
+          },
+          down: {
+            legend: 'Move Down',
+            group: 'Navigate',
+            handler: () => null,
           },
         },
+        opts: {
+          keySymbols: {
+            down: '↓',
+            up: '↑',
+          },
+        },
+        expectedLegendEntries: {
+          Navigate: legendGroup({
+            symbol: '↑↓',
+            description: 'Navigate',
+            keys: [legendKey('↑', 'Move Up'), legendKey('↓', 'Move Down')],
+          }),
+        },
       },
-      keySymbols: {
-        down: '↓',
-        up: '↑',
+    ],
+    [
+      'S-up+S-down => S-↑/S-↓',
+      {
+        keyMapEntries: {
+          'S-up': {
+            legend: 'Shift Up',
+            group: 'Navigate',
+            handler: () => null,
+          },
+          'S-down': {
+            legend: 'Shift Down',
+            group: 'Navigate',
+            handler: () => null,
+          },
+        },
+        opts: {
+          grouping: {
+            separator: '/',
+          },
+          keySymbols: {
+            down: '↓',
+            up: '↑',
+          },
+        },
+        expectedLegendEntries: {
+          Navigate: legendGroup({
+            symbol: 'S-↑/S-↓',
+            description: 'Navigate',
+            keys: [
+              legendKey('S-↑', 'Shift Up'),
+              legendKey('S-↓', 'Shift Down'),
+            ],
+          }),
+        },
       },
-    })
+    ],
+  ])(
+    'should merge mappings belonging to the same group - %s',
+    (_, { keyMapEntries, opts, expectedLegendEntries }) => {
+      // Given
+      const component = {
+        keyMap: {
+          tab: {
+            legend: 'Next Section',
+            handler: () => null,
+          },
+          ...keyMapEntries,
+        },
+      } as unknown as Controller
 
-    // Then
-    expect(legend).toEqual({
-      categories: {
-        app: {
-          'C-c': { symbol: 'C-c', description: 'Quit' },
+      // When
+      const legend = generateKeystrokeLegend(component, {
+        initial: {
+          categories: {
+            app: {
+              'C-c': legendKey('C-c', 'Quit'),
+            },
+          },
         },
-        default: {
-          tab: { symbol: 'tab', description: 'Next Section' },
-          Navigate: { symbol: '↑↓', description: 'Navigate' },
+        ...opts,
+      })
+
+      // Then
+      expect(legend).toEqual({
+        categories: {
+          app: {
+            'C-c': legendKey('C-c', 'Quit'),
+          },
+          default: {
+            tab: legendKey('tab', 'Next Section'),
+            ...expectedLegendEntries,
+          },
         },
-      },
-    })
-  })
+      })
+    }
+  )
 
   it('should generate a KeystrokeLegend by extending a supplied initial legend', () => {
     // Given
@@ -219,7 +279,7 @@ describe('generateKeystrokeLegend', () => {
       initial: {
         categories: {
           app: {
-            'C-c': { symbol: 'C-c', description: 'Quit' },
+            'C-c': legendKey('C-c', 'Quit'),
           },
         },
       },
@@ -233,11 +293,11 @@ describe('generateKeystrokeLegend', () => {
     expect(legend).toEqual({
       categories: {
         app: {
-          'C-c': { symbol: 'C-c', description: 'Quit' },
+          'C-c': legendKey('C-c', 'Quit'),
         },
         default: {
-          up: { symbol: 'arrow up', description: 'Move Up' },
-          down: { symbol: 'arrow down', description: 'Move Down' },
+          up: legendKey('arrow up', 'Move Up'),
+          down: legendKey('arrow down', 'Move Down'),
         },
       },
     })
@@ -290,12 +350,16 @@ describe('generateKeystrokeLegend', () => {
     expect(legend).toEqual({
       categories: {
         focused: {
-          enter: { symbol: 'enter', description: 'Toggle' },
+          enter: legendKey('enter', 'Toggle'),
         },
         default: {
-          tab: { symbol: 'tab', description: 'Next Section' },
-          'S-tab': { symbol: 'S-tab', description: 'Prev Section' },
-          Navigate: { symbol: '↑↓', description: 'Navigate' },
+          tab: legendKey('tab', 'Next Section'),
+          'S-tab': legendKey('S-tab', 'Prev Section'),
+          Navigate: legendGroup({
+            symbol: '↑↓',
+            description: 'Navigate',
+            keys: [legendKey('↑', 'Move Up'), legendKey('↓', 'Move Down')],
+          }),
         },
       },
     })
@@ -353,50 +417,20 @@ describe('renderLegendCategories', () => {
     categories: {
       // Default rendered length: 41
       Navigate: {
-        up: {
-          symbol: 'up',
-          description: 'Move Up',
-          priority: 3,
-        },
-        down: {
-          symbol: 'down',
-          description: 'Move Down',
-        },
-        left: {
-          symbol: 'left',
-          description: 'Move Left',
-          priority: 3,
-        },
-        right: {
-          symbol: 'right',
-          description: 'Move Right',
-        },
+        up: legendKey('up', 'Move Up', 3),
+        down: legendKey('down', 'Move Down'),
+        left: legendKey('left', 'Move Left', 3),
+        right: legendKey('right', 'Move Right'),
       },
       // Default rendered length: 39
       focused: {
-        enter: {
-          symbol: 'enter',
-          description: 'Toggle',
-          priority: 1,
-        },
-        delete: {
-          symbol: 'delete',
-          description: 'Discard Entry',
-          priority: 1,
-        },
+        enter: legendKey('enter', 'Toggle', 1),
+        delete: legendKey('delete', 'Discard Entry', 1),
       },
       // Default rendered length: 71
       global: {
-        tab: {
-          symbol: 'tab',
-          description: 'Next Section',
-          priority: 2,
-        },
-        'S-tab': {
-          symbol: 'S-tab',
-          description: 'Prev Section',
-          priority: 5,
-        },
+        tab: legendKey('tab', 'Next Section', 2),
+        'S-tab': legendKey('S-tab', 'Prev Section', 5),
       },
     },
   }

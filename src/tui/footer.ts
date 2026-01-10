@@ -73,7 +73,7 @@ export class FooterController extends Controller {
       initial: {
         categories: {
           app: {
-            q: { symbol: 'q', description: 'Quit' },
+            q: legendKey('q', 'Quit'),
           },
         },
       },
