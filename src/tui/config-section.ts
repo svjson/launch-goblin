@@ -52,6 +52,8 @@ export interface ConfigListItem extends ListItem {
   type: 'private' | 'shared' | 'recent' | 'unsaved'
 }
 
+const CONFIG_SECTION_TITLE = ' Configurations '
+
 /**
  * TUI Component containing project local(shared) and user(private)
  * configurations in a list box.
@@ -88,7 +90,7 @@ export class ConfigSection extends CustomListBox<
             width: 40,
             height: 14,
             border: {
-              label: ' Configurations ',
+              label: CONFIG_SECTION_TITLE,
             },
           },
           options
@@ -194,6 +196,19 @@ export class ConfigSection extends CustomListBox<
     this.populateModel()
     this.refreshItems()
     this.adjustHeight()
+    this.adjustWidth()
+  }
+
+  adjustWidth() {
+    this.width(
+      Math.max(
+        40,
+        Math.max(
+          CONFIG_SECTION_TITLE.length,
+          ...this.model.map((c) => c.label.length)
+        ) + 13
+      )
+    )
   }
 
   adjustHeight() {

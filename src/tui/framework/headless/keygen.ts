@@ -1,6 +1,6 @@
 import { KeyEvent } from '../event'
 import { KeyPress, KeyMeta } from '../input'
-import { MOD_REGEX, parseKeyIdentifier } from '../keymap'
+import { MOD_REGEX } from '../keymap'
 
 const CHAR_0 = 48
 const CHAR_UCASE_A = 65

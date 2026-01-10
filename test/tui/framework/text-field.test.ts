@@ -1,4 +1,4 @@
-import { describe, expect, it, test } from 'vitest'
+import { describe, expect, test } from 'vitest'
 import { applicationEnvironment } from './fixtures'
 import { createStore, HeadlessBackend, TextInput } from '@src/tui/framework'
 import { TextInputModel } from '@src/tui/framework/text-field'

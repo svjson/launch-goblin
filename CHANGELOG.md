@@ -16,6 +16,9 @@
 - Trim footer legend to fit terminal width using priority-based culling of keyboard shortcut entries
 - Grouped Next/Prev Section and Next/Prev Section to preserve space and reduce clutter in footer
 
+### Fixes
+- Dynamic width of config section, making sure type labels do not cut off long config names
+
 ---
 
 
