@@ -10,6 +10,7 @@ import {
 } from './framework'
 import { ConfigType, toLaunchConfigComponents } from '@src/config'
 import { makeDefaultFilter } from '@src/project/target'
+import { unique } from '@whimbrel/array'
 
 export type TuiTargetOptionType = 'checkbox' | 'option-bar'
 
@@ -108,8 +109,9 @@ export class LaunchGoblinApp extends Application<
   MainController
 > {
   actions = this.defineActions({
-    'create-config': this.performCreateConfig,
-    'delete-config': this.deleteConfig,
+    'create-config': this.performCreateConfigAction,
+    'delete-config': this.performDeleteConfigAction,
+    'update-config': this.performUpdateConfigAction,
     launch: this.launch,
   })
 
@@ -125,7 +127,7 @@ export class LaunchGoblinApp extends Application<
     await this.facade.launch()
   }
 
-  async performCreateConfig(createAction: Action): Promise<void> {
+  async performCreateConfigAction(createAction: Action): Promise<void> {
     this.store.set(
       [
         'config',
@@ -142,9 +144,24 @@ export class LaunchGoblinApp extends Application<
     await this.facade.saveConfig(this.model, createAction.details.type)
   }
 
-  async deleteConfig(deleteAction: Action): Promise<void> {
+  async performDeleteConfigAction(deleteAction: Action): Promise<void> {
     const { configId, configType } = deleteAction.details
     this.store.delete(['config', configType, 'launchConfigs', configId])
     await this.facade.saveConfig(this.model, configType)
+  }
+
+  async performUpdateConfigAction(updateAction: Action): Promise<void> {
+    const { type, name, original } = updateAction.details
+
+    this.store.relocate(
+      ['config', original.type, 'launchConfigs', original.name],
+      ['config', type, 'launchConfigs', name]
+    )
+
+    await Promise.all(
+      unique([type, original.type]).map((t) =>
+        this.facade.saveConfig(this.model, t)
+      )
+    )
   }
 }

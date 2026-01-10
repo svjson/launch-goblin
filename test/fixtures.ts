@@ -524,14 +524,14 @@ export const runGoblinApp = async ({
     async () => noBackend()
   )
 
-  let applicationEvents: string[] = []
+  let applicationEvents: (string | string[])[] = []
 
   const concreteFacade: ActionFacade = {
     launch: async () => {
       applicationEvents.push('launch')
     },
-    saveConfig: async (_state, _type) => {
-      applicationEvents.push('saveConfig')
+    saveConfig: async (_state, type) => {
+      applicationEvents.push(['saveConfig', type])
     },
     ...facade,
   }

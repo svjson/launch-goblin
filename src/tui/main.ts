@@ -10,7 +10,7 @@ import {
 import { ComponentSection } from './component-section'
 import { FooterController } from './footer'
 import { HeaderController } from './header'
-import { SaveConfigDialog } from './save-config-dialog'
+import { SaveConfigDialog } from './config-dialog'
 import { ConfigSection } from './config-section'
 import { LaunchSession } from '@src/project/state'
 

@@ -1,6 +1,6 @@
 import { mergeLeft } from '@whimbrel/walk'
 
-import { CtrlCtorParams, Label, Store } from './framework'
+import { Backend, CtrlCtorParams, Label, Store } from './framework'
 import { ApplicationState } from '@src/project'
 import {
   launchConfigByContent,
@@ -21,6 +21,7 @@ import { LabelItem } from './framework/label'
 import { ComponentEnvironment } from './framework/controller'
 import { LaunchSession } from '@src/project/state'
 import { toLaunchConfig } from '@src/config/apply'
+import { EditConfigDialog } from './config-dialog'
 
 export const LAST_LAUNCH_LABEL = '< Last Launch >'
 export const LAST_LAUNCH_ID = '__!last_launch'
@@ -39,6 +40,10 @@ const transformEntries = (
   Object.entries(launchConfigs).map(([name, _cfg]) => {
     return { id: name, label: name, type, selected: false }
   })
+
+const isTransientConfig = (config: ConfigListItem) => {
+  return config.type === 'recent' || config.type === 'unsaved'
+}
 
 /**
  * Specialization of the ListItem model, adding configuration type
@@ -63,6 +68,7 @@ export class ConfigSection extends CustomListBox<
 > {
   events = this.defineEvents({
     selected: this.configSelected,
+    edit: this.editConfig,
     delete: this.confirmDelete,
   })
 
@@ -229,6 +235,28 @@ export class ConfigSection extends CustomListBox<
     }
   }
 
+  editConfig() {
+    const item = this.getSelectedItem()
+    if (!item || isTransientConfig(item)) return
+    this.dispatch({
+      type: 'open-modal',
+      details: {
+        source: this,
+        create: <M, SM>(_: { backend: Backend; model: M; store: Store<SM> }) =>
+          new EditConfigDialog({
+            env: this.env,
+            store: this.store,
+            model: {
+              config: {
+                name: item.id,
+                type: item.type as ConfigType,
+              },
+            },
+          }),
+      },
+    })
+  }
+
   confirmDelete() {
     this.dispatch({
       type: 'open-modal',
@@ -270,9 +298,16 @@ class ConfigItemBox extends CustomListBoxItem<ConfigListItem, ConfigListItem> {
   focusable = true
 
   keyMap = this.defineKeys(
-    this.isTransientConfig()
+    isTransientConfig(this.model)
       ? {}
       : {
+          enter: {
+            propagate: true,
+            legend: 'Edit Configuration',
+            category: 'focused',
+            handler: () =>
+              this.emit({ type: 'custom', name: 'edit', source: this }),
+          },
           delete: {
             legend: 'Delete Config',
             propagate: true,
@@ -289,8 +324,8 @@ class ConfigItemBox extends CustomListBoxItem<ConfigListItem, ConfigListItem> {
       model: { text: this.model.label },
       style: {
         left: 1,
-        textAlign: this.isTransientConfig() ? 'center' : 'left',
-        ...(this.isTransientConfig() ? { width: '100%-2' } : {}),
+        textAlign: isTransientConfig(this.model) ? 'center' : 'left',
+        ...(isTransientConfig(this.model) ? { width: '100%-2' } : {}),
         ':focused': {
           color: 'black',
         },
@@ -304,15 +339,11 @@ class ConfigItemBox extends CustomListBoxItem<ConfigListItem, ConfigListItem> {
       },
       style: {
         right: 1,
-        hidden: this.isTransientConfig(),
+        hidden: isTransientConfig(this.model),
         color: this.model.type === 'private' ? 208 : 'green',
       },
     },
   })
-
-  isTransientConfig() {
-    return this.model.type === 'recent' || this.model.type === 'unsaved'
-  }
 
   constructor({
     widget: { env, options },

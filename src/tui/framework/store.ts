@@ -1,3 +1,4 @@
+import { includesEqual } from '@whimbrel/array'
 import { deletePath, PropertyPath, readPath, writePath } from '@whimbrel/walk'
 import equal from 'fast-deep-equal'
 
@@ -40,6 +41,7 @@ export interface Store<_Model> {
   get<T>(propertyPath: PropertyPath): T
   set<T>(propertyPath: PropertyPath, value: T): void
   delete(propertyPath: PropertyPath): void
+  relocate(from: PropertyPath, to: PropertyPath): void
   subscribe<T>(
     propertyPath: PropertyPath,
     subscriber: SubscriberFunction<T>
@@ -61,6 +63,13 @@ export const createStore = <Model>(state: Model): Store<Model> => {
     delete(propertyPath: PropertyPath) {
       deletePath(state, propertyPath)
       publish(subscribers, propertyPath, null)
+    },
+    relocate(from: PropertyPath, to: PropertyPath) {
+      this.set(to, this.get(from))
+      const ffrom = [from].flat()
+      const fto = [to].flat()
+      if (fto.length !== ffrom.length || !fto.every((v, i) => v === ffrom[i]))
+        this.delete(from)
     },
     subscribe<T>(propertyPath: PropertyPath, handler: SubscriberFunction<T>) {
       subscribers.push({

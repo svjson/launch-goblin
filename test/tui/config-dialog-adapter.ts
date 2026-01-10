@@ -1,17 +1,33 @@
 import { HeadlessBackend, TextField } from '@src/tui/framework'
-import { SaveConfigDialog } from '@src/tui/save-config-dialog'
+import { ConfigDialog } from '@src/tui/config-dialog'
+import { AdapterBase, makeAdapterBase } from './adapter-base'
 
-export const saveConfigDialogAdapter = (
-  dialog: SaveConfigDialog,
+export const configDialogAdapter = <D extends ConfigDialog>(
+  dialog: D,
   backend: HeadlessBackend
 ) => {
-  return {
+  const adapter = {
+    ...makeAdapterBase(backend, dialog),
+
     getTextField() {
       return dialog.children[0] as TextField
     },
 
     getTextFieldContent(): string {
       return this.getTextField().model.value
+    },
+
+    tabToOptionBar() {
+      const initial = backend.getFocusedWidget()!
+
+      let current = backend.getFocusedWidget()
+      while (current?.type !== 'label') {
+        backend.performKeyPress('tab')
+        current = backend.getFocusedWidget()!
+        if (current === initial) {
+          throw new Error('Could not find option bar')
+        }
+      }
     },
 
     tabToButton(buttonLabel: string) {
@@ -27,4 +43,6 @@ export const saveConfigDialogAdapter = (
       }
     },
   }
+
+  return adapter satisfies AdapterBase
 }

@@ -5,6 +5,7 @@ import {
 import { Controller, HeadlessBackend, Widget } from '@src/tui/framework'
 import { keyPressEvent } from '@src/tui/framework/headless/keygen'
 import { CheckboxWidget } from '@src/tui/framework/widget'
+import { AdapterBase, makeAdapterBase } from './adapter-base'
 
 export const componentSectionAdapter = (
   section: ComponentSection,
@@ -18,7 +19,8 @@ export const componentSectionAdapter = (
   }
 
   const adapter = {
-    section,
+    ...makeAdapterBase(backend, section),
+
     hasFocus() {
       return section.getWidget().contains(backend.getFocusedWidget()!)
     },
@@ -65,7 +67,7 @@ export const componentSectionAdapter = (
     },
   }
 
-  return adapter
+  return adapter satisfies AdapterBase
 }
 
 export type ComponentSectionAdapter = ReturnType<typeof componentSectionAdapter>

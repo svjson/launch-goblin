@@ -42,6 +42,16 @@ export const KeyGen: Record<string, KeyPress> = {
       full: 'down',
     },
   },
+  backspace: {
+    key: {
+      sequence: '\x7F',
+      name: 'backspace',
+      ctrl: false,
+      meta: false,
+      shift: false,
+      full: 'backspace',
+    },
+  },
   enter: {
     ch: '\r',
     key: {
