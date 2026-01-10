@@ -11,7 +11,7 @@
 [![Node](https://img.shields.io/node/v/launch-goblin)](https://www.npmjs.com/package/launch-goblin)
 
 Launch Goblin is a TUI (text-based user interface) tool for developers working in monorepos or other multi-service environments.  
-Instead of juggling `turbo run` and `pnpm dev` with endless `--filter` sequences, shell scripts, or custom launchers, you get a single interface where you can:
+Instead of juggling `turbo run` and `npm`/`pnpm` with endless `--filter` or `--workspace` sequences, shell scripts, or custom launchers, you get a single interface where you can:
 
 - Inspect available modules
 - Select what to launch
@@ -21,10 +21,11 @@ Instead of juggling `turbo run` and `pnpm dev` with endless `--filter` sequences
 ## Features (0.1.4)
 
 - **Turborepo integration** – browse and run `turbo run` targets per module.  
-- **pnpm integration** – run `pnpm` scripts directly from the interface.  
+- **npm and pnpm integration** – run package.json scripts with `npm` or `pnpm` directly from the interface.  
 - **docker compose** - run all or a selection of services from your `docker-compose.yaml`.  
-- **Interactive TUI** – keyboard-driven, curses-style UI with focus and navigation.  
 - **Granularity** – pick specific modules or run multiple together.  
+- **shared and private configs** - Keep common launch configurations in VCS and temporary working sets in $HOME.  
+- **Interactive TUI** – keyboard-driven, curses-style UI with focus and navigation.  
 
 
 ## Installation
@@ -69,7 +70,7 @@ By default, Launch Goblin attempts to run the `dev` target/script of your projec
 | Argument         | Command                                                                                                |
 |------------------|--------------------------------------------------------------------------------------------------------|
 | (no-args)        | Open the Launch Goblin TUI                                                                             |
-| <target-name>    | Specifies the name of the default target/launch script                                                 |
+| <target-name>    | Specify the default launch/target script, and open the Launch Goblin TUI                               |
 | --r, --relaunch  | Bypasses the TUI component selection and immediately launches the most recently launched configuration |
 | --i, --term-info | Outputs the information about the terminal environment you are running in                              |
 
@@ -107,7 +108,7 @@ Grouped key legends + Docker Compose fix
 ### Short-term (0.1.x - 0.2.0)
 - Config management: 
   - ✅ Create 
-  - rename
+  - ✅ rename
   - Edit
 - ✅ Auto-keep “last launched” setup, even if not saved as config.
 - CLI mode: run configs directly without opening the TUI.
