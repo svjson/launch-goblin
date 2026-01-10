@@ -58,7 +58,7 @@ export type KeyEvent = TUIEventBase & {
 
 export type CustomTUIEvent = TUIEventBase & {
   type: 'custom'
-  name: 'delete'
+  name: string
   payload?: any
 }
 
