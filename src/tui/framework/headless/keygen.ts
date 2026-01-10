@@ -1,5 +1,6 @@
 import { KeyEvent } from '../event'
 import { KeyPress, KeyMeta } from '../input'
+import { MOD_REGEX, parseKeyIdentifier } from '../keymap'
 
 const CHAR_0 = 48
 const CHAR_UCASE_A = 65
@@ -133,8 +134,6 @@ export const KeyGen: Record<string, KeyPress> = {
       {}
     ),
 }
-
-const MOD_REGEX = /^(?<modifiers>(?:[CMS]-)+)(?<keySym>.+)$/
 
 const applyModifiers = (
   full: string,

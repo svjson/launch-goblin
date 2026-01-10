@@ -1,7 +1,7 @@
 import { mergeLeft } from '@whimbrel/walk'
 
 import { Controller } from './controller'
-import { getEffectiveKeyMap } from './keymap'
+import { getEffectiveKeyMap, parseKeyIdentifier } from './keymap'
 
 export interface KeyLegend {
   legend?: string
@@ -243,6 +243,24 @@ export interface LegendRenderOptions {
 }
 
 /**
+ * Substitute key symbols in a key expression according to the provided
+ * keySymbols map.
+ *
+ * @param keyExpr The key expression to substitute symbols in
+ * @param keySymbols The map of key symbols to use for substitution
+ *
+ * @return The key expression with substituted symbols
+ */
+export const substituteKeySymbols = (
+  keyExpr: string,
+  keySymbols: KeystrokeLegendOptions['keySymbols']
+) => {
+  const parts = parseKeyIdentifier(keyExpr)
+
+  return [...(parts.mod ?? []), keySymbols?.[parts.key] ?? parts.key].join('-')
+}
+
+/**
  * Generate a KeystrokeLegend for `controller`, collecting all active
  * keymappings of the component and its parents.
  *
@@ -301,10 +319,10 @@ export const generateKeystrokeLegend = (
         symbol: '',
         description: group,
       })
-      gr.symbol += keySymbols[key] ?? key
+      gr.symbol += substituteKeySymbols(key, keySymbols)
     } else {
       legendCategory[key] = {
-        symbol: keySymbols[key] ?? key,
+        symbol: substituteKeySymbols(key, keySymbols),
         description: legend,
       }
     }

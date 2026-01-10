@@ -38,39 +38,72 @@ describe('generateKeystrokeLegend', () => {
     })
   })
 
-  it('should generate a KeystrokeLegend using keySymbols substitutions', () => {
-    // Given
-    const component = {
-      keyMap: {
-        up: {
-          legend: 'Move Up',
-          handler: () => null,
+  it.each([
+    [
+      'up => ↑, down => ↓',
+      {
+        keySymbols: {
+          down: '↓',
+          up: '↑',
         },
-        down: {
-          legend: 'Move Down',
-          handler: () => null,
+        keyMap: {
+          up: {
+            legend: 'Move Up',
+            handler: () => null,
+          },
+          down: {
+            legend: 'Move Down',
+            handler: () => null,
+          },
         },
-      },
-    } as unknown as Controller
-
-    // When
-    const legend = generateKeystrokeLegend(component, {
-      keySymbols: {
-        down: '↓',
-        up: '↑',
-      },
-    })
-
-    // Then
-    expect(legend).toEqual({
-      categories: {
-        default: {
+        expectedLegendEntries: {
           up: { symbol: '↑', description: 'Move Up' },
           down: { symbol: '↓', description: 'Move Down' },
         },
       },
-    })
-  })
+    ],
+    [
+      'up => ↑, down => ↓ - with modifiers',
+      {
+        keySymbols: {
+          down: '↓',
+          up: '↑',
+        },
+        keyMap: {
+          'S-up': {
+            legend: 'Move Up',
+            handler: () => null,
+          },
+          'M-down': {
+            legend: 'Move Down',
+            handler: () => null,
+          },
+        },
+        expectedLegendEntries: {
+          'S-up': { symbol: 'S-↑', description: 'Move Up' },
+          'M-down': { symbol: 'M-↓', description: 'Move Down' },
+        },
+      },
+    ],
+  ])(
+    'should generate a KeystrokeLegend using keySymbols substitutions - %s',
+    (_, { keySymbols, keyMap, expectedLegendEntries }) => {
+      // Given
+      const component = {
+        keyMap,
+      } as unknown as Controller
+
+      // When
+      const legend = generateKeystrokeLegend(component, { keySymbols })
+
+      // Then
+      expect(legend).toEqual({
+        categories: {
+          default: expectedLegendEntries,
+        },
+      })
+    }
+  )
 
   it('should generate a KeystrokeLegend by extending a supplied initial legend', () => {
     // Given

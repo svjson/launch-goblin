@@ -1,5 +1,19 @@
-import { keyHandler, KeyMap } from '@src/tui/framework/keymap'
+import {
+  keyHandler,
+  KeyMap,
+  parseKeyIdentifier,
+} from '@src/tui/framework/keymap'
 import { describe, expect, it } from 'vitest'
+
+describe('parseKeyIdentifier', () => {
+  it.each([
+    ['up', { key: 'up' }],
+    ['S-up', { mod: ['S'], key: 'up' }],
+    ['C-S-return', { mod: ['C', 'S'], key: 'return' }],
+  ])('should parse "%s" into %s', (keyIdentifier, parsed) => {
+    expect(parseKeyIdentifier(keyIdentifier)).toEqual(parsed)
+  })
+})
 
 describe('keyHandler', () => {
   interface KeyHandlerTestCase {

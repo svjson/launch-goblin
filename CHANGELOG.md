@@ -8,6 +8,7 @@
 - Keyboard shortcut: `S-↑` / `S-↓` - Cycle through configurations regardless of focused component
 - Trim footer legend to fit terminal width using priority-based culling of keyboard shortcut entries
 - **npm**-launcher.
+- Substitute modifier-prefixed key symbols when generating key legend
 
 ### Changed
 - CLI arg for repeating last launch has been changed to `--repeat` / `-r`

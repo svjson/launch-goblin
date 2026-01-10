@@ -19,6 +19,41 @@ export type KeyMapping = {
 } & KeyLegend
 
 /**
+ * Regular expression for parsing key identifier expressions.
+ *
+ * Example matches:
+ * ```ts
+ * // 'C-S-return' => { modifiers: 'C-S-', keySym: 'return' }
+ * // 'M-a' => { modifiers: 'M-', keySym: 'a' }
+ * ```
+ */
+export const MOD_REGEX = /^(?<modifiers>(?:[CMS]-)+)(?<keySym>.+)$/
+
+/**
+ * Parse a key identifier expression into its modifier and key components.
+ *
+ * Example:
+ * ```ts
+ * // result is { mod: ['C', 'S'], key: 'return' }
+ * const result = parseKeyIdentifier('C-S-return')
+ * ```
+ *
+ * @param keyIdentifier The key identifier expression to parse
+ *
+ * @returns An object containing the `mod` array and `key` string
+ */
+export const parseKeyIdentifier = (keyIdentifier: string) => {
+  const match = MOD_REGEX.exec(keyIdentifier)
+  if (match?.groups) {
+    return {
+      mod: match.groups?.modifiers?.split('-').filter(Boolean),
+      key: match.groups?.keySym,
+    }
+  }
+  return { key: keyIdentifier }
+}
+
+/**
  * Resolves the handler function for the keypress described by `ch` and `key`
  * as defined in `keyMap`
  *
