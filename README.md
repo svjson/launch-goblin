@@ -66,11 +66,12 @@ By default, Launch Goblin attempts to run the `dev` target/script of your projec
 
 ### Commands / Arguments
 
-| Argument  | Command                                                                                                |
-|-----------|--------------------------------------------------------------------------------------------------------|
-| <no-args> | Open the Launch Goblin TUI                                                                             |
-| last      | Bypasses the TUI component selection and immediately launches the most recently launched configuration |
-| env       | Outputs the information about the terminal environment you are running in                              |
+| Argument         | Command                                                                                                |
+|------------------|--------------------------------------------------------------------------------------------------------|
+| (no-args)        | Open the Launch Goblin TUI                                                                             |
+| <target-name>    | Specifies the name of the default target/launch script                                                 |
+| --r, --relaunch  | Bypasses the TUI component selection and immediately launches the most recently launched configuration |
+| --i, --term-info | Outputs the information about the terminal environment you are running in                              |
 
 When running the Launch Goblin TUI, you can use `--color-mode <mode>` to force a specific color mode. 
 This is helpful if the terminal misreports its capabilities, which can otherwise cause issues like 
@@ -120,4 +121,4 @@ Grouped key legends + Docker Compose fix
 
 ## License
 
-© 2025 Sven Johansson. [MIT Licensed](./LICENSE)
+© 2025-2026 Sven Johansson. [MIT Licensed](./LICENSE)

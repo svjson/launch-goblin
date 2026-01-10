@@ -3,10 +3,14 @@
 ## [UNRELEASED]
 
 ### Added
+- A CLI arg can now be passed to center launch around a different target than 'dev'
 - Keyboard shortcut: `C-l` - launch immediately
 - Keyboard shortcut: `S-↑` / `S-↓` - Cycle through configurations regardless of focused component
 - Priority-based culling of keyboard shortcut legend in footer
 
+### Changed
+- CLI arg for repeating last launch has been changed to `--repeat` / `-r`
+- CLI arg for outputting terminal capabilities has been changed to `--term-info` / `-i`.
 
 ---
 
@@ -21,6 +25,7 @@ Grouped key legends + Docker Compose fix
 - Fixed issue when docker compose failed to launch due to references to missing services in configs
 
 ---
+
 
 ## [0.1.3] - 2025-10-03
 Docker Compose + Transient Configs

@@ -1,10 +1,8 @@
 import { LaunchGoblinApp } from './tui'
 import { LogEvent } from './tui/framework'
-import { Command } from 'commander'
-import { LGOptions, makeLGOptions } from './tui/goblin-app'
-import { bootstrap, inspectEnvironment } from './bootstrap'
-import { BootstrapError } from './bootstrap/error'
-import { makeDefaultFilter, makePassThroughFilter } from './project'
+import { LGOptions } from './tui/goblin-app'
+import { bootstrap, BootstrapError } from './bootstrap'
+import { makeProgram, termInfo } from './cli'
 
 /**
  * Launches the application with the command-line options contained in
@@ -52,55 +50,13 @@ const main = async (options: LGOptions): Promise<void> => {
 /**
  * Create Commander CLI interpreter, parse and run.
  */
-const program = new Command()
-
-program
-  .name('launch-goblin')
-  .description('Launch Goblin project launcher')
-  .option('-v, --verbose', 'Enable verbose output')
-  .option('--color-mode <colorMode>', 'Force color mode')
-
-program.action(async (opts: LGOptions) => {
-  await main({
-    ...opts,
-    launch: {
-      autoLaunch: false,
-      defaultTarget: 'dev',
-      targetFilter: makeDefaultFilter('dev'),
-    },
-  })
+const program = makeProgram({
+  run: main,
+  termInfo,
+  onError: (error: string) => {
+    console.error(error)
+    console.log('')
+    process.exit(1)
+  },
 })
-
-program
-  .command('env')
-  .description('Output execution environment details')
-  .action(async () => {
-    const env = await inspectEnvironment()
-    console.log(`Shell: ${env.shell}`)
-    console.log(`TTY: ${env.tty}`)
-    console.log(`Color Mode: ${env.colorMode}`)
-    console.log(`TERM: ${env.TERM}`)
-    console.log(`Terminal: ${env.terminal}`)
-    console.log(`Session name: ${env.nt ?? ''}`)
-    process.exit(0)
-  })
-
-program
-  .command('last')
-  .description(
-    'Launch with the most recent launch configuration, bypassing the tui.'
-  )
-  .action(async () => {
-    await main(
-      makeLGOptions({
-        verbose: false,
-        launch: {
-          autoLaunch: true,
-          defaultTarget: 'dev',
-          targetFilter: makePassThroughFilter(),
-        },
-      })
-    )
-  })
-
 program.parse()

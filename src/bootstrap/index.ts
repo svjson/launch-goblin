@@ -20,6 +20,8 @@ import { findExecutable } from '@src/system'
 import { spawnDetachedProcess, spawnProxiedProcess } from '@src/launch/launch'
 export { inspectEnvironment } from '@src/tui/framework'
 
+export { BootstrapError } from './error'
+
 /**
  * Bootstrap the application using the provided command-line options.
  *
