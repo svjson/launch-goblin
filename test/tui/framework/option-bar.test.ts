@@ -1,5 +1,5 @@
-import { createStore, HeadlessBackend, OptionBar } from '@src/tui/framework'
 import { describe, expect, it } from 'vitest'
+import { createStore, HeadlessBackend, OptionBar } from '@src/tui/framework'
 import { applicationEnvironment } from './fixtures'
 import { OptionItem } from '@src/tui/framework/option-bar'
 import { SelectionMode } from '@src/tui/framework/widget'
@@ -19,7 +19,7 @@ describe('OptionBar', () => {
           },
         },
         state: {
-          model: model,
+          model,
           store: createStore(model),
         },
       }),

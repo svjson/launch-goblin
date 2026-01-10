@@ -12,8 +12,16 @@ export interface TextFieldModel {
 
 export interface TextInputModel {
   value: string
+  cursor: number
 }
 
+/**
+ * A TextField with label and input field, suitable for use in a
+ * form.
+ *
+ * This compoent is a bare controller containing a Label and a
+ * TextInput.
+ */
 export class TextField extends Controller<Widget, TextFieldModel> {
   events = this.defineEvents({
     'text-changed': (event: TextChangedEvent) => {
@@ -59,14 +67,34 @@ export class TextField extends Controller<Widget, TextFieldModel> {
     this.focusedIndex = 1
   }
 
+  /**
+   * Get the current text value of the TextInput
+   */
   getText() {
     return this.components.textInput.getText()
   }
+
+  /**
+   * Set the current text value of the TextInput
+   *
+   * @param text The text to set
+   */
+  setText(text?: string) {
+    return this.components.textInput.setText(text)
+  }
 }
 
-export class TextInput extends Controller<Widget, { value: string }> {
+/**
+ * A single-line text input field.
+ *
+ * This is a bare-bones implementation of a text-based input field,
+ * whose rasion d'etre is that the stock dito from neo-blessed is
+ * buggy and too opinionated.
+ *
+ * Emits 'text-changed' events when the text content changes.
+ */
+export class TextInput extends Controller<Widget, TextInputModel> {
   private prevRenderBuffer = ''
-  private cursor = 0
 
   keyMap = this.defineKeys({
     left: {
@@ -118,58 +146,80 @@ export class TextInput extends Controller<Widget, { value: string }> {
           options
         )
       ),
-      model ?? { value: '' }
+      model ?? { value: '', cursor: 0 }
     )
     this.model.value ??= ''
+    this.model.cursor ??= 0
 
     this.widget.onBeforeRender(this.render.bind(this))
   }
 
+  /**
+   * Move the cursor to the start of the input field
+   *
+   * Emits 'dirty'.
+   */
   moveStart() {
-    this.cursor = 0
+    this.model.cursor = 0
     this.emit('dirty')
   }
 
+  /**
+   * Move the cursor to the end of the input field
+   *
+   * Emits 'dirty'.
+   */
   moveEnd() {
-    this.cursor = this.model.value.length
+    this.model.cursor = this.model.value.length
     this.emit('dirty')
   }
 
+  /**
+   * Move the cursor one position to the left, if possible
+   *
+   * Emits 'dirty'.
+   */
   moveLeft() {
-    this.cursor = Math.max(0, this.cursor - 1)
+    this.model.cursor = Math.max(0, this.model.cursor - 1)
     this.emit('dirty')
   }
+
+  /**
+   * Move the cursor one position to the right, if possible
+   *
+   * Emits 'dirty'.
+   */
   moveRight() {
-    this.cursor = Math.min(this.model.value.length, this.cursor + 1)
+    this.model.cursor = Math.min(this.model.value.length, this.model.cursor + 1)
     this.emit('dirty')
   }
   submit() {
     //    this.emit({ type: 'submit', value: this.model.value })
   }
   killBackwards() {
-    if (this.cursor > 0) {
+    if (this.model.cursor > 0) {
       this.model.value =
-        this.model.value.slice(0, this.cursor - 1) +
-        this.model.value.slice(this.cursor)
-      this.cursor--
+        this.model.value.slice(0, this.model.cursor - 1) +
+        this.model.value.slice(this.model.cursor)
+      this.model.cursor--
     }
     this.emit('dirty')
   }
   killForwards() {
-    if (this.cursor < this.model.value.length) {
+    if (this.model.cursor < this.model.value.length) {
       this.model.value =
-        this.model.value.slice(0, this.cursor) +
-        this.model.value.slice(this.cursor + 1)
+        this.model.value.slice(0, this.model.cursor) +
+        this.model.value.slice(this.model.cursor + 1)
     }
     this.emit('dirty')
   }
   insertChar({ ch }: KeyEvent) {
     if (ch && ch.length === 1) {
       this.model.value =
-        this.model.value.slice(0, this.cursor) +
+        this.model.value.slice(0, this.model.cursor) +
         ch +
-        this.model.value.slice(this.cursor)
-      this.cursor++
+        this.model.value.slice(this.model.cursor)
+      this.model.cursor++
     }
     this.emit('dirty')
   }
@@ -177,9 +227,9 @@ export class TextInput extends Controller<Widget, { value: string }> {
   private render() {
     if (!this.model.value) this.model.value = ''
     if (this.isFocused()) {
-      const before = this.model.value.slice(0, this.cursor)
-      const atCursor = this.model.value[this.cursor] || ' '
-      const after = this.model.value.slice(this.cursor + 1)
+      const before = this.model.value.slice(0, this.model.cursor)
+      const atCursor = this.model.value[this.model.cursor] || ' '
+      const after = this.model.value.slice(this.model.cursor + 1)
       this.widget.set(
         'text',
         before + '{inverse}' + atCursor + '{/inverse}' + after
@@ -196,7 +246,26 @@ export class TextInput extends Controller<Widget, { value: string }> {
     this.prevRenderBuffer = this.model.value
   }
 
+  /**
+   * Get the current text value
+   *
+   * @returns The current text value
+   */
   getText() {
     return this.model.value
+  }
+
+  /**
+   * Set the current text value
+   *
+   * Replaces the entire text content of the input field and places
+   * the cursor at the end of the input.
+   *
+   * @param text The text to set
+   */
+  setText(text?: string) {
+    this.model.value = text ?? ''
+    this.model.cursor = this.model.value.length
+    this.emit('dirty')
   }
 }

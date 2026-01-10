@@ -8,6 +8,7 @@
 - Keyboard shortcut: `C-l` - launch immediately
 - Keyboard shortcut: `S-↑` / `S-↓` - Cycle through configurations regardless of focused component
 - Substitute modifier-prefixed key symbols when generating key legend
+- (Jackpoint) Added TextInput.setText, for replacing text input content
 
 ### Changed
 - CLI arg for repeating last launch has been changed to `--repeat` / `-r`
