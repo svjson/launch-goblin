@@ -8,6 +8,7 @@ import {
 } from './controller'
 import { KeyMap } from './keymap'
 import { BoxOptions, Widget } from './widget'
+import { ElementOf } from './type-util'
 
 type Elem<T extends readonly unknown[]> = T[number]
 
@@ -104,6 +105,15 @@ export class CustomListBox<
   selectNext() {
     this.nextChild({ focus: this.isFocused({ down: true }) })
     this.itemFocused()
+  }
+
+  /**
+   * Get the currently selected item, if any.
+   *
+   * @returns The selected item, or `undefined` if there is none.
+   */
+  getSelectedItem(): ElementOf<Model> | undefined {
+    return this.model[this.focusedIndex]
   }
 
   itemFocused() {
