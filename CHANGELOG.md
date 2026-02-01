@@ -1,6 +1,8 @@
 # Changelog
 
-## [UNRELEASED]
+## [0.1.5] - 2026-02-01
+
+**npm** launcher - CLI overhaul + Convenience keyboard shortcuts + Improved layout
 
 ### Added
 - A CLI arg can now be passed to center launch around a different target than 'dev'
