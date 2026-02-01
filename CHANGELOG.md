@@ -4,6 +4,7 @@
 
 ### Added
 - A CLI arg can now be passed to center launch around a different target than 'dev'
+- Keyboard command: `enter` - Open dialog to edit configuration details (name and type)
 - **npm**-launcher.
 - Keyboard shortcut: `C-l` - launch immediately
 - Keyboard shortcut: `S-↑` / `S-↓` - Cycle through configurations regardless of focused component
