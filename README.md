@@ -18,7 +18,7 @@ Instead of juggling `turbo run` and `npm`/`pnpm` with endless `--filter` or `--w
 - Run targets interactively
 - Keep both shared and private launch configurations
 
-## Features (0.1.4)
+## Features
 
 - **Turborepo integration** – browse and run `turbo run` targets per module.  
 - **npm and pnpm integration** – run package.json scripts with `npm` or `pnpm` directly from the interface.  
